@@ -1,0 +1,117 @@
+<?php
+
+class LTE_DB {
+
+	protected $_conn; /* the PDO object */
+	
+	/*
+	 * Get a connection to the lte search database. Throws on failure.
+	 */
+	function __construct() {
+		$dbjson = file_get_contents("../etc/ltesearch.org/db.json");
+		$dbarr = json_decode($dbjson, TRUE);
+  
+		$hostname = $dbarr['hostname'];
+		$port = $dbarr['port'];
+		$dbname = $dbarr['dbname'];
+		$username = $dbarr['username'];
+		$password = $dbarr['password'];
+		$dbspec = "mysql:dbname=$dbname;host=$hostname;port=$port";
+		
+		$this->_conn = new PDO($dbspec, $username, $password);
+		$this->_conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); 
+	}
+
+	/* 
+	 * Fetch the api key for the named api, using the provided db connection.
+	 */
+	function fetch_api_key($apiname) {
+	    $stmt = $this->_conn->query("select apikey from api where name = '$apiname'");
+	    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+	    $stmt = null;
+	    return $result['apikey'];
+	}
+	
+	/*
+	 * checks that the given name is a known region and returns the region id. Returns
+	 * null if not found.
+	 */
+	function validate_region($region_name) {
+		$stmt = $this->_conn->query("select id from regions where name = '$region_name'");
+		$result = $stmt->fetch(PDO::FETCH_NUM);
+		$stmt = null;
+		return $result[0];
+	}
+	
+	/*
+	 * checks that the given topic name is known - returns boolean
+	 */
+	function validate_topic($topic) {
+		$lstr = strtolower($topic);
+		$stmt = $this->_conn->query("select region_id from keywords where topic = '$topic'");
+		$result = $stmt->fetch(PDO::FETCH_NUM);
+		$stmt = null;
+		return !empty($result);
+	}
+	
+	/*
+	 * Fetch the set of keywords as an array for the specified topic and region.
+	 */
+	 function fetch_keywords($topic, $region_id) {
+		$stmt = $this->_conn->query("select keyword from keywords where topic='$topic' and (region_id='$region_id' or region_id=0)");
+		$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'keyword');
+		$stmt = null;
+		return $result;
+	 }
+
+	/*
+	 * Fetch the set of configured regions.
+	 */
+	 function fetch_regions() {
+		$stmt = $this->_conn->query("select name from regions");
+		$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'name');
+		$stmt = null;
+		return $result;
+	 }
+	 
+	 /*
+	  * Fetch the search engine keys for a specified region
+	  */
+	 function fetch_engine_keys($region_id) {
+	 	$stmt = $this->_conn->query("select gcseid from engines where (region_id='$region_id' or region_id='0')");
+	 	$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'gcseid');
+	 	$stmt = null;
+	 	return $result;
+	 }
+	 
+	 /* 
+	  * Fetch the URL filters 
+	  */
+	 function fetch_url_filters($topic, $region_id) {
+	 	$stmt = $this->_conn->query("select filter from url_filters where (region_id='$region_id' or region_id=0) and topic='$topic'");
+	 	$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'filter');
+	 	$stmt = null;
+	 	return $result;
+	 }
+	 
+	 /* 
+	  * Fetch the content filters 
+	  */
+	 function fetch_content_filters($topic, $region_id) {
+	 	$stmt = $this->_conn->query("select filter from content_filters where (region_id='$region_id' or region_id=0) and topic='$topic'");
+	 	$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'filter');
+	 	$stmt = null;
+	 	return $result;
+	 }
+	 /*
+	  * Fetch papers
+	  */
+	function fetch_papers() {
+		$stmt = $this->_conn->query("select * from papers order by name");
+		$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$stmt = null;
+		return $result;
+	}
+	 
+}
+?>

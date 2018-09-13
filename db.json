@@ -1,0 +1,7 @@
+{
+	"hostname" : "localhost",
+	"port"     : "3306",
+	"dbname"   : "fred_ltesearch",
+	"username" : "fred_lteadmin",
+	"password" : "qm0K4H7z5WRp"
+}

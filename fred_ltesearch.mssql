@@ -1,0 +1,299 @@
+-- phpMyAdmin SQL Dump
+-- version 4.7.7
+-- https://www.phpmyadmin.net/
+--
+-- Host: localhost:3306
+-- Generation Time: Sep 13, 2018 at 01:57 PM
+-- Server version: 5.6.39-83.1
+-- PHP Version: 5.6.30
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `fred_ltesearch`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `api`
+--
+
+CREATE TABLE `api` (
+  `name` varchar(64) COLLATE utf8_unicode_ci NOT NULL,
+  `apikey` varchar(512) COLLATE utf8_unicode_ci NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `api`
+--
+
+INSERT INTO `api` (`name`, `apikey`) VALUES
+('custom_search', 'AIzaSyAEVAMfUoy-07Lj5pG8sGsg1Qbh5aVyW7A');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `content_filters`
+--
+
+CREATE TABLE `content_filters` (
+  `topic` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
+  `region_id` int(11) NOT NULL,
+  `filter` varchar(64) COLLATE utf8_unicode_ci NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `content_filters`
+--
+
+INSERT INTO `content_filters` (`topic`, `region_id`, `filter`) VALUES
+('climate', 0, 'carbon monoxide'),
+('climate', 0, 'business climate'),
+('climate', 0, 'political climate'),
+('climate', 0, 'warming center'),
+('climate', 0, 'warming station'),
+('climate', 0, 'classifieds'),
+('climate', 0, 'transit police'),
+('climate', 0, 'warming up'),
+('climate', 0, 'bullpen');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `engines`
+--
+
+CREATE TABLE `engines` (
+  `name` varchar(64) COLLATE utf8_unicode_ci NOT NULL,
+  `region_id` int(11) NOT NULL,
+  `gcseid` varchar(256) COLLATE utf8_unicode_ci NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `engines`
+--
+
+INSERT INTO `engines` (`name`, `region_id`, `gcseid`) VALUES
+('massachusetts', 1, '006279963128323602481:htvm83kav-u'),
+('Boston Globe and Herald', 1, '006279963128323602481:imuz_ntie-q'),
+('Seattle Region Newspapers', 2, '006279963128323602481:hwbjwbv80qq'),
+('Boston - Tier 3', 1, '006279963128323602481:abrig64lzai'),
+('national papers', 3, '006279963128323602481:v8bjmbw0dt8'),
+('Oregon', 4, '006279963128323602481:fbbcaqczi5y');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `keywords`
+--
+
+CREATE TABLE `keywords` (
+  `topic` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
+  `region_id` int(11) NOT NULL,
+  `keyword` varchar(64) COLLATE utf8_unicode_ci NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `keywords`
+--
+
+INSERT INTO `keywords` (`topic`, `region_id`, `keyword`) VALUES
+('climate', 0, 'climate'),
+('climate', 0, 'emissions'),
+('climate', 0, 'fossil fuel'),
+('climate', 0, 'warming'),
+('climate', 0, 'renewable'),
+('climate', 0, 'pipeline'),
+('climate', 0, 'solar'),
+('climate', 0, 'offshore wind'),
+('climate', 0, 'transit'),
+('climate', 0, 'divestment'),
+('climate', 0, 'greenhouse gas'),
+('climate', 0, 'carbon'),
+('climate', 0, 'environmental protection'),
+('climate', 0, 'congestion'),
+('climate', 0, 'coal'),
+('climate', 0, 'fuel economy'),
+('climate', 0, 'self-driving'),
+('democracy', 0, 'citizens united'),
+('democracy', 0, 'campaign finance');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `papers`
+--
+
+CREATE TABLE `papers` (
+  `name` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
+  `domain` varchar(256) COLLATE utf8_unicode_ci NOT NULL,
+  `lteaddr` varchar(256) COLLATE utf8_unicode_ci NOT NULL,
+  `max_words` int(11) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `papers`
+--
+
+INSERT INTO `papers` (`name`, `domain`, `lteaddr`, `max_words`) VALUES
+('Boston Globe', 'bostonglobe.com', 'letter@globe.com', 200),
+('Boston Herald', 'bostonherald.com', 'letterstoeditor@bostonherald.com', 0),
+('Lowell Sun', 'lowellsun.com', 'http://www.lowellsun.com/writealetter', 0),
+('Cape Cod Times', 'capecodtimes.com', 'letters@capecodonline.com', 200),
+('Berkshire Eagle', 'berkshireeagle.com', 'letters@berkshireeagle.com', 400),
+('South Coast Today', 'southcoasttoday.com', 'http://services.southcoasttoday.com/reader-services/submissions/letter-to-editor/', 300),
+('Christian Science Monitor', 'csmonitor.com', 'letters@csmonitor.com', 0),
+('Worcester Telegram', 'telegram.com', 'letters@telegram.com', 250),
+('Brookline Tab', 'brookline.wickedlocal.com', 'brookline@wickedlocal.com', 0),
+('Cambridge Tab', 'cambridge.wickedlocal.com', 'cambridge@wickedlocal.com', 0),
+('Arlington Advocate', 'arlington.wickedlocal.com', 'arlington@wickedlocal.com', 0),
+('Belmont Citizen', 'belmont.wickedlocal.com', 'belmont@wickedlocal.com', 0),
+('Patriot Ledger', 'patriotledger.com', 'editpage@ledger.com', 0),
+('Medford Transcript', 'medford.wickedlocal.com', 'medford@wickedlocal.com', 0),
+('Metro', 'metro.us', 'letters@metro.us', 0),
+('Attleboro Sun Chronicle', 'www.thesunchronicle.com', 'mkirby@thesunchronicle.com', 0),
+('MWDN', 'metrowestdailynews.com', 'mdnletters@wickedlocal.com', 0),
+('Watertown Tab', 'watertown.wickedlocal.com', 'watertown@wickedlocal.com', 0),
+('Harvard Crimson', 'thecrimson.com', 'letters@thecrimson.com', 0),
+('Hampshire Gazette', 'gazettenet.com', 'opinion@gazettenet.com', 0),
+('Fitchburg Sentinel & Enterprise', 'sentinelandenterprise.com', 'letters@sentinelandenterprise.com ', 0),
+('Springfield Republican', 'masslive.com', 'letters@repub.com', 0),
+('Somerville Times', 'thesomervilletimes.com', 'jclark@thesomervilletimes.com', 0),
+('Providence Journal', 'providencejournal.com', 'letters@providencejournal.com', 150),
+('Somerville Journal', 'somerville.wickedlocal.com', 'somerville@wickedlocal.com', 0),
+('Salem News', 'salemnews.com', 'https://www.salemnews.com/site/forms/online_services/letter/', 250),
+('Haverhill Eagle-Tribune', 'eagletribune.com', 'https://www.eagletribune.com/site/forms/online_services/letter/', 0),
+('Greenfield Recorder', 'recorder.com', 'http://www.recorder.com/Opinion/Submit-a-Letter', 0),
+('Milford Daily News', 'milforddailynews.com', 'mdnletters@wickedlocal.com', 0),
+('Fall River Herald News', 'heraldnews.com', 'letters@heraldnews.com', 0),
+('Barnstable Patriot', 'barnstablepatriot.com', 'letters@barnstablepatriot.com', 0),
+('Washington Post', 'washingtonpost.com', 'letters@washpost.com', 0),
+('Manchester Union Leader', 'unionleader.com', 'letters@unionleader.com', 250),
+('New York Times', 'nytimes.com', 'letters@nytimes.com', 175),
+('Concord Monitor', 'concordmonitor.com', 'http://www.concordmonitor.com/Opinion/Submit-a-Letter', 0),
+('Albany Times Union', 'timesunion.com', 'tuletters@timesunion.com', 0),
+('Hartford Courant', 'courant.com', 'letters@courant.com', 0),
+('Dorchester Reporter', 'dotnews.com', 'letters@dotnews.com', 0),
+('Gloucester Times', 'gloucestertimes.com', 'https://www.gloucestertimes.com/site/forms/online_services/letter/', 0),
+('Portland Tribune', 'portlandtribune.com', 'http://www.emailmeform.com/builder/form/P6F64czlK9qVsdN0r2', 0),
+('Oregon Live', 'oregonlive.com', 'letters@oregonian.com', 0),
+('Portland Observer', 'portlandobserver.com', 'webmaster@portlandobserver.com', 0),
+('Portland Mercury', 'portlandmercury.com', 'lovenotes@portlandmercury.com', 0),
+('Seattle Times', 'seattletimes.com', 'https://www.seattletimes.com/contact/', 0),
+('The Daily News (Washington)', 'tdn.com', 'https://tdn.com/forms/contact/letter_to_the_editor/', 0),
+('Kitsap Sun', 'kitsapsun.com', 'https://www.kitsapsun.com/pages/interactives/submit-letter/', 0),
+('Yakima Herald', 'yakimaherald.com', 'https://www.yakimaherald.com/site/forms/online_services/letter_editor/', 0),
+('Tri-City Herald', 'tri-cityherald.com', 'https://www.tri-cityherald.com/opinion/letters-to-the-editor/submit-letter/', 0),
+('The Columbian', 'columbian.com', 'http://www.columbian.com/lettertotheeditor/', 0),
+('HeraldNet (Everett)', 'heraldnet.com', 'letters@heraldnet.com', 0),
+('The Olympian', 'theolympian.com', 'https://www.theolympian.com/opinion/letters-to-the-editor/submit-letter/', 0),
+('The News Tribune (Tacoma)', 'thenewstribune.com', 'https://www.thenewstribune.com/opinion/letters-to-the-editor/submit-letter/', 0),
+('Spokesman-Review', 'spokesman.com', 'editor@spokesman.com', 0),
+('Chicago Tribune', 'chicagotribune.com', 'http://www.chicagotribune.com/news/opinion/letters/chi-submit-a-letter-to-the-editor-htmlstory.html', 0),
+('Lynn Daily Item', 'itemlive.com', 'letterstoeditor@itemlive.com', 0),
+('Los Angeles Times', 'latimes.com', 'http://www.latimes.com/opinion/la-letter-to-the-editor-htmlstory.html', 150),
+('Miami Herald', 'miamiherald.com', 'https://www.miamiherald.com/opinion/letters-to-the-editor/submit-letter/', 200),
+('Houston Chronicle', 'chron.com', 'viewpoints@chron.com', 0),
+('Denver Post', 'denverpost.com', 'https://www.denverpost.com/submit-letter/', 0),
+('Washington Post', 'washingtonpost.com', 'letters@washpost.com', 200),
+('Wall Street Journal', 'wsj.com', 'wsj.ltrs@wsj.com', 0),
+('Pittsburgh Post-Gazette', 'post-gazette.com', 'http://biz.post-gazette.com/contact/comments_form.aspx?ID=40', 0),
+('Portsmouth Herald', 'seacoastonline.com', 'http://services.seacoastonline.com/reader-services/submissions/letter-to-editor/\r\n', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `regions`
+--
+
+CREATE TABLE `regions` (
+  `id` int(11) NOT NULL,
+  `name` varchar(64) COLLATE utf8_unicode_ci NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `regions`
+--
+
+INSERT INTO `regions` (`id`, `name`) VALUES
+(1, 'Massachusetts'),
+(2, 'Washington'),
+(3, 'National'),
+(4, 'Oregon');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `url_filters`
+--
+
+CREATE TABLE `url_filters` (
+  `topic` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
+  `region_id` int(11) NOT NULL,
+  `filter` varchar(64) COLLATE utf8_unicode_ci NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `url_filters`
+--
+
+INSERT INTO `url_filters` (`topic`, `region_id`, `filter`) VALUES
+('climate', 0, '/auto'),
+('climate', 0, '/job'),
+('climate', 0, '/entertainment'),
+('climate', 0, '/sports'),
+('climate', 0, '/make-'),
+('climate', 0, '/model-'),
+('climate', 0, '/horoscope'),
+('climate', 0, '/travel'),
+('climate', 0, '/car-review'),
+('climate', 0, '/arts/'),
+('climate', 0, '/realestate'),
+('climate', 0, '/real-estate'),
+('climate', 0, 'masslive.com/living'),
+('climate', 0, 'for-sale'),
+('climate', 0, 'for_sale'),
+('climate', 0, 'for-rent'),
+('climate', 0, 'for_rent'),
+('climate', 0, '/obit'),
+('climate', 0, '/sitemap'),
+('climate', 0, '/patriots'),
+('climate', 0, '/databases'),
+('climate', 0, 'holiday_mathis'),
+('climate', 0, '/calendar'),
+('climate', 0, '/events/'),
+('climate', 0, 'directory'),
+('climate', 0, '/circular/'),
+('climate', 1, '/test2/'),
+('climate', 0, '/cnhi_network'),
+('climate', 0, '/multimedia/'),
+('climate', 0, 'dear-abby'),
+('climate', 0, '/lifestyle/'),
+('climate', 0, '/photogallery'),
+('climate', 0, '/house-and-home/'),
+('climate', 0, '/search');
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `regions`
+--
+ALTER TABLE `regions`
+  ADD PRIMARY KEY (`id`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
