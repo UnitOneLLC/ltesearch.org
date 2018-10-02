@@ -3,6 +3,7 @@ header('Access-Control-Allow-Origin: *');
 
 define('DEFAULT_TOPIC', 'climate');
 define('TOPIC', 'topic');
+define('FILTER', 'filter');
 define('ACTION', 'action');
 define('REGION', 'region');
 define('SEARCH', 'search');
@@ -12,6 +13,7 @@ define('MISSING_PARAM', "A required parameter is missing");
 define('REGION_INVALID', "Specified region not configured");
 define('MAX_RESULTS', 100);
 define('UNKNOWN_TOPIC', 'Unknown topic specified');
+define('BAD_FILTER_VALUE', 'Invalid filter argument');
 
 include "CustomSearch.php";
 include "lte_db.php";
@@ -63,11 +65,29 @@ include "lte_db.php";
 				echo return_error(UNKNOWN_TOPIC, $topic);
 			}
 			$conn = null;
+			return;
 		}
 		catch (PDOException $e) {
 			$conn = null;
 		}
 	}
+	$filter_strength = $qstr_aa[FILTER];
+	if (empty($filter_strength)) {
+		$filter_strength = CustomSearch.FILTER_STRONG;
+	}
+	else {
+		if ($filter_strength == 'off') {
+			$filter_stength = CustomSearch.FILTER_OFF;
+		}
+		else if ($filter_strength == 'weak') {
+			$filter_strength = CustomSearch.FILTER_WEAK;
+		}
+		else {
+			echo return_error(BAD_FILTER_VALUE, $filter_strength);
+			return;
+		}
+	}
+	
 	
 	if ($action == SEARCH) {
 		$region = $qstr_aa[REGION];
@@ -108,7 +128,7 @@ include "lte_db.php";
 			$all_results = array();
 			foreach ($engines as $engine) {
 				$cse = new CustomSearch($apikey, $engine, $terms_string, $url_filters, $content_filters);
-				$items = $cse->execute_search(MAX_RESULTS);
+				$items = $cse->execute_search(MAX_RESULTS, $filter_strength);
 				$all_results = array_merge($all_results, $items);
 			}
 			

@@ -1,7 +1,11 @@
 <?php
+
 class CustomSearch {
 	const HOST_URL = 'https://content.googleapis.com/customsearch/v1';
 	const MAX_ITEMS = 10;
+	const FILTER_STRONG = 'strong';
+	const FILTER_WEAK = 'weak';
+	const FILTER_OFF = 'off';
 	
 	protected $_engine_id;
 	protected $_search_terms;
@@ -51,8 +55,7 @@ class CustomSearch {
 		return $months[$s];
 	}
 	
-	function execute_search($max_items) {
-	
+	function execute_search($max_items, $filter_strength) {
 		$current_index = 1;
 		$ret_arr = array();
 		
@@ -75,11 +78,11 @@ class CustomSearch {
 			foreach($items as $item) {
 				$date_aa = self::estimate_item_date($item);
 				
-				if (!$this->filter_url($item["link"])) {
+				if (($filter_strength != CustomSearch.FILTER_OFF) and !$this->filter_url($item["link"])) {
 					continue;
 				}
 				
-				if (!$this->filter_contents($item["snippet"] . " " . $item['title'])) {
+				if (($filter_strength != CustomSearch.FILTER_OFF) and !$this->filter_contents($item["snippet"] . " " . $item['title'], $item["htmlSnippet"], $filter_strength)) {
 					continue;
 				}
 				
@@ -134,9 +137,16 @@ class CustomSearch {
 		return $is_bait;
 	}
 	
-	function filter_contents($str) {
+	function filter_contents($str, $htmlStr, $filter_strength) {
 		$passes = true;
 		$lstr = strtolower($str);
+		
+		if ($filter_strength == CustomSearch.FILTER_STRONG) {
+			if (strpos($htmlStr, '<b>') === false) {
+				return false;
+			}
+		}
+		
 		foreach ($this->_content_filters as &$filter) {
 			if (strpos($lstr, $filter) !== false) {
 				$passes = false;
@@ -144,7 +154,7 @@ class CustomSearch {
 			}
 		}
 		
-		if ($passes) {
+		if ($passes and ($filter_strength == CustomSearch.FILTER_STRONG)) {
 			$passes = ! self::looks_like_clickbait($str);
 		}
 		return $passes;

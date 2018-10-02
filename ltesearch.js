@@ -137,6 +137,10 @@ function getDigest() {
     if (topic) {
     	url += "&topic=" + topic;
     }
+    var filterStrength = getQueryVariable("filter");
+    if (filterStrength) {
+    	url += "&filter=" + filterStrength;
+    }
     
     document.cookie = "region=" + area;
 
