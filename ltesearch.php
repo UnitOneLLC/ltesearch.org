@@ -63,9 +63,9 @@ include "lte_db.php";
 			$conn = new LTE_DB();
 			if (!$conn->validate_topic($topic)) {
 				echo return_error(UNKNOWN_TOPIC, $topic);
+				return;
 			}
 			$conn = null;
-			return;
 		}
 		catch (PDOException $e) {
 			$conn = null;
@@ -81,6 +81,9 @@ include "lte_db.php";
 		}
 		else if ($filter_strength == 'weak') {
 			$filter_strength = CustomSearch.FILTER_WEAK;
+		}
+		else if ($filter_strength == 'strong') {
+			$filter_strength = CustomSearch.FILTER_STRONG;
 		}
 		else {
 			echo return_error(BAD_FILTER_VALUE, $filter_strength);

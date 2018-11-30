@@ -12,10 +12,12 @@ class CustomSearch {
 	protected $_url_filters;
 	protected $_content_filters;
 	protected $_apikey;
+	protected $_terms_array;
 	
 	function __construct($apikey, $engine, $search_terms, $url_filters, $content_filters) {
 		$this->_engine_id = $engine;
 		$this->_search_terms  = $search_terms;
+		$this->_terms_array = explode(" ", $search_terms);
 		$this->_url_filters = $url_filters;
 		$this->_content_filters = $content_filters;
 		$this->_apikey = $apikey;
@@ -143,7 +145,17 @@ class CustomSearch {
 		
 		if ($filter_strength == CustomSearch.FILTER_STRONG) {
 			if (strpos($htmlStr, '<b>') === false) {
-				return false;
+				$keyword_found = false;
+				foreach ($this->_terms_array as $t) {
+					if (strpos($str, $t) !== false) {
+						$keyword_found = true;
+						break;
+					}
+				}
+				
+				if (!$keyword_found) {
+					return false;
+				}
 			}
 		}
 		
