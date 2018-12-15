@@ -142,7 +142,7 @@ function getDigest() {
     	url += "&filter=" + filterStrength;
     }
     
-    document.cookie = "region=" + area;
+    document.cookie = "region=" + area + "; Max-Age=9999999";
 
     $.ajax({
         url: url,
