@@ -8,6 +8,7 @@ include "lte_db.php";
     <title>LTE Article Search</title>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.16/datatables.min.css"/>
     <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.16/datatables.min.js"></script>
+    <!--meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/-->
 
     <style type="text/css">
         body {
@@ -19,13 +20,13 @@ include "lte_db.php";
             padding: 20px;
         }
         
-        @media (min-width: 600px) {
+        @media  (min-width: 600px) {
         	#container {
 				max-width: 900px;
 				width: 66%;
         	}
         }
-        @media (min-width: 1000px) {
+        @media  (min-width: 1000px) {
         	#container {
 				max-width: 1100px;
 				width: 75%;
