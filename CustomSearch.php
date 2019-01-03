@@ -14,10 +14,31 @@ class CustomSearch {
 	protected $_apikey;
 	protected $_terms_array;
 	
+	function explode_term_list($term_list) {
+		$DELIM = "^";
+		$strx = '';
+		$in_quotes = false;
+		for ($i=0; $i < strlen($term_list); ++$i) {
+			$ch = $term_list[$i];
+			if ($ch === '"') {
+				$in_quotes = !$in_quotes;
+				continue;
+			}
+			if (!$in_quotes and ($ch === ' ')) {
+				$strx .= $DELIM;
+			}
+			else {
+				$strx .= $ch;
+			}
+
+		}
+		return explode($DELIM, $strx);
+	}
+
 	function __construct($apikey, $engine, $search_terms, $url_filters, $content_filters) {
 		$this->_engine_id = $engine;
 		$this->_search_terms  = $search_terms;
-		$this->_terms_array = explode(" ", $search_terms);
+		$this->_terms_array = self::explode_term_list($search_terms);
 		$this->_url_filters = $url_filters;
 		$this->_content_filters = $content_filters;
 		$this->_apikey = $apikey;
