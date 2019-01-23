@@ -6,6 +6,7 @@ class CustomSearch {
 	const FILTER_STRONG = 'strong';
 	const FILTER_WEAK = 'weak';
 	const FILTER_OFF = 'off';
+	const HIGHLIGHT_THRESHOLD = 4;
 	
 	protected $_engine_id;
 	protected $_search_terms;
@@ -117,7 +118,8 @@ class CustomSearch {
 					"pubDate" => $date_aa['year'].'-'. $date_aa['month'].'-'. $date_aa['day'],      
 					"url" => $item["link"], 
 					"title" => $item["title"],
-					"description" => $item["htmlSnippet"]);
+					"description" => $item["htmlSnippet"],
+					"highlight" => self::is_highlight($item));
 					
 				array_push($ret_arr, $ret_item);
 				
@@ -128,6 +130,15 @@ class CustomSearch {
 		} while ($current_index < $max_items);
 
 		return $ret_arr;
+	}
+	
+	function is_highlight($item) {
+		if (substr_count($item["htmlSnippet"], "<b>") >= self::HIGHLIGHT_THRESHOLD) {
+			return "true";
+		}
+		else {
+			return "false";
+		}
 	}
 	
 	function filter_url($url) {

@@ -1,10 +1,11 @@
 <?php
 include "lte_db.php";
+define("VERSION", "2.1.2")
 ?>
 <!DOCTYPE html>
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="ltesearch.js"></script>
+    <script src="ltesearch.js?ver=<?php echo VERSION;?>"></script>
     <title>LTE Article Search</title>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.16/datatables.min.css"/>
     <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.16/datatables.min.js"></script>
@@ -17,7 +18,7 @@ include "lte_db.php";
         #container {
             margin: auto;
             background-color: #e8e8f0;
-            padding: 20px;
+            padding: 10px;
         }
         
         @media  (min-width: 600px) {
@@ -33,20 +34,15 @@ include "lte_db.php";
         	}
         }
         
-        #desc_area {
-            background-color: #e8e8e8;
-            padding: 10px;
-            border-top: solid 1px #ddd;
-        }
         #controls {
             background-color: #e8e8e8;
-            padding: 20px;
+            padding: 0 0 5px;
             border-bottom: solid 1px #aaa;
             margin-bottom: 20px;
         }
-        .spacer100 {
+        .spacer {
             display: inline-block;
-            margin: 0 50px 0 50px;
+            margin: 0 15px 0 0;
         }
         #fetch {
             font-size: 13px;
@@ -62,6 +58,9 @@ include "lte_db.php";
         }
         #digest_length {
             display: none;  /* don't show page length control */
+        }
+        .row-highlight {
+            background-color: #ffa !important;
         }
      </style>
 </head>
@@ -79,7 +78,7 @@ include "lte_db.php";
 				$conn = null;
             ?>
             </select>
-            <div class="spacer100"></div>
+            <div class="spacer"></div>
             <button id="fetch">Search</button>
             <div class="spacer100">     </div>
             <div id = "loading">
@@ -97,7 +96,6 @@ include "lte_db.php";
 				</tbody>
 			</table>
 		</div>
-        <div id="desc_area"></div>
     </div>
 
 </body>

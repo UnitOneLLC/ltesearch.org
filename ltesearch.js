@@ -26,7 +26,7 @@ $(document).ready(function() {
 
     var urlVars = getUrlVars();
 
-    DATA_TABLE_OPTIONS.scrollY = Math.round($(window).height()*0.6);
+    DATA_TABLE_OPTIONS.scrollY = Math.round($(window).height()*0.7);
 
 	var bRegionSet = false;    
 	var area = document.cookie.indexOf("region=");
@@ -100,7 +100,12 @@ function buildResultTable(jsonArr) {
 
 		date = (new Date(d.pubDate.substr(0,4),parseInt(d.pubDate.substr(5,2))-1,d.pubDate.substr(8,2)));
         date = date.toLocaleDateString("en-US",{month: "short", day: "numeric"});
-        row = "<tr>";
+        if (d.highlight == "true") {
+            row = "<tr class=row-highlight>";
+        }
+        else {
+            row = "<tr>";
+        }
         row += "<td>" + date + "</td>";
         row += "<td>" + d.paper + "</td>";
         row += "<td>" + "<a target='_blank' href='" + d.url + "'>" + d.title + "</a></td>";
@@ -117,12 +122,6 @@ function walkUpToRow(e) {
         elem = elem.parentElement;
     }
     return elem ? elem : e;
-}
-
-
-function showDesc(ev) {
-    var row = walkUpToRow(ev.target);
-    $("#desc_area").html(row.tw_desc);
 }
 
 function getDigest() {
