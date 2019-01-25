@@ -132,8 +132,27 @@ class CustomSearch {
 		return $ret_arr;
 	}
 	
+	function get_bold_word_count($str) 
+	{
+		$doc = new DOMDocument();
+		$doc->loadHtml($str);
+		$bolds = $doc->getElementsByTagName('b');
+		
+		$bcount = $bolds->length;
+		$all_bold = "";
+		
+		for ($i=0; $i < $bcount; ++$i) {
+			$item = $bolds->item($i);
+			$all_bold .= $item->nodeValue . " ";
+		}
+		
+		$arr = preg_split('/\s+/', trim($all_bold));
+		return count($arr);	
+	}
+	
 	function is_highlight($item) {
-		if (substr_count($item["htmlSnippet"], "<b>") >= self::HIGHLIGHT_THRESHOLD) {
+		$n_bold = self::get_bold_word_count($item["htmlSnippet"]);
+		if ($n_bold >= self::HIGHLIGHT_THRESHOLD) {
 			return "true";
 		}
 		else {
