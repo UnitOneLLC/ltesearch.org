@@ -1,4 +1,5 @@
 <?php
+define(SECONDS_PER_DAY, 60*60*24);
 
 class CustomSearch {
 	const HOST_URL = 'https://content.googleapis.com/customsearch/v1';
@@ -78,6 +79,7 @@ class CustomSearch {
 		                "jul"=>"07","aug"=>"08","sep"=>"09","oct"=>"10","nov"=>"11","dec"=>"12");
 		return $months[$s];
 	}
+
 	
 	function execute_search($max_items, $filter_strength) {
 		$current_index = 1;
@@ -99,8 +101,17 @@ class CustomSearch {
 				break;
 			}
 
+			$now = time();
+			
 			foreach($items as $item) {
 				$date_aa = self::estimate_item_date($item);
+				
+				/* ignore items older than two days */
+				$date_str = $date_aa['month'].'/'.$date_aa['day']."/".$date_aa['year'];
+				$elapsed_days = ($now - strtotime($date_str))/SECONDS_PER_DAY;
+				if (($elapsed_days > 2) or ($elapsed_days < 0)) {
+					continue;
+				}
 				
 				if (($filter_strength != CustomSearch.FILTER_OFF) and !$this->filter_url($item["link"])) {
 					continue;
@@ -244,6 +255,15 @@ class CustomSearch {
 		}
 			
 		$pagemap = $item["pagemap"];
+		if (array_key_exists("article", $pagemap)) {
+			$article = $pagemap["article"][0];
+			if (self::try_date($article, "datepublished", $date))
+				return $date;
+			if (self::try_date($article, "datecreated", $date))
+					return $date;
+			if (self::try_date($article, "datemodified", $date))
+				return $date;
+		} 
 		if (array_key_exists("metatags", $pagemap)) {
 			$metatags = $pagemap["metatags"][0];
 			
@@ -258,20 +278,20 @@ class CustomSearch {
 			if (self::try_date($metatags, "article:published_time", $date))
 				return $date;
 		}
-		else if (array_key_exists("newsarticle", $pagemap)) {
+		if (array_key_exists("newsarticle", $pagemap)) {
 			$newsarticle = $pagemap["newsarticle"][0];
 			
 			if (self::try_date($newsarticle, "datepublished", $date)) {
 				return $date;
 			}
 		}
-		else if (array_key_exists("document", $pagemap)) {
+		if (array_key_exists("document", $pagemap)) {
 			$newsarticle = $pagemap["document"][0];
 			
 			if (self::try_date($newsarticle, "article_date_original", $date))
 				return $date;
 		}
-		
+
 		$dt = getdate();
 		$dt["day"] = $dt["mday"];
 		$dt["day"] = self::zero_pad_left($dt["day"]);
