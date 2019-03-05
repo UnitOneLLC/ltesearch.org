@@ -1,6 +1,8 @@
 <?php
 include "lte_db.php";
-define("VERSION", "2.1.2")
+define("VERSION", "2.1.3");
+define("BOOKMARK_URL", "https://groups.google.com/forum/#!forum/350ma-cambridge-media-team");
+define("BOOKMARK_TEXT", "350 MA Cambridge Media Team");
 ?>
 <!DOCTYPE html>
 <head>
@@ -62,24 +64,30 @@ define("VERSION", "2.1.2")
         .row-highlight {
             background-color: #ffa !important;
         }
+        #bookmark {
+            float: right;
+        }
      </style>
 </head>
 
 <body>
     <div id="container">
         <div id="controls">
-            <select id="region">
-            <?php
-				$conn = new LTE_DB();
-				$regions = $conn->fetch_regions();
-				foreach($regions as $region) {
-					echo "<option>$region</option>";
-				}
-				$conn = null;
-            ?>
-            </select>
-            <div class="spacer"></div>
-            <button id="fetch">Search</button>
+            <div>
+                <select id="region">
+                <?php
+    				$conn = new LTE_DB();
+    				$regions = $conn->fetch_regions();
+    				foreach($regions as $region) {
+    					echo "<option>$region</option>";
+    				}
+    				$conn = null;
+                ?>
+                </select>
+                <div class="spacer"></div>
+                <button id="fetch">Search</button>
+                <a id="bookmark" href="<?php echo BOOKMARK_URL; ?>" target="_other"><?php echo BOOKMARK_TEXT; ?></a>
+            </div>
             <div class="spacer100">     </div>
             <div id = "loading">
                 Searching . . .

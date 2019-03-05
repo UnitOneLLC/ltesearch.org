@@ -26,7 +26,7 @@ $(document).ready(function() {
 
     var urlVars = getUrlVars();
 
-    DATA_TABLE_OPTIONS.scrollY = Math.round($(window).height()*0.7);
+    DATA_TABLE_OPTIONS.scrollY = Math.round($(window).height()-180);
 
 	var bRegionSet = false;    
 	var area = document.cookie.indexOf("region=");
@@ -42,9 +42,20 @@ $(document).ready(function() {
 	if (!bRegionSet) {
 	  $("#region").val("Massachusetts");
 	}
-    
+
+    hideShowBookMark();
+
     getDigest();
+    
+    $("#region").change(hideShowBookMark);
 });
+
+function hideShowBookMark() {
+    if ($("#region").val() === "Massachusetts")
+        $("#bookmark").show();
+    else 
+        $("#bookmark").hide();
+}
 
 
 function getUrlVars() {
