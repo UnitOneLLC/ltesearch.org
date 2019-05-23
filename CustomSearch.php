@@ -277,13 +277,30 @@ class CustomSearch {
 		else
 			return false;
 	}
+	
+	function get_date_from_url($surl) {
+		$reg_ex = "/\/(20\d\d)\/(\d\d)\/(\d\d)\//";
+		if (preg_match($reg_ex, $surl, $matches) > 0) {
+			$dt = array();
+			$dt["day"] = $matches[3];
+			$dt["month"] = $matches[2];
+			$dt["year"] = $matches[1];
+			return $dt;
+		}
+		else {
+			return false;
+		}
+	}
 		
 	function estimate_item_date($item) {
 		if (!array_key_exists("pagemap", $item)) {
-			$dt = getdate();
-			$dt["day"] = $dt["mday"];
-			$dt["day"] = self::zero_pad_left($dt["day"]);
-			$dt["month"] = self::use_numeric_month($dt["month"]);			
+			$dt = self::get_date_from_url($item["link"]);
+			if ($dt === false) {
+				$dt = getdate();
+				$dt["day"] = $dt["mday"];
+				$dt["day"] = self::zero_pad_left($dt["day"]);
+				$dt["month"] = self::use_numeric_month($dt["month"]);			
+			}
 			return $dt;
 		}
 			
@@ -325,10 +342,13 @@ class CustomSearch {
 				return $date;
 		}
 
-		$dt = getdate();
-		$dt["day"] = $dt["mday"];
-		$dt["day"] = self::zero_pad_left($dt["day"]);
-		$dt["month"] = self::use_numeric_month($dt["month"]);			
+		$dt = self::get_date_from_url($item["link"]);
+		if ($dt === false) {
+			$dt = getdate();
+			$dt["day"] = $dt["mday"];
+			$dt["day"] = self::zero_pad_left($dt["day"]);
+			$dt["month"] = self::use_numeric_month($dt["month"]);
+		}
 		return $dt;
 	}
 }
