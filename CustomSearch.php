@@ -13,6 +13,7 @@ class CustomSearch {
 	protected $_search_terms;
 	protected $_url_filters;
 	protected $_content_filters;
+	protected $_title_filters;
 	protected $_apikey;
 	protected $_terms_array;
 	
@@ -37,12 +38,13 @@ class CustomSearch {
 		return explode($DELIM, $strx);
 	}
 
-	function __construct($apikey, $engine, $search_terms, $url_filters, $content_filters) {
+	function __construct($apikey, $engine, $search_terms, $url_filters, $content_filters, $title_filters) {
 		$this->_engine_id = $engine;
 		$this->_search_terms  = $search_terms;
 		$this->_terms_array = self::explode_term_list($search_terms);
 		$this->_url_filters = $url_filters;
 		$this->_content_filters = $content_filters;
+		$this->_title_filters = $title_filters;
 		$this->_apikey = $apikey;
 	}
 
@@ -81,11 +83,17 @@ class CustomSearch {
 	}
 
 	
-	function execute_search($max_items, $filter_strength) {
+	function execute_search($max_items, $filter_strength, $is_raw_mode) {
 		$current_index = 1;
 		$ret_arr = array();
+		$watchdog = 0;
 		
-		do {	
+		do {
+			$watchdog++;
+			if ($watchdog > 25) {
+				echo "WATCHDOG FAIL";
+				break;
+			}
 			$q = $this->buildQuery(self::MAX_ITEMS, $current_index);
 			$curlObj = curl_init();
 			curl_setopt($curlObj, CURLOPT_URL, $q);
@@ -95,10 +103,18 @@ class CustomSearch {
 			$json = curl_exec($curlObj);
 
 			$result_aa = json_decode($json, TRUE);
-
 			$items = $result_aa["items"];
 			if (is_null($items)) {
 				break;
+			}
+			
+			if ($is_raw_mode) {
+				$current_index += count($items);
+				$ret_arr = array_merge($ret_arr, $items);
+				if (count($ret_arr) == $max_items) 
+					break;
+					
+				continue;
 			}
 
 			$now = time();
@@ -118,6 +134,10 @@ class CustomSearch {
 				}
 				
 				if (($filter_strength != CustomSearch.FILTER_OFF) and !$this->filter_contents($item["snippet"] . " " . $item['title'], $item["htmlSnippet"], $filter_strength)) {
+					continue;
+				}
+
+				if (($filter_strength != CustomSearch.FILTER_OFF) and !$this->filter_titles($item['title'])) {
 					continue;
 				}
 				
@@ -231,6 +251,19 @@ class CustomSearch {
 		if ($passes and ($filter_strength == CustomSearch.FILTER_STRONG)) {
 			$passes = ! self::looks_like_clickbait($str);
 		}
+		return $passes;
+	}
+	
+	function filter_titles($title) {
+		$passes = true;
+		
+		foreach ($this->_title_filters as &$t) {
+			if (strpos($title, $t) !== false) {
+				$passes = false;
+				break;
+			}
+		}
+		
 		return $passes;
 	}
 	

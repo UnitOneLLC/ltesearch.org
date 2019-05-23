@@ -103,6 +103,15 @@ class LTE_DB {
 	 	$stmt = null;
 	 	return $result;
 	 }
+	/*
+	 * Fetch the title filters
+	 */
+	function fetch_title_filters($region_id) {
+		$stmt = $this->_conn->query("select blacklisted_title from title_filters where region_id='$region_id' or region_id='0'");
+		$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'blacklisted_title');
+		$stmt = null;
+		return $result;
+	}
 	 /*
 	  * Fetch papers
 	  */

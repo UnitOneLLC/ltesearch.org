@@ -1,4 +1,6 @@
 <?php
+$maintenance = false;
+
 include "lte_db.php";
 define("VERSION", "2.1.3");
 define("BOOKMARK_URL", "https://groups.google.com/forum/#!forum/350ma-cambridge-media-team");
@@ -6,8 +8,15 @@ define("BOOKMARK_TEXT", "350 MA Cambridge Media Team");
 ?>
 <!DOCTYPE html>
 <head>
+    <meta name="robots" content="noindex,nofollow">
+<?php
+    if (!$maintenance) {
+?>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="ltesearch.js?ver=<?php echo VERSION;?>"></script>
+<?php
+    }
+?>
     <title>LTE Article Search</title>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.16/datatables.min.css"/>
     <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.16/datatables.min.js"></script>
@@ -71,17 +80,27 @@ define("BOOKMARK_TEXT", "350 MA Cambridge Media Team");
 </head>
 
 <body>
+<?php
+    if ($maintenance) {
+?>
+    <DIV style="text-align:center; padding:20px;color:white;font-weight:bold;font-size: 30px">**** ltesearch.org is undergoing maintenance right now -- try again later ****</DIV>
+<?php
+    }
+    else {    
+?>    
     <div id="container">
         <div id="controls">
             <div>
                 <select id="region">
                 <?php
-    				$conn = new LTE_DB();
-    				$regions = $conn->fetch_regions();
-    				foreach($regions as $region) {
-    					echo "<option>$region</option>";
-    				}
-    				$conn = null;
+                    if (!$maintenance) {
+        				$conn = new LTE_DB();
+        				$regions = $conn->fetch_regions();
+        				foreach($regions as $region) {
+        					echo "<option>$region</option>";
+        				}
+        				$conn = null;
+                    }
                 ?>
                 </select>
                 <div class="spacer"></div>
@@ -105,5 +124,6 @@ define("BOOKMARK_TEXT", "350 MA Cambridge Media Team");
 			</table>
 		</div>
     </div>
-
+<?php }
+?>
 </body>

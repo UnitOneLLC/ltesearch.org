@@ -7,11 +7,13 @@ define('FILTER', 'filter');
 define('ACTION', 'action');
 define('REGION', 'region');
 define('SEARCH', 'search');
+define('MODE', 'mode');
+define('RAW', 'raw');
 define('GETPAPERDB', 'getpaperdb');
 define('DATABASE_FAILURE', 'Database failure');
 define('MISSING_PARAM', "A required parameter is missing");
 define('REGION_INVALID', "Specified region not configured");
-define('MAX_RESULTS', 100);
+define('MAX_RESULTS', 200);
 define('UNKNOWN_TOPIC', 'Unknown topic specified');
 define('BAD_FILTER_VALUE', 'Invalid filter argument');
 
@@ -91,8 +93,14 @@ include "lte_db.php";
 		}
 	}
 	
-	
 	if ($action == SEARCH) {
+		
+		$is_raw_mode = false;
+		$mode = $qstr_aa[MODE];
+		if (!empty($mode)) {
+			$is_raw_mode = ($mode == RAW);
+		}
+		
 		$region = $qstr_aa[REGION];
 		if (empty($region)) {
 			echo return_error(MISSING_PARAM, REGION);
@@ -123,6 +131,7 @@ include "lte_db.php";
 			$engines = $conn->fetch_engine_keys($region_id);
 			$url_filters = $conn->fetch_url_filters($topic, $region_id);
 			$content_filters = $conn->fetch_content_filters($topic, $region_id);
+			$title_filters = $conn->fetch_title_filters($region_id);
 
 			if (empty($engines)) {
 				return return_error(REGION_INVALID, $region);
@@ -130,8 +139,8 @@ include "lte_db.php";
 			
 			$all_results = array();
 			foreach ($engines as $engine) {
-				$cse = new CustomSearch($apikey, $engine, $terms_string, $url_filters, $content_filters);
-				$items = $cse->execute_search(MAX_RESULTS, $filter_strength);
+				$cse = new CustomSearch($apikey, $engine, $terms_string, $url_filters, $content_filters, $title_filters);
+				$items = $cse->execute_search(MAX_RESULTS, $filter_strength, $is_raw_mode);
 				$all_results = array_merge($all_results, $items);
 			}
 			
