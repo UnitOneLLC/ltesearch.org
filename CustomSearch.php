@@ -165,6 +165,9 @@ class CustomSearch {
 	
 	function get_bold_word_count($str) 
 	{
+		if (empty($str)) {
+			return 0;
+		}
 		$doc = new DOMDocument();
 		$doc->loadHtml($str);
 		$bolds = $doc->getElementsByTagName('b');
