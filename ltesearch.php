@@ -143,13 +143,14 @@ include "lte_db.php";
 				$items = $cse->execute_search(MAX_RESULTS, $filter_strength, $is_raw_mode);
 				$all_results = array_merge($all_results, $items);
 			}
-			
+
 			$papers = $conn->fetch_papers(); 
 			foreach($all_results as &$result) {
 				$result["paper"] = find_paper_name($papers, $result["url"]);
 			}
 			
 			$conn = null;
+			
 			echo json_encode($all_results);
 		}
 		catch (PDOException $e) {

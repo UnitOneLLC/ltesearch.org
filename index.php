@@ -2,7 +2,7 @@
 $maintenance = false;
 
 include "lte_db.php";
-define("VERSION", "2.1.3");
+define("VERSION", "2.1.4");
 define("BOOKMARK_URL", "https://groups.google.com/forum/#!forum/350ma-cambridge-media-team");
 define("BOOKMARK_TEXT", "350 MA Cambridge Media Team");
 ?>
@@ -76,6 +76,15 @@ define("BOOKMARK_TEXT", "350 MA Cambridge Media Team");
         #bookmark {
             float: right;
         }
+        #ver {
+            position: absolute;
+            bottom: 10px;
+            color: #88A;
+            font-size: 12px;
+            padding-right: 6px;
+            font-family: arial;
+            width: 100%;
+        }
      </style>
 </head>
 
@@ -124,6 +133,7 @@ define("BOOKMARK_TEXT", "350 MA Cambridge Media Team");
 			</table>
 		</div>
     </div>
+    <div id='ver'>Version <?php echo VERSION;?></div>
 <?php }
 ?>
 </body>

@@ -6,6 +6,8 @@ var DO_FILTER = true;
 var bFirstQuery = true;
 var gDataTable = null;
 
+var docTitle;
+
 var DATA_TABLE_OPTIONS = {
     "lengthMenu": [10],
     "paging": false,
@@ -20,6 +22,8 @@ var DATA_TABLE_OPTIONS = {
 }
 
 $(document).ready(function() {
+    docTitle = document.title;
+    
     $("#digest").hide();
     $("#loading").hide();
     $("#fetch").click(getDigest);
@@ -123,6 +127,7 @@ function buildResultTable(jsonArr) {
         row += "<td>" + d.pubDate + " " + d.description + "</td>";
         table.append(row);
     }
+    document.title = docTitle + " (" + jsonArr.length + ")";
 
     gDataTable = table.DataTable(DATA_TABLE_OPTIONS);
 }
@@ -136,6 +141,8 @@ function walkUpToRow(e) {
 }
 
 function getDigest() {
+    document.title = docTitle;
+    
     $("#digest tbody tr").remove();
     $("#loading").show();
     var url = 'ltesearch.php';
