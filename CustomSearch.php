@@ -1,13 +1,19 @@
 <?php
 define(SECONDS_PER_DAY, 60*60*24);
 
+function dbg($label, $var) {
+	echo $label . ": ";
+	var_dump($var);
+	echo "<br>";
+}
+
 class CustomSearch {
 	const HOST_URL = 'https://content.googleapis.com/customsearch/v1';
 	const MAX_ITEMS = 10;
 	const FILTER_STRONG = 'strong';
 	const FILTER_WEAK = 'weak';
 	const FILTER_OFF = 'off';
-	const HIGHLIGHT_THRESHOLD = 4;
+	const MAX_TERMS_LENGTH = 100;
 	
 	protected $_engine_id;
 	protected $_search_terms;
@@ -15,7 +21,7 @@ class CustomSearch {
 	protected $_content_filters;
 	protected $_title_filters;
 	protected $_apikey;
-	protected $_terms_array;
+	protected $_terms_groups;
 	
 	function explode_term_list($term_list) {
 		$DELIM = "^";
@@ -42,13 +48,14 @@ class CustomSearch {
 		$this->_engine_id = $engine;
 		$this->_search_terms  = $search_terms;
 		$this->_terms_array = self::explode_term_list($search_terms);
+		$this->_terms_groups = self::break_terms($this->_terms_array);
 		$this->_url_filters = $url_filters;
 		$this->_content_filters = $content_filters;
 		$this->_title_filters = $title_filters;
 		$this->_apikey = $apikey;
 	}
 
-	function buildQuery($number, $start_index) {
+	function build_query($number, $start_index, $orterms) {
 		$q = self::HOST_URL;
 		$q .= '?cx=' . rawurlencode($this->_engine_id);
 		$q .= '&key=' . rawurlencode($this->_apikey);
@@ -57,7 +64,7 @@ class CustomSearch {
 		$q .= "&num=$number";
 		$q .= "&start=$start_index";
 		$q .= '&q=' . rawurlencode("");
-		$q .= '&orTerms=' . rawurlencode($this->_search_terms);
+		$q .= '&orTerms=' . rawurlencode(implode(" ",$orterms));
 /*		$q .= '&excludeTerms=' . rawurlencode($this->_excludes); */
 		return $q;
 	}
@@ -81,117 +88,114 @@ class CustomSearch {
 		                "jul"=>"07","aug"=>"08","sep"=>"09","oct"=>"10","nov"=>"11","dec"=>"12");
 		return $months[$s];
 	}
+	
+	function break_terms($terms) {
+		$result = array();
+
+		$length = 0;
+		$group = array();
+		foreach($terms as $t) {
+			if (($length + strlen($t)) > self::MAX_TERMS_LENGTH) {
+				array_push($result, $group);
+				$group = array();
+				$length = 0;
+			}
+			else {
+				$length += strlen($t) + 1;
+			}
+			
+			if (strpos($t, ' ') !== false) {
+				$t = "\"" . $t . "\"";
+			}
+			
+			array_push($group, $t);
+		}
+		return $result;
+	}
 
 	
 	function execute_search($max_items, $filter_strength, $is_raw_mode) {
-		$current_index = 1;
 		$ret_arr = array();
-		$watchdog = 0;
+
+		for ($it=0; $it < count($this->_terms_groups); ++$it) {
+			$cur_group = $this->_terms_groups[$it];
+			$current_index = 1;
+			$watchdog = 0;
 		
-		do {
-			$watchdog++;
-			if ($watchdog > 25) {
-				echo "WATCHDOG FAIL";
-				break;
-			}
-			$q = $this->buildQuery(self::MAX_ITEMS, $current_index);
-			$curlObj = curl_init();
-			curl_setopt($curlObj, CURLOPT_URL, $q);
-			curl_setopt($curlObj, CURLOPT_RETURNTRANSFER, TRUE);
-			curl_setopt($curlObj, CURLOPT_HTTPGET, TRUE);
+			do {
+				$watchdog++;
+				if ($watchdog > 25) {
+					echo "WATCHDOG FAIL";
+					break;
+				}
 
-			$json = curl_exec($curlObj);
+				$q = $this->build_query(self::MAX_ITEMS, $current_index, $cur_group);
+				$curlObj = curl_init();
+				curl_setopt($curlObj, CURLOPT_URL, $q);
+				curl_setopt($curlObj, CURLOPT_RETURNTRANSFER, TRUE);
+				curl_setopt($curlObj, CURLOPT_HTTPGET, TRUE);
+				$json = curl_exec($curlObj);
+				/*dbg("JSON", $json);*/
 
-			$result_aa = json_decode($json, TRUE);
-			$items = $result_aa["items"];
-			if (is_null($items)) {
-				break;
-			}
-			
-			if ($is_raw_mode) {
+				$result_aa = json_decode($json, TRUE);
+				$items = $result_aa["items"];
+				if (is_null($items)) {
+					break;
+				}
+				
+				if ($is_raw_mode) {
+					$current_index += count($items);
+					$ret_arr = array_merge($ret_arr, $items);
+					if (count($ret_arr) == $max_items) 
+						break;
+						
+					continue;
+				}
+
+				$now = time();
+				
+				foreach($items as $item) {
+					$date_aa = self::estimate_item_date($item);
+					
+					/* ignore items older than two days */
+					$date_str = $date_aa['month'].'/'.$date_aa['day']."/".$date_aa['year'];
+					$elapsed_days = ($now - strtotime($date_str))/SECONDS_PER_DAY;
+					if (($elapsed_days > 2) or ($elapsed_days < 0)) {
+						continue;
+					}
+					
+					if (($filter_strength != CustomSearch.FILTER_OFF) and !$this->filter_url($item["link"])) {
+						continue;
+					}
+					
+					if (($filter_strength != CustomSearch.FILTER_OFF) and !$this->filter_contents($item["snippet"] . " " . $item['title'], $item["htmlSnippet"], $filter_strength)) {
+						continue;
+					}
+
+					if (($filter_strength != CustomSearch.FILTER_OFF) and !$this->filter_titles($item['title'])) {
+						continue;
+					}
+					
+					if (strlen(parse_url($item["link"], PHP_URL_PATH)) <= 1) {
+						continue;
+					}
+					
+					$ret_item = array(
+						"pubDate" => $date_aa['year'].'-'. $date_aa['month'].'-'. $date_aa['day'],      
+						"url" => $item["link"], 
+						"title" => $item["title"],
+						"description" => $item["htmlSnippet"]);
+						
+					array_push($ret_arr, $ret_item);
+					
+					if (count($ret_arr) == $max_items) 
+						break;
+				}
 				$current_index += count($items);
-				$ret_arr = array_merge($ret_arr, $items);
-				if (count($ret_arr) == $max_items) 
-					break;
-					
-				continue;
-			}
-
-			$now = time();
-			
-			foreach($items as $item) {
-				$date_aa = self::estimate_item_date($item);
-				
-				/* ignore items older than two days */
-				$date_str = $date_aa['month'].'/'.$date_aa['day']."/".$date_aa['year'];
-				$elapsed_days = ($now - strtotime($date_str))/SECONDS_PER_DAY;
-				if (($elapsed_days > 2) or ($elapsed_days < 0)) {
-					continue;
-				}
-				
-				if (($filter_strength != CustomSearch.FILTER_OFF) and !$this->filter_url($item["link"])) {
-					continue;
-				}
-				
-				if (($filter_strength != CustomSearch.FILTER_OFF) and !$this->filter_contents($item["snippet"] . " " . $item['title'], $item["htmlSnippet"], $filter_strength)) {
-					continue;
-				}
-
-				if (($filter_strength != CustomSearch.FILTER_OFF) and !$this->filter_titles($item['title'])) {
-					continue;
-				}
-				
-				if (strlen(parse_url($item["link"], PHP_URL_PATH)) <= 1) {
-					continue;
-				}
-				
-				$ret_item = array(
-					"pubDate" => $date_aa['year'].'-'. $date_aa['month'].'-'. $date_aa['day'],      
-					"url" => $item["link"], 
-					"title" => $item["title"],
-					"description" => $item["htmlSnippet"],
-					"highlight" => self::is_highlight($item));
-					
-				array_push($ret_arr, $ret_item);
-				
-				if (count($ret_arr) == $max_items) 
-					break;
-			}
-			$current_index += count($items);
-		} while ($current_index < $max_items);
+			} while (count($ret_arr) < $max_items);
+		}
 
 		return $ret_arr;
-	}
-	
-	function get_bold_word_count($str) 
-	{
-		if (empty($str)) {
-			return 0;
-		}
-		$doc = new DOMDocument();
-		$doc->loadHtml($str);
-		$bolds = $doc->getElementsByTagName('b');
-		
-		$bcount = $bolds->length;
-		$all_bold = "";
-		
-		for ($i=0; $i < $bcount; ++$i) {
-			$item = $bolds->item($i);
-			$all_bold .= $item->nodeValue . " ";
-		}
-		
-		$arr = preg_split('/\s+/', trim($all_bold));
-		return count($arr);	
-	}
-	
-	function is_highlight($item) {
-		$n_bold = self::get_bold_word_count($item["htmlSnippet"]);
-		if ($n_bold >= self::HIGHLIGHT_THRESHOLD) {
-			return "true";
-		}
-		else {
-			return "false";
-		}
 	}
 	
 	function filter_url($url) {

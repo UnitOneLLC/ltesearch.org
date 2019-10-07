@@ -2,7 +2,7 @@
 $maintenance = false;
 
 include "lte_db.php";
-define("VERSION", "2.1.4");
+define("VERSION", "2.2.0/20191006");
 define("BOOKMARK_URL", "https://groups.google.com/forum/#!forum/350ma-cambridge-media-team");
 define("BOOKMARK_TEXT", "350 MA Cambridge Media Team");
 ?>

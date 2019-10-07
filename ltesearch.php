@@ -16,6 +16,7 @@ define('REGION_INVALID', "Specified region not configured");
 define('MAX_RESULTS', 200);
 define('UNKNOWN_TOPIC', 'Unknown topic specified');
 define('BAD_FILTER_VALUE', 'Invalid filter argument');
+define('HIGHLIGHT_THRESHOLD',4);
 
 include "CustomSearch.php";
 include "lte_db.php";
@@ -31,6 +32,46 @@ include "lte_db.php";
 			}
 		}
 		return parse_url($url, PHP_URL_HOST);
+	}
+
+
+	function result_compare($r1, $r2) {
+		return strcmp($r1["url"], $r2["url"]);
+	}	
+	function remove_duplicate_urls($results) {
+		if (count($results) == 0) return;
+		
+		$sorted = $results;
+		$results = array();
+		usort($sorted, "result_compare");
+
+		# combine descriptions if URLs match
+		array_push($results, $sorted[0]);
+		for ($i=1; $i < count($sorted); ++$i) {
+			if (strcmp($sorted[$i]["url"],$sorted[$i-1]["url"]) != 0) {
+				array_push($results, $sorted[$i]);
+			}
+			else {
+				$results[count($results)-1]["description"] .= $sorted[$i]["description"];
+			}
+		}
+		
+		return $results;		
+	}
+	
+	function get_bold_word_count($str) 
+	{
+		return substr_count($str, "<b>");
+	}
+	
+	function is_highlight($item) {
+		$n_bold = get_bold_word_count($item["description"]);
+		if ($n_bold >= HIGHLIGHT_THRESHOLD) {
+			return "true";
+		}
+		else {
+			return "false";
+		}
 	}
 		
 	# begin script
@@ -144,11 +185,14 @@ include "lte_db.php";
 				$all_results = array_merge($all_results, $items);
 			}
 
+			$all_results = remove_duplicate_urls($all_results);
+			
 			$papers = $conn->fetch_papers(); 
 			foreach($all_results as &$result) {
 				$result["paper"] = find_paper_name($papers, $result["url"]);
+				$result["highlight"] = is_highlight($result);
 			}
-			
+
 			$conn = null;
 			
 			echo json_encode($all_results);
