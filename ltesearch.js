@@ -32,17 +32,24 @@ $(document).ready(function() {
 
     DATA_TABLE_OPTIONS.scrollY = Math.round($(window).height()-180);
 
-	var bRegionSet = false;    
-	var area = document.cookie.indexOf("region=");
-	if (area != -1) {
-		area = document.cookie.substr(area + "region=".length);
-		if (area.indexOf(";") != -1)
-			area = area.substr(0, area.indexOf(";"));
-		if ((area.length > 0) && (area != "null")) {
-		  $("#region").val(area);
-		  bRegionSet = true;
-		}
-	}
+    var reg = urlVars["region"];
+    var bRegionSet = false;    
+    if (reg) {
+	  $("#region").val(reg);
+	  bRegionSet = true;
+    }
+    else {
+    	var area = document.cookie.indexOf("region=");
+    	if (area != -1) {
+    		area = document.cookie.substr(area + "region=".length);
+    		if (area.indexOf(";") != -1)
+    			area = area.substr(0, area.indexOf(";"));
+    		if ((area.length > 0) && (area != "null")) {
+    		  $("#region").val(area);
+    		  bRegionSet = true;
+    		}
+    	}
+    }
 	if (!bRegionSet) {
 	  $("#region").val("Massachusetts");
 	}

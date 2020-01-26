@@ -19,10 +19,10 @@ class LTE_DB {
 		$dbspec = "mysql:dbname=$dbname;host=$hostname;port=$port";
 		
 		$this->_conn = new PDO($dbspec, $username, $password);
-		$this->_conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); 
+		$this->_conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	}
 
-	/* 
+	/*
 	 * Fetch the api key for the named api, using the provided db connection.
 	 */
 	function fetch_api_key($apiname) {
@@ -84,8 +84,8 @@ class LTE_DB {
 	 	return $result;
 	 }
 	 
-	 /* 
-	  * Fetch the URL filters 
+	 /*
+	  * Fetch the URL filters
 	  */
 	 function fetch_url_filters($topic, $region_id) {
 	 	$stmt = $this->_conn->query("select filter from url_filters where (region_id='$region_id' or region_id=0) and topic='$topic'");
@@ -94,8 +94,8 @@ class LTE_DB {
 	 	return $result;
 	 }
 	 
-	 /* 
-	  * Fetch the content filters 
+	 /*
+	  * Fetch the content filters
 	  */
 	 function fetch_content_filters($topic, $region_id) {
 	 	$stmt = $this->_conn->query("select filter from content_filters where (region_id='$region_id' or region_id=0) and topic='$topic'");
@@ -121,6 +121,26 @@ class LTE_DB {
 		$stmt = null;
 		return $result;
 	}
-	 
+	/*
+	 * add a row to the queries table
+	 */
+	function insert_qtab_row($timestamp, $region, $ipaddr, $b_filter, $n_results) {
+      $sql = "INSERT INTO queries (timestamp, region, ipaddr, filter, nResults) VALUES (?,?,?,?,?)";
+      $stmt= $this->_conn->prepare($sql);
+    
+      $stmt->execute([$timestamp, $region, $ipaddr, $b_filter, $n_results]);
+	}
+	/*
+	 * Get activity
+	 */
+	function fetch_activity($max_rows) {
+		if ($max_rows <= 0) {
+			$max_rows = 100;
+		}
+		$stmt = $this->_conn->query("select * from queries order by timestamp DESC LIMIT $max_rows");
+		$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$stmt = null;
+		return $result;
+	}
 }
 ?>

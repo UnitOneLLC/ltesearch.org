@@ -37,7 +37,7 @@ include "lte_db.php";
 
 	function result_compare($r1, $r2) {
 		return strcmp($r1["url"], $r2["url"]);
-	}	
+	}
 	function remove_duplicate_urls($results) {
 		if (count($results) == 0) return;
 		
@@ -56,10 +56,10 @@ include "lte_db.php";
 			}
 		}
 		
-		return $results;		
+		return $results;
 	}
 	
-	function get_bold_word_count($str) 
+	function get_bold_word_count($str)
 	{
 		return substr_count($str, "<b>");
 	}
@@ -120,7 +120,7 @@ include "lte_db.php";
 	}
 	else {
 		if ($filter_strength == 'off') {
-			$filter_stength = CustomSearch.FILTER_OFF;
+			$filter_strength = CustomSearch.FILTER_OFF;
 		}
 		else if ($filter_strength == 'weak') {
 			$filter_strength = CustomSearch.FILTER_WEAK;
@@ -156,7 +156,7 @@ include "lte_db.php";
 				return;
 			}
 
-			$keywords = $conn->fetch_keywords($topic, $region_id);		
+			$keywords = $conn->fetch_keywords($topic, $region_id);
 			foreach($keywords as &$kw) {
 				if (strpos($kw, ' ') !== false) {
 					$kw = '"' . $kw . '"';
@@ -187,13 +187,20 @@ include "lte_db.php";
 
 			$all_results = remove_duplicate_urls($all_results);
 			
-			$papers = $conn->fetch_papers(); 
+			$papers = $conn->fetch_papers();
 			foreach($all_results as &$result) {
 				$result["paper"] = find_paper_name($papers, $result["url"]);
 				$result["highlight"] = is_highlight($result);
 			}
+			
+			$status = update_queries($conn, $region, $filter_strength, count($all_results));
 
 			$conn = null;
+			
+			if ($status != "OK") {
+			//	echo $status;
+			//	return;
+			}
 			
 			echo json_encode($all_results);
 		}
@@ -204,3 +211,29 @@ include "lte_db.php";
 		}
 	}
 	
+	function get_ip_address() {
+    foreach (array('HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR') as $key){
+        if (array_key_exists($key, $_SERVER) === true){
+            foreach (explode(',', $_SERVER[$key]) as $ip){
+                $ip = trim($ip); // just to be safe
+
+                if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false){
+                    return $ip;
+                }
+            }
+        }
+    }
+  }
+  
+  function update_queries($pdo, $region, $filter_strength, $n_results) {
+    try {
+      $timestamp = gmdate("Y-m-d H:i:s");
+      $ipaddr = get_ip_address();
+      $b_filter = ($filter_strength == CustomSearch.FILTER_OFF) ? 0 : 1;
+      $pdo->insert_qtab_row($timestamp, $region, $ipaddr, $b_filter, $n_results);
+	  return "OK";
+    }
+    catch (PDOException $e) {
+      return $e->getMessage();
+    }
+  }
