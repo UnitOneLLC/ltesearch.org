@@ -59,7 +59,7 @@ include "lte_db.php";
          <div id="table-parent">
 			<table id="digest" class="hover stripe">
 				<thead>
-					<tr><th>Date</th><th>Region</th><th>IP Address</th><th>Filtered</th><th>Results</th></tr>
+					<tr><th>Date</th><th>Region</th><th>IP Address</th><th>Filtered</th><th>Results</th><th>User</th></tr>
 				</thead>
 				<tbody>
 

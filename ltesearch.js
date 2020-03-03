@@ -27,6 +27,7 @@ $(document).ready(function() {
     $("#digest").hide();
     $("#loading").hide();
     $("#fetch").click(getDigest);
+    $("#sign-out").click(signOut);
 
     var urlVars = getUrlVars();
 
@@ -54,12 +55,56 @@ $(document).ready(function() {
 	  $("#region").val("Massachusetts");
 	}
 
+    prepareAuth();
+
     hideShowBookMark();
 
-    getDigest();
+    if (isLoggedIn())
+        getDigest();
     
     $("#region").change(hideShowBookMark);
+    
 });
+
+function isLoggedIn() {
+    var tkn = localStorage.getItem("token");
+    return (tkn && (tkn != "null"));
+}
+
+function prepareAuth() {
+    var controls = document.getElementById("controls");
+    var authDiv = document.getElementById("auth");
+
+    if (!isLoggedIn()) {
+        controls.style.display = "none";
+        auth.style.display = "block";
+    }
+    else {
+        controls.style.display = "block";
+        auth.style.display = "none";
+    }
+}
+
+function onSignIn(googleUser) {
+    var profile = googleUser.getBasicProfile();
+    console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+    console.log('Name: ' + profile.getName());
+    console.log('Image URL: ' + profile.getImageUrl());
+    console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+    
+    localStorage.setItem("token", btoa(profile.getEmail()));
+    prepareAuth();
+    getDigest();
+}
+
+function signOut() {
+    var auth2 = gapi.auth2.getAuthInstance();
+    auth2.signOut().then(function () {
+        console.log('User signed out.');
+        localStorage.setItem("token", null);
+        prepareAuth();
+    });
+}
 
 function hideShowBookMark() {
     if ($("#region").val() === "Massachusetts")
@@ -156,6 +201,7 @@ function getDigest() {
     var area = $("#region").val();
     url += "?region=" + area;
     url += "&action=search";
+    url += "&tkn=" + localStorage.getItem("token");
     
     var topic = getQueryVariable("topic");
     if (topic) {
@@ -189,3 +235,4 @@ function getQueryVariable(variable) { // https://stackoverflow.com/questions/209
     }
     return "";
 }
+

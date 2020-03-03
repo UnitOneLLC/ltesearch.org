@@ -17,6 +17,7 @@ var DATA_TABLE_OPTIONS = {
         {type: "date", width: "100px"},
         {type: "text"},
         {type: "text"},
+        {type: "text"},
         {type: "text"}
         ]
 }
@@ -45,12 +46,16 @@ function buildActivityTable(jsonArr) {
         var row = "<tr>";
         
         var dt = (new Date(d.timestamp + " UTC")).toLocaleString();
+        var email = "";
+        if (d.usertoken != null)
+            email = atob(d.usertoken);
 
         row += "<td>" + dt + "</td>";
         row += "<td>" + d.region + "</td>";
         row += "<td>" + d.ipaddr + "</td>";
         row += "<td>" + d.filter + "</td>";
         row += "<td>" + d.nresults + "</td>";
+        row += "<td>" + email + "</td>";
         table.append(row);
     }
     gDataTable = table.DataTable(DATA_TABLE_OPTIONS);

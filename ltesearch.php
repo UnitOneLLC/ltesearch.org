@@ -3,6 +3,7 @@ header('Access-Control-Allow-Origin: *');
 
 define('DEFAULT_TOPIC', 'climate');
 define('TOPIC', 'topic');
+define('USERTOKEN', 'tkn');
 define('FILTER', 'filter');
 define('ACTION', 'action');
 define('REGION', 'region');
@@ -17,6 +18,7 @@ define('MAX_RESULTS', 200);
 define('UNKNOWN_TOPIC', 'Unknown topic specified');
 define('BAD_FILTER_VALUE', 'Invalid filter argument');
 define('HIGHLIGHT_THRESHOLD',4);
+define('AUTH_ERROR', 'Authentication error');
 
 include "CustomSearch.php";
 include "lte_db.php";
@@ -95,6 +97,17 @@ include "lte_db.php";
 			$conn = null;
 		}
 		return;
+	}
+	
+	$usertoken = $qstr_aa[USERTOKEN];
+	try {
+		$user_email = base64_decode($usertoken);
+		if (!filter_var($user_email, FILTER_VALIDATE_EMAIL)) {
+			echo return_error(AUTH_ERROR, $user_email);
+		}
+	}
+	catch (Exception $e) {
+		echo return_error(AUTH_ERROR, "");
 	}
 
 	$topic = $qstr_aa[TOPIC];
@@ -193,7 +206,7 @@ include "lte_db.php";
 				$result["highlight"] = is_highlight($result);
 			}
 			
-			$status = update_queries($conn, $region, $filter_strength, count($all_results));
+			$status = update_queries($conn, $region, $filter_strength, count($all_results), $usertoken);
 
 			$conn = null;
 			
@@ -225,12 +238,12 @@ include "lte_db.php";
     }
   }
   
-  function update_queries($pdo, $region, $filter_strength, $n_results) {
+  function update_queries($pdo, $region, $filter_strength, $n_results, $token) {
     try {
       $timestamp = gmdate("Y-m-d H:i:s");
       $ipaddr = get_ip_address();
       $b_filter = ($filter_strength == CustomSearch.FILTER_OFF) ? 0 : 1;
-      $pdo->insert_qtab_row($timestamp, $region, $ipaddr, $b_filter, $n_results);
+      $pdo->insert_qtab_row($timestamp, $region, $ipaddr, $b_filter, $n_results, $token);
 	  return "OK";
     }
     catch (PDOException $e) {

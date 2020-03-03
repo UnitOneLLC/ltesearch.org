@@ -124,11 +124,11 @@ class LTE_DB {
 	/*
 	 * add a row to the queries table
 	 */
-	function insert_qtab_row($timestamp, $region, $ipaddr, $b_filter, $n_results) {
-      $sql = "INSERT INTO queries (timestamp, region, ipaddr, filter, nResults) VALUES (?,?,?,?,?)";
+	function insert_qtab_row($timestamp, $region, $ipaddr, $b_filter, $n_results, $token) {
+      $sql = "INSERT INTO queries (timestamp, region, ipaddr, filter, nResults, usertoken) VALUES (?,?,?,?,?,?)";
       $stmt= $this->_conn->prepare($sql);
     
-      $stmt->execute([$timestamp, $region, $ipaddr, $b_filter, $n_results]);
+      $stmt->execute([$timestamp, $region, $ipaddr, $b_filter, $n_results, $token]);
 	}
 	/*
 	 * Get activity
