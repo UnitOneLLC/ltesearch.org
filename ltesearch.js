@@ -59,11 +59,7 @@ $(document).ready(function() {
 
     hideShowBookMark();
 
-    if (isLoggedIn())
-        getDigest();
-    
     $("#region").change(hideShowBookMark);
-    
 });
 
 function isLoggedIn() {

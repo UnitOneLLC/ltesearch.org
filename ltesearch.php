@@ -104,10 +104,12 @@ include "lte_db.php";
 		$user_email = base64_decode($usertoken);
 		if (!filter_var($user_email, FILTER_VALIDATE_EMAIL)) {
 			echo return_error(AUTH_ERROR, $user_email);
+			return;
 		}
 	}
 	catch (Exception $e) {
 		echo return_error(AUTH_ERROR, "");
+		return;
 	}
 
 	$topic = $qstr_aa[TOPIC];
@@ -125,6 +127,8 @@ include "lte_db.php";
 		}
 		catch (PDOException $e) {
 			$conn = null;
+			echo return_error(DATABASE_FAILURE, "topic");
+			return;
 		}
 	}
 	$filter_strength = $qstr_aa[FILTER];
