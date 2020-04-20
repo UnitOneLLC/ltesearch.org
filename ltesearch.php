@@ -41,7 +41,7 @@ include "lte_db.php";
 		return strcmp($r1["url"], $r2["url"]);
 	}
 	function remove_duplicate_urls($results) {
-		if (count($results) == 0) return;
+		if (count($results) == 0) return array();
 		
 		$sorted = $results;
 		$results = array();
