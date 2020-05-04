@@ -110,6 +110,9 @@ class CustomSearch {
 			
 			array_push($group, $t);
 		}
+		if (count($group) > 0)
+			array_push($result, $group);
+
 		return $result;
 	}
 

@@ -197,11 +197,14 @@ function getDigest() {
     var area = $("#region").val();
     url += "?region=" + area;
     url += "&action=search";
-    url += "&tkn=" + localStorage.getItem("token");
     
     var topic = getQueryVariable("topic");
     if (topic) {
     	url += "&topic=" + topic;
+    }
+    var specificSearch = getQueryVariable("s");
+    if (specificSearch) {
+        url += "&s=" + encodeURIComponent(specificSearch);
     }
     var filterStrength = getQueryVariable("filter");
     if (filterStrength) {
@@ -212,11 +215,12 @@ function getDigest() {
 
     $.ajax({
         url: url,
-        type: 'GET',
+        type: 'POST',
+        data: {"tkn":localStorage.getItem("token")},
         success: function(data) { $("#digest").show(); $("#loading").hide(); buildResultTable(JSON.parse(data)) },
         cache: false,
         contentType: false,
-        processData: false
+        processData: true
     });
 }
 

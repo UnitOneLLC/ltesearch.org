@@ -10,6 +10,7 @@ define('REGION', 'region');
 define('SEARCH', 'search');
 define('MODE', 'mode');
 define('RAW', 'raw');
+define('KWSEARCH', 's');
 define('GETPAPERDB', 'getpaperdb');
 define('DATABASE_FAILURE', 'Database failure');
 define('MISSING_PARAM', "A required parameter is missing");
@@ -75,6 +76,18 @@ include "lte_db.php";
 			return "false";
 		}
 	}
+	
+	function get_form_variables() {
+		$result = array();
+		$post_args = explode("&", file_get_contents('php://input'));
+		for ($i=0; $i < count($post_args); $i++) {
+			$arg_pair = explode("=", $post_args[$i]);
+			if (count($arg_pair) == 2) {
+				$result[$arg_pair[0]] = $arg_pair[1];
+			}
+		}
+		return $result;
+	}
 		
 	# begin script
 
@@ -99,7 +112,12 @@ include "lte_db.php";
 		return;
 	}
 	
-	$usertoken = $qstr_aa[USERTOKEN];
+
+	$form_vars = get_form_variables();
+
+	$usertoken = $form_vars["tkn"];
+
+
 	try {
 		$user_email = base64_decode($usertoken);
 		if (!filter_var($user_email, FILTER_VALIDATE_EMAIL)) {
@@ -173,16 +191,22 @@ include "lte_db.php";
 				return;
 			}
 
-			$keywords = $conn->fetch_keywords($topic, $region_id);
-			foreach($keywords as &$kw) {
-				if (strpos($kw, ' ') !== false) {
-					$kw = '"' . $kw . '"';
+			$kw_search = $qstr_aa[KWSEARCH];
+			$keywords = array();
+			if (empty($kw_search)) {
+				$keywords = $conn->fetch_keywords($topic, $region_id);
+				foreach($keywords as &$kw) {
+					if (strpos($kw, ' ') !== false) {
+						$kw = '"' . $kw . '"';
+					}
 				}
+			}
+			else {
+				$keywords[0] = '"' . $kw_search . '"';
 			}
 	
 			$randomized = $keywords;
 			shuffle($randomized);
-	
 			$terms_string = implode(" ", $randomized);
 	
 			$apikey = $conn->fetch_api_key('custom_search');
