@@ -116,6 +116,7 @@ include "lte_db.php";
 	$form_vars = get_form_variables();
 
 	$usertoken = $form_vars["tkn"];
+	$usertoken = urldecode($usertoken);
 
 
 	try {
