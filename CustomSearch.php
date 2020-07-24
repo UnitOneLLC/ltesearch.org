@@ -1,5 +1,5 @@
 <?php
-define(SECONDS_PER_DAY, 60*60*24);
+define("SECONDS_PER_DAY", 60*60*24);
 
 function dbg($label, $var) {
 	echo $label . ": ";

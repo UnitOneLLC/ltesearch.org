@@ -29,12 +29,19 @@ include "lte_db.php";
 	}
 	
 	function find_paper_name($papers, $url) {
+		$matchlen = 0;
+		$matched = parse_url($url, PHP_URL_HOST);
+		
 		foreach($papers as $paper) {
-			if (strpos($url, trim($paper["domain"])) !== false) {
-				return $paper["name"];
+			$trimmed = trim($paper["domain"]);
+			if (strpos($url, $trimmed) !== false) {
+				if (strlen($trimmed) > $matchlen) {
+					$matchlen = strlen($trimmed);
+					$matched = $paper["name"];
+				}
 			}
 		}
-		return parse_url($url, PHP_URL_HOST);
+		return $matched;
 	}
 
 
