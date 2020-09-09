@@ -12,7 +12,16 @@ var DATA_TABLE_OPTIONS = {
     "paging": false,
     "scrollY": "80vh",
     "scrollCollapse": true,
-    "order": [ [0, "desc"], [1, "asc"]]
+    "order": [ [0, "desc"], [1, "asc"]],
+    "columns": [
+        {type: "date", width: "150px"},
+        {type: "text"},
+        {type: "text"},
+        {type: "text"},
+        {type: "text"},
+        {type: "text"}
+        ]
+        
 }
 
 $(document).ready(function() {
