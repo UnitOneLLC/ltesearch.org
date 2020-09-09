@@ -242,7 +242,7 @@ include "lte_db.php";
 				$result["highlight"] = is_highlight($result);
 			}
 			
-			$status = update_queries($conn, $region, $filter_strength, count($all_results), $usertoken);
+			$status = update_queries($conn, $region, $topic, count($all_results), $usertoken);
 
 			$conn = null;
 			
@@ -274,12 +274,12 @@ include "lte_db.php";
     }
   }
   
-  function update_queries($pdo, $region, $filter_strength, $n_results, $token) {
+  function update_queries($pdo, $region, $topic, $n_results, $token) {
     try {
       $timestamp = gmdate("Y-m-d H:i:s");
       $ipaddr = get_ip_address();
       $b_filter = ($filter_strength == CustomSearch::FILTER_OFF) ? 0 : 1;
-      $pdo->insert_qtab_row($timestamp, $region, $ipaddr, $b_filter, $n_results, $token);
+      $pdo->insert_qtab_row($timestamp, $region, $ipaddr, $topic, $n_results, $token);
 	  return "OK";
     }
     catch (PDOException $e) {

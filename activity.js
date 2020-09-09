@@ -19,7 +19,7 @@ $(document).ready(function() {
     buildActivityTable(activity_json);
 });
 
-// date region ipaddr filter nresults
+// date region ipaddr topic nresults
 
 function buildActivityTable(jsonArr) {
 	if (!Array.isArray(jsonArr)) {
@@ -44,7 +44,7 @@ function buildActivityTable(jsonArr) {
         row += "<td>" + dt + "</td>";
         row += "<td>" + d.region + "</td>";
         row += "<td>" + d.ipaddr + "</td>";
-        row += "<td>" + d.filter + "</td>";
+        row += "<td>" + d.topic + "</td>";
         row += "<td>" + d.nresults + "</td>";
         row += "<td>" + email + "</td>";
         table.append(row);
