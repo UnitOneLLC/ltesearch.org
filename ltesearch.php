@@ -159,17 +159,17 @@ include "lte_db.php";
 	}
 	$filter_strength = $qstr_aa[FILTER];
 	if (empty($filter_strength)) {
-		$filter_strength = CustomSearch.FILTER_STRONG;
+		$filter_strength = CustomSearch::FILTER_STRONG;
 	}
 	else {
 		if ($filter_strength == 'off') {
-			$filter_strength = CustomSearch.FILTER_OFF;
+			$filter_strength = CustomSearch::FILTER_OFF;
 		}
 		else if ($filter_strength == 'weak') {
-			$filter_strength = CustomSearch.FILTER_WEAK;
+			$filter_strength = CustomSearch::FILTER_WEAK;
 		}
 		else if ($filter_strength == 'strong') {
-			$filter_strength = CustomSearch.FILTER_STRONG;
+			$filter_strength = CustomSearch::FILTER_STRONG;
 		}
 		else {
 			echo return_error(BAD_FILTER_VALUE, $filter_strength);
@@ -278,7 +278,7 @@ include "lte_db.php";
     try {
       $timestamp = gmdate("Y-m-d H:i:s");
       $ipaddr = get_ip_address();
-      $b_filter = ($filter_strength == CustomSearch.FILTER_OFF) ? 0 : 1;
+      $b_filter = ($filter_strength == CustomSearch::FILTER_OFF) ? 0 : 1;
       $pdo->insert_qtab_row($timestamp, $region, $ipaddr, $b_filter, $n_results, $token);
 	  return "OK";
     }

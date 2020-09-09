@@ -1,5 +1,5 @@
 <?php
-define("VERSION", "2.2.0/20200122");
+define("VERSION", "2.2.1/20200909");
 include "lte_db.php";
 ?>
 <!DOCTYPE html>
@@ -9,8 +9,8 @@ include "lte_db.php";
     <script src="activity.js?ver=<?php echo VERSION;?>"></script>
 
     <title>LTE Search Activity</title>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.16/datatables.min.css"/>
-    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.16/datatables.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css"/>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
     <!--meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/-->
 
     <script type="text/javascript">

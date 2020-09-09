@@ -9,23 +9,14 @@ var gDataTable = null;
 var docTitle = window.docTitle;
 
 var DATA_TABLE_OPTIONS = {
-    "lengthMenu": [10],
     "paging": false,
-    "scrollY": 400,
-    "order": [ [0, "desc"], [1, "asc"]],
-    "columns": [
-        {type: "date", width: "100px"},
-        {type: "text"},
-        {type: "text"},
-        {type: "text"},
-        {type: "text"}
-        ]
+    "scrollY": "80vh",
+    "scrollCollapse": true,
+    "order": [ [0, "desc"], [1, "asc"]]
 }
 
 $(document).ready(function() {
-
     buildActivityTable(activity_json);
-    
 });
 
 // date region ipaddr filter nresults

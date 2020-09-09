@@ -156,7 +156,7 @@ class CustomSearch {
 				}
 
 				$now = time();
-				
+				date_default_timezone_set('America/New_York');
 				foreach($items as $item) {
 					$date_aa = self::estimate_item_date($item);
 					
@@ -167,15 +167,15 @@ class CustomSearch {
 						continue;
 					}
 					
-					if (($filter_strength != CustomSearch.FILTER_OFF) and !$this->filter_url($item["link"])) {
+					if (($filter_strength != self::FILTER_OFF) and !$this->filter_url($item["link"])) {
 						continue;
 					}
 					
-					if (($filter_strength != CustomSearch.FILTER_OFF) and !$this->filter_contents($item["snippet"] . " " . $item['title'], $item["htmlSnippet"], $filter_strength)) {
+					if (($filter_strength != self::FILTER_OFF) and !$this->filter_contents($item["snippet"] . " " . $item['title'], $item["htmlSnippet"], $filter_strength)) {
 						continue;
 					}
 
-					if (($filter_strength != CustomSearch.FILTER_OFF) and !$this->filter_titles($item['title'])) {
+					if (($filter_strength != self::FILTER_OFF) and !$this->filter_titles($item['title'])) {
 						continue;
 					}
 					
@@ -235,7 +235,7 @@ class CustomSearch {
 		$passes = true;
 		$lstr = strtolower($str);
 		
-		if ($filter_strength == CustomSearch.FILTER_STRONG) {
+		if ($filter_strength == self::FILTER_STRONG) {
 			if (strpos($htmlStr, '<b>') === false) {
 				$keyword_found = false;
 				foreach ($this->_terms_array as $t) {
@@ -258,7 +258,7 @@ class CustomSearch {
 			}
 		}
 		
-		if ($passes and ($filter_strength == CustomSearch.FILTER_STRONG)) {
+		if ($passes and ($filter_strength == self::FILTER_STRONG)) {
 			$passes = ! self::looks_like_clickbait($str);
 		}
 		return $passes;
@@ -354,6 +354,7 @@ class CustomSearch {
 
 		$dt = self::get_date_from_url($item["link"]);
 		if ($dt === false) {
+			date_default_timezone_set('America/New_York');
 			$dt = getdate();
 			$dt["day"] = $dt["mday"];
 			$dt["day"] = self::zero_pad_left($dt["day"]);

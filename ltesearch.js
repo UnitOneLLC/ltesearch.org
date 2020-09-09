@@ -9,13 +9,13 @@ var gDataTable = null;
 var docTitle;
 
 var DATA_TABLE_OPTIONS = {
-    "lengthMenu": [10],
     "paging": false,
-    "scrollY": 400,
+    "scrollY": "75vh",
+    "scrollCollapse": true,
     "order": [ [0, "desc"], [1, "asc"]],
     "columns": [
         {type: "date", width: "100px"},
-        {type: "text"},
+        {type: "text", width: "150px"},
         {type: "html"},
         {type: "text"}
         ]
@@ -30,8 +30,6 @@ $(document).ready(function() {
     $("#sign-out").click(signOut);
 
     var urlVars = getUrlVars();
-
-    DATA_TABLE_OPTIONS.scrollY = Math.round($(window).height()-180);
 
     var reg = urlVars["region"];
     var bRegionSet = false;    

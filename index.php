@@ -29,8 +29,8 @@ function _bot_detected() {
     }
 ?>
     <title>LTE Article Search</title>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.16/datatables.min.css"/>
-    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.16/datatables.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css"/>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
     <!--meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/-->
 
     <style type="text/css">
