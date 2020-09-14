@@ -44,8 +44,8 @@ function buildActivityTable(jsonArr) {
 //		date = (new Date(d.pubDate.substr(0,4),parseInt(d.pubDate.substr(5,2))-1,d.pubDate.substr(8,2)));
 //        date = date.toLocaleDateString("en-US",{month: "short", day: "numeric"});
         var row = "<tr>";
-        
-        var dt = (new Date(d.timestamp + " UTC")).toLocaleString();
+        d.timestamp = d.timestamp.substr(0,10) + 'T' + d.timestamp.substr(11) + "-00:00";
+        var dt = (new Date(d.timestamp)).toLocaleString('en-US',{"hour12":false});
         var email = "";
         if (d.usertoken != null)
             email = atob(d.usertoken);
