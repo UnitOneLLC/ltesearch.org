@@ -66,29 +66,45 @@ function isLoggedIn() {
 }
 
 function prepareAuth() {
+console.debug("enter prepareAuth");
     var controls = document.getElementById("controls");
     var authDiv = document.getElementById("auth");
 
     if (!isLoggedIn()) {
+console.debug("NOT logged in");
         controls.style.display = "none";
         auth.style.display = "block";
     }
     else {
+console.debug("Login OK already");
         controls.style.display = "block";
         auth.style.display = "none";
     }
 }
 
 function onSignIn(googleUser) {
-    var profile = googleUser.getBasicProfile();
-    console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-    console.log('Name: ' + profile.getName());
-    console.log('Image URL: ' + profile.getImageUrl());
-    console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
-    
-    localStorage.setItem("token", btoa(profile.getEmail()));
-    prepareAuth();
-    getDigest();
+    try {
+        console.log("onSignIn: call getBasicProfile");
+        var profile = googleUser.getBasicProfile();
+        console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+        console.log('Name: ' + profile.getName());
+        console.log('Image URL: ' + profile.getImageUrl());
+        console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+        
+        localStorage.setItem("token", btoa(profile.getEmail()));
+        prepareAuth();
+        getDigest();
+    } catch (e) {
+        console.log("auth exception: " + e.message);
+        $("body")[0].append(" [" + e.message + "]");
+        window.alert("auth fail: " + e.message);
+    }
+}
+
+function onAuthFail(e) {
+    window.alert("auth fail: " + e.error);
+    window.alert(e.error);
+    $("body")[0].append(" [" + e.error + "]");
 }
 
 function signOut() {

@@ -120,7 +120,7 @@ function _bot_detected() {
     <div id="container">
         <div id="auth">
             <span id="auth-prompt">You must sign in. </span>
-            <div id="auth-btn" class="g-signin2" data-onsuccess="onSignIn"></div>
+            <div id="auth-btn" class="g-signin2" data-onsuccess="onSignIn" data-onfailure="onAuthFail"></div>
         </div>
         <div id="controls">
             <div>
