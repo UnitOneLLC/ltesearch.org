@@ -176,7 +176,10 @@ function buildResultTable(jsonArr) {
         d = jsonArr[i];
 
 		date = (new Date(d.pubDate.substr(0,4),parseInt(d.pubDate.substr(5,2))-1,d.pubDate.substr(8,2)));
-        date = date.toLocaleDateString("en-US",{month: "short", day: "numeric"});
+//        date = date.toLocaleDateString("en-US",{month: "short", day: "numeric"});
+        
+        date = Intl.DateTimeFormat('en-US').format(date);
+        
         if (d.highlight == "true") {
             row = "<tr class=row-highlight>";
         }
