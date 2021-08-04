@@ -220,6 +220,7 @@ include "lte_db.php";
 			$apikey = $conn->fetch_api_key('custom_search');
 			$engines = $conn->fetch_engine_keys($region_id);
 			$url_filters = $conn->fetch_url_filters($topic, $region_id);
+			$url_suffixes_to_strip = $conn->fetch_url_removal_suffixes($topic, $region_id);
 			$content_filters = $conn->fetch_content_filters($topic, $region_id);
 			$title_filters = $conn->fetch_title_filters($region_id);
 
@@ -229,7 +230,7 @@ include "lte_db.php";
 			
 			$all_results = array();
 			foreach ($engines as $engine) {
-				$cse = new CustomSearch($apikey, $engine, $terms_string, $url_filters, $content_filters, $title_filters);
+				$cse = new CustomSearch($apikey, $engine, $terms_string, $url_filters, $content_filters, $title_filters, $url_suffixes_to_strip);
 				$items = $cse->execute_search(MAX_RESULTS, $filter_strength, $is_raw_mode);
 				$all_results = array_merge($all_results, $items);
 			}

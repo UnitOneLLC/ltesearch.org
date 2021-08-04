@@ -44,7 +44,7 @@ class CustomSearch {
 		return explode($DELIM, $strx);
 	}
 
-	function __construct($apikey, $engine, $search_terms, $url_filters, $content_filters, $title_filters) {
+	function __construct($apikey, $engine, $search_terms, $url_filters, $content_filters, $title_filters, $url_suffixes_to_strip) {
 		$this->_engine_id = $engine;
 		$this->_search_terms  = $search_terms;
 		$this->_terms_array = self::explode_term_list($search_terms);
@@ -53,6 +53,7 @@ class CustomSearch {
 		$this->_content_filters = $content_filters;
 		$this->_title_filters = $title_filters;
 		$this->_apikey = $apikey;
+		$this->suffixes = $url_suffixes_to_strip;
 	}
 
 	function build_query($number, $start_index, $orterms) {
@@ -167,6 +168,17 @@ class CustomSearch {
 						continue;
 					}
 					
+					if ($filter_strength != self::FILTER_OFF) {
+						$url = $item["link"];
+						foreach ($this->suffixes as $suf) {
+							$ending = substr($url,  strlen($url) - strlen($suf));
+							if (strcmp($ending, $suf) == 0) {
+								$item["link"] = substr($url, 0, strlen($url) - strlen($suf));
+								break;
+							}
+						}
+					}
+					
 					if (($filter_strength != self::FILTER_OFF) and !$this->filter_url($item["link"])) {
 						continue;
 					}
@@ -183,11 +195,13 @@ class CustomSearch {
 						continue;
 					}
 					
+					$descr = str_replace("<b>...</b>", "...", $item["htmlSnippet"]);
+					
 					$ret_item = array(
 						"pubDate" => $date_aa['year'].'-'. $date_aa['month'].'-'. $date_aa['day'],      
 						"url" => $item["link"], 
 						"title" => $item["title"],
-						"description" => $item["htmlSnippet"]);
+						"description" => $descr);
 						
 					array_push($ret_arr, $ret_item);
 					
@@ -234,6 +248,8 @@ class CustomSearch {
 	function filter_contents($str, $htmlStr, $filter_strength) {
 		$passes = true;
 		$lstr = strtolower($str);
+		
+		$htmlStr = str_replace("<b>...</b>", "...", $htmlStr);
 		
 		if ($filter_strength == self::FILTER_STRONG) {
 			if (strpos($htmlStr, '<b>') === false) {

@@ -88,11 +88,20 @@ class LTE_DB {
 	  * Fetch the URL filters
 	  */
 	 function fetch_url_filters($topic, $region_id) {
-	 	$stmt = $this->_conn->query("select filter from url_filters where (region_id='$region_id' or region_id=0) and topic='$topic'");
+	 	$stmt = $this->_conn->query("select filter from url_filters where (region_id='$region_id' or region_id=0) and topic='$topic' and remove_suffix=false");
 	 	$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'filter');
 	 	$stmt = null;
 	 	return $result;
 	 }
+	/*
+	* Fetch the URL filters
+	*/
+	function fetch_url_removal_suffixes($topic, $region_id) {
+		$stmt = $this->_conn->query("select filter from url_filters where (region_id='$region_id' or region_id=0) and topic='$topic' and remove_suffix=true");
+		$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'filter');
+		$stmt = null;
+		return $result;
+	}
 	 
 	 /*
 	  * Fetch the content filters
