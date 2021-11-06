@@ -2,7 +2,7 @@
 $maintenance = false;
 
 include "lte_db.php";
-define("VERSION", "2.2.5/20200724");
+define("VERSION", "2.2.6/20211106");
 define("BOOKMARK_URL", "https://groups.google.com/forum/#!forum/350ma-cambridge-media-team");
 define("BOOKMARK_TEXT", "350 MA Cambridge Media Team");
 
@@ -23,7 +23,8 @@ function _bot_detected() {
     if (!$maintenance) {
 ?>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+        <!-- OLD GOOGLE AUTH script src="https://apis.google.com/js/platform.js" async defer></script-->
     <script src="ltesearch.js?ver=<?php echo VERSION;?>"></script>
 <?php
     }
@@ -120,7 +121,25 @@ function _bot_detected() {
     <div id="container">
         <div id="auth">
             <span id="auth-prompt">You must sign in. </span>
-            <div id="auth-btn" class="g-signin2" data-onsuccess="onSignIn" data-onfailure="onAuthFail"></div>
+            
+            <div id="g_id_onload"
+                data-client_id="139675035932-s3i8081v6er03o89aes68ujirk1b99d6.apps.googleusercontent.com"
+                data-context="signin"
+                data-ux_mode="popup"
+                data-callback="handleGoogleAuth"
+                data-auto_prompt="false">
+            </div>
+            
+            <div class="g_id_signin"
+                data-type="standard"
+                data-shape="rectangular"
+                data-theme="outline"
+                data-text="signin_with"
+                data-size="large"
+                data-logo_alignment="left">
+            </div>
+            
+            <!-- OLD GOOGLE AUTH div id="auth-btn" class="g-signin2" data-onsuccess="onSignIn" data-onfailure="onAuthFail"></div-->
         </div>
         <div id="controls">
             <div>

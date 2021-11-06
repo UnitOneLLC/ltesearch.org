@@ -82,6 +82,25 @@ console.debug("Login OK already");
     }
 }
 
+function handleGoogleAuth(credResponse) {
+    try {
+        console.log("auth: clientId=" + credResponse.clientId);
+        console.log("auth: credential=" + credResponse.credential);
+        
+        var jwt = credResponse.credential.split(".");
+        var decoded = atob(jwt[1]); // decode payload
+        payload = JSON.parse(decoded);
+        localStorage.setItem("token", btoa(payload.email));
+        prepareAuth();
+        getDigest();
+    } catch (e) {
+        console.log("auth exception: " + e.message);
+        $("body")[0].append(" [" + e.message + "]");
+        window.alert("auth fail: " + e.message);
+    }
+}
+
+// this is the old Google auth code —– not used now
 function onSignIn(googleUser) {
     try {
         console.log("onSignIn: call getBasicProfile");
