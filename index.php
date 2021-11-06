@@ -158,7 +158,9 @@ function _bot_detected() {
                 <div class="spacer"></div>
                 <button id="fetch">Search</button>
                 <button id="sign-out">Sign out</button>
-                <a id="bookmark" href="<?php echo BOOKMARK_URL; ?>" target="_other"><?php echo BOOKMARK_TEXT; ?></a>
+                <select name="paper-lookup" style="float:right; width:150px;">
+                    <option value=",0">&lt;filter on paper&gt;</option>
+                </select>
             </div>
             <div class="spacer100">     </div>
             <div id = "loading">

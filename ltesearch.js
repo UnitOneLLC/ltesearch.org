@@ -28,6 +28,9 @@ $(document).ready(function() {
     $("#loading").hide();
     $("#fetch").click(getDigest);
     $("#sign-out").click(signOut);
+    
+    var sel = document.querySelector("select[name=paper-lookup]");
+    sel.addEventListener("change", doFilterPaper)
 
     var urlVars = getUrlVars();
 
@@ -54,10 +57,6 @@ $(document).ready(function() {
 	}
 
     prepareAuth();
-
-    hideShowBookMark();
-
-    $("#region").change(hideShowBookMark);
 });
 
 function isLoggedIn() {
@@ -81,6 +80,18 @@ console.debug("Login OK already");
         auth.style.display = "none";
     }
 }
+
+
+function doFilterPaper() {
+    var sel = document.querySelector("select[name=paper-lookup]");
+    var paper = sel.value.split(",")[0];
+    
+    
+    var search = document.querySelector("input[type=search]");
+    search.value = paper;
+    $(search).trigger("paste");
+}
+
 
 function handleGoogleAuth(credResponse) {
     try {
@@ -191,6 +202,8 @@ function buildResultTable(jsonArr) {
     	bFirstQuery = false;
     }
     
+    var paperCounts = {};
+    
     for (i in jsonArr) {
         d = jsonArr[i];
 
@@ -210,7 +223,33 @@ function buildResultTable(jsonArr) {
         row += "<td>" + "<a target='_blank' href='" + d.url + "'>" + d.title + "</a></td>";
         row += "<td>" + d.pubDate + " " + d.description + "</td>";
         table.append(row);
+        
+        if (paperCounts[d.paper]) {
+            paperCounts[d.paper][1]++
+        }
+        else {
+            paperCounts[d.paper] = [d.paper, 1];
+        }
     }
+    
+    var sel = document.querySelector("select[name=paper-lookup]");
+    for (var i=sel.children.length-1; i > 0; i--) {
+        sel.children[i].remove();
+    }
+    
+    var sortedPapers = [];
+    for (p in paperCounts)
+        sortedPapers[sortedPapers.length] = p;
+    sortedPapers.sort();
+    
+    for (var i=0; i < sortedPapers.length; ++i) {
+        var p = sortedPapers[i];
+        var opt = document.createElement("option");
+        opt.value = paperCounts[p];
+        opt.text = p + " (" + paperCounts[p][1] + ")";
+        sel.appendChild(opt);
+    }
+    
     document.title = docTitle + " (" + jsonArr.length + ")";
 
     gDataTable = table.DataTable(DATA_TABLE_OPTIONS);
