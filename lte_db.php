@@ -130,6 +130,14 @@ class LTE_DB {
 		$stmt = null;
 		return $result;
 	}
+	
+	function fetch_paper_by_domain($domain) {
+		$sql = "select * from papers where domain like '%$domain'";
+		$stmt = $this->_conn->query($sql);
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+		$stmt = null;
+		return $result;
+	}
 	/*
 	 * add a row to the queries table
 	 */
