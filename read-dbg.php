@@ -1,19 +1,15 @@
 <?php
 	include "lte_db.php";
 	
-	$using_alternates = false;
-	$trace = 0;
-	
+	error_reporting(E_ERROR | E_PARSE);
+		
 	function walkDom($elem, $visit) {
-		global $trace;
-		if ($trace >= 5) {
-			if (get_class($elem) == 'DOMElement') {
-				$tag = $elem->nodeName;
-				$cls = $elem->getAttribute("class");
-				$id = $elem->getAttribute("id");
-				dbg_trace(5, "DOM Walk", "tag=$tag class=$cls id=$id");
-			}
-		}
+if (get_class($elem) == 'DOMElement') {
+	$tag = $elem->nodeName;
+	$cls = $elem->getAttribute("class");
+	$id = $elem->getAttribute("id");
+	echo "DOM Walk: tag=$tag class=$cls id=$id <br>";
+}
 		$visit($elem);
 		foreach ($elem->childNodes as $child) {
 			walkDom($child, $visit);
@@ -24,19 +20,7 @@
 	
 	$visitNode = function ($elem) {
 		global $found_para_count;
-		global $using_alternates;
 		global $relativeUrlFix;
-		
-		if ($elem->nodeName == 'article' or ($using_alternates and ($elem->nodeName == 'div'))) {
-			$visited = $elem->getAttribute("ltesearch");
-			if ($visited == 'true') {
-				return;
-			}
-			else {
-				$elem->setAttribute("ltesearch", "true");
-			}
-		}
-		
 		if (looksLikeArticleBody($elem)) {
 			$text = "";
 			$child = $elem->firstChild;
@@ -66,7 +50,7 @@
 
 	$relativeUrlFix = function($elem) {
 		global $targetHostPrefix;
-#echo "rUF node name is '$elem->nodeName' <br>";
+
 		if ($elem->nodeName == 'a') {
 			$href = $elem->getAttribute("href");
 			$url = parse_url($href);
@@ -77,27 +61,8 @@
 		}
 	};
 	
-	function dump_meta($doc) {
-		global $trace;
-		dbg_trace(2, "enter dump meta");
-		if ($trace >= 2) {
-			$metas = $doc->getElementsByTagName("meta");
-			dbg_trace(2, "meta count", strval(count($metas)));
-			foreach ($metas as $meta) {
-				$attrs = $meta->attributes;
-				dbg_trace(2, "--meta");
-				foreach ($attrs as $attr) {
-					$n = $attr->name;
-					$v = $attr->nodeValue;
-					dbg_trace(2, "attr", "name=$n value=$v");
-				}
-			}
-		}
-	}
-	
 	function getCharSet($doc) {
 		$metas = $doc->getElementsByTagName("meta");
-		
 		foreach ($metas as $node) {
 			$cs = $node->getAttribute("charset");
 			if (!empty($cs)) {
@@ -130,6 +95,7 @@
 		foreach ($divs as $div) {
 			$cls = $div->getAttribute("class");
 			if (contains_any_of($cls, ["article", "body", "content"])) {
+				echo "Alternate article has clas $cls<br>";
 				array_push($articles, $div);
 			}
 		}
@@ -146,30 +112,25 @@
 	}
 	
 	function looksLikeArticleBody($elem) {
-		global $trace;
 		$looksGood;
-
-		if ($trace >= 3) {
-			if (get_class($elem) == "DOMElement")		{
-				$cls = $elem->getAttribute("class");
-				$nChildren = count($elem->childNodes);
-				dbg_trace(3, "Testing element", "$elem->nodeName class=$cls child count=$nChildren");
-			}
+		if (get_class($elem) == "DOMElement")		{
+			$cls = $elem->getAttribute("class");
+			$nChildren = count($elem->childNodes);
+			echo "Testing element $elem->nodeName class=$cls child count=$nChildren<br>";
 		}
-	
 		foreach ($elem->childNodes as $child) {
 			if ($child->nodeName == "#text") {
 				continue;
 			}
 			
 			if ($child->nodeName == 'p') {
-				dbg_trace(3, "found child para");
+echo "Found child para<br>";
 				$thisNode = $child;
 				$looksGood = true;
 				$limit = 2;
 				for ($i=0; $i < $limit; ++$i) {
 					if (($thisNode) and ($thisNode->nextSibling->nodeName == 'p')) {
-						dbg_trace(3, "Found para sibling para",  "count=$i");
+echo "Found para sibling para count=$i<br>";
 						$thisNode = $thisNode->nextSibling;
 					}
 					else if (($thisNode) and ($thisNode->nextSibling->nodeName == '#text')) {
@@ -237,7 +198,6 @@
 		curl_close($ch);
 		return $data;
 	}
-	
 		
 	function insertImage() {
 		global $doc;
@@ -253,50 +213,27 @@
 			}
 		}
 		if (!empty($image)) {
-			echo "<img src='$image' style='max-height:300px'/>";
+			echo "<img src='$image'/>";
 		}
-		
+
 	}
-		
-	function dbg_trace($level, $str, $val='') {
-		global $trace;
-		
-		if ($trace >= $level) {
-			echo "$str";
-			if (!empty($val)) {
-				echo ": $val";
-			}
-			echo "<br>";
-		}
-	}
+	
 	
 #===================================================
 	try {	
-		$trace_param = $_GET['trace'];
-		if (!empty($trace_param)) {
-			$trace = intval($trace_param);
-		}
-		
-		if ($trace < 5) {
-			error_reporting(E_ERROR | E_PARSE);
-		}
-		
 		$u = $_GET['u'];
 		
 		if ($u == null) {
 			echo "no URL\n";
 			exit(0);
 		}
+		
 		$targetHostPrefix = parse_url($u, PHP_URL_SCHEME) . "://" . parse_url($u, PHP_URL_HOST);
-		dbg_trace(1, "target host", $targetHostPrefix);
 #		$d = file_get_contents($u);
 		$d = read_html_from_url($u);
-		dbg_trace(5, "html data", $d);
 		$doc = new DOMDocument();
 		$doc->loadHTML($d);
 		$charset = getCharSet($doc);
-		dbg_trace(1, "char set", $charset);
-		dump_meta($doc);
 		
 		$titles = $doc->getElementsByTagName("title");
 		if (count($titles) > 0) {
@@ -304,7 +241,6 @@
 			if (strcasecmp($charset, "utf-8") !== 0) {
 				$title = utf8_decode($title);
 			}
-			dbg_trace(1, "title", $title);
 		}
 		else 
 			$title = null;
@@ -312,13 +248,14 @@
 		walkDom($doc, $relativeUrlFix);
 		
 		$articles = $doc->getElementsByTagName("article");
-		dbg_trace(1, "article count", strval(count($articles)));
-
+		echo "Count of article elements is " + count($articles) + "<br>";
+		$using_alternates = false;
 		if (empty($articles) or (count($articles) == 0)) {
+			echo "Using alternates<br>";
 			$articles = getAlternateArticles($doc);
 			$using_alternates = true;
-			dbg_trace(1, "using alternates");
 		}
+		echo "The article count is " . count($articles) . "<br>";
 	}
 	catch (Exception $e) {
 		echo 'Reader encountered an error: ',  $e->getMessage(), "<br>";
@@ -354,19 +291,15 @@
 		<?php
 		
 		if (count($articles) > 0) {
-			dbg_trace(1, "begin main dom walk");
 			foreach($articles as $article) {
 				walkDom($article, $visitNode);
 			}
-			dbg_trace(1, "1st found para count", $found_para_count);
 			if ($found_para_count < 3) {
-				dbg_trace(1, "walk with paragraph vist");
 				foreach($articles as $article) {
 					walkDom($article, $paraVisit);
 				}
 			}
 			if ($found_para_count < 3 and !$using_alternates) {
-				dbg_trace(1, "walk alternates with paragraph vist");				
 				$articles = getAlternateArticles($doc);
 				foreach($articles as $article) {
 					walkDom($article, $paraVisit);

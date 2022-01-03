@@ -180,6 +180,17 @@ function dedupItems(items) {
     });
 }
 
+function _preview(url) {
+    window.open("https://ltesearch.org/read?u=" + url);
+}
+
+function previewButton(link) {
+    
+    var action = "javascript:_preview(\"" + link + "\")";
+    
+    return "<img class='preview-btn-img' onclick='" + action + "' src='images/eyes.png' alt='Preview'/>"
+}
+
 function buildResultTable(jsonArr) {
 	if (!Array.isArray(jsonArr)) {
 		alert(jsonArr.error);
@@ -220,7 +231,7 @@ function buildResultTable(jsonArr) {
         }
         row += "<td>" + date + "</td>";
         row += "<td>" + d.paper + "</td>";
-        row += "<td>" + "<a target='_blank' href='" + d.url + "'>" + d.title + "</a></td>";
+        row += "<td>" + "<a target='_blank' href='" + d.url + "'>" + d.title + "</a>" + previewButton(d.url) + "</td>";
         row += "<td>" + d.pubDate + " " + d.description + "</td>";
         table.append(row);
         

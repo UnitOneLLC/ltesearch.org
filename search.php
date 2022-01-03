@@ -106,6 +106,11 @@ function _bot_detected() {
             display: inline-block;
             margin: 0 10px;
         }
+        .preview-btn-img {
+            vertical-align:bottom;
+            height:25px;
+            cursor:pointer
+        }
      </style>
 </head>
 
