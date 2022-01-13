@@ -57,7 +57,7 @@
 	
 	$paraVisit = function($elem) {
 		global $found_para_count;
-		global $relativeUrlFix;
+
 		if ($elem->nodeName == 'p') {
 			echo "<p>" . innerHtml($elem) . "</p>";
 			$found_para_count++;
@@ -138,9 +138,16 @@
 	
 	function innerHtml($p) {
 		global $charset;
+		global $need_utf8_decode;
+		
 		$html = $p->ownerDocument->saveHTML($p);
-		if (strcasecmp($charset, "utf-8") !== 0) {
+		dbg_trace(4, "html before utf-8 decode", $html);
+		if ($need_utf8_decode) {
 			$html = utf8_decode($html);
+			dbg_trace(4, "html after utf-8 decode", $html);			
+		}
+		else {
+			dbg_trace(4, "not decoding");
 		}
 		return $html;
 	}
@@ -191,11 +198,8 @@
 	
 	function insertSubmitAddress() {
 		global $u;
-		$host = parse_url($u, PHP_URL_HOST);
-		if (strncmp($host, "www.", 4) === 0) {
-			$host = substr($host, 4);
-		}
-
+		global $host;
+		
 		try {
 			$conn = new LTE_DB();
 			$paper = $conn->fetch_paper_by_domain($host);
@@ -287,6 +291,15 @@
 			echo "no URL\n";
 			exit(0);
 		}
+		
+		$host = parse_url($u, PHP_URL_HOST);
+		if (strncmp($host, "www.", 4) === 0) {
+			$host = substr($host, 4);
+		}
+		dbg_trace(1, "global host set", "$host");
+		
+		
+		
 		$targetHostPrefix = parse_url($u, PHP_URL_SCHEME) . "://" . parse_url($u, PHP_URL_HOST);
 		dbg_trace(1, "target host", $targetHostPrefix);
 #		$d = file_get_contents($u);
@@ -296,6 +309,9 @@
 		$doc->loadHTML($d);
 		$charset = getCharSet($doc);
 		dbg_trace(1, "char set", $charset);
+		
+		$need_utf8_decode  = (strcasecmp($charset, "utf-8") !== 0 or $host=='washingtonpost.com');
+		
 		dump_meta($doc);
 		
 		$titles = $doc->getElementsByTagName("title");
@@ -337,8 +353,49 @@
 			}
 		?>
 	</title>
+	<meta charset="UTF-8"/>
+	<script type="text/javascript">
+		function setupFontControl() {
+			document.getElementById("btn-font-up").addEventListener("click", ()=>incrFont());
+			document.getElementById("btn-font-down").addEventListener("click", ()=>decrFont());        
+		}
+		
+		function incrFont() {
+			var fs = parseFloat(document.getElementById("main").style.fontSize);
+			fs += 0.1;
+			document.getElementById("main").style.fontSize = fs.toString() + "em";
+		}
+		
+		function decrFont() {
+			var fs = parseFloat(document.getElementById("main").style.fontSize);
+			fs -= 0.1;
+			if (fs > 0.2)
+				document.getElementById("main").style.fontSize = fs.toString() + "em";
+		}
+	</script>
+
 </head>
-<body style="max-width:700px; margin: 0 auto; font-family:arial; font-size: 20px; line-height: 1.4;">
+<body onload=setupFontControl() >
+<div id="font-control" style="position:fixed; left:30px; top:30px">
+	<table><tr>
+		<td>
+			<div>
+			<span id="btn-font-up" style="cursor:pointer;padding:0 3px">&#9650;</span>
+			</div>
+			<div>
+				<span id="btn-font-down" style="cursor:pointer;padding:0 3px">&#9660;</span>
+			</div>
+		</td>
+		
+		<td>
+			<div style="font-family:serif">
+				<span style="font-size:1.5em">A</span>
+				<span style="font-size:0.8em">A</span>
+			</div>
+		</td>
+	</tr></table>
+</div>
+<div style="max-width:700px; margin: 0 auto; font-family:arial;">
 	<h2>
 		<?php
 			if (!empty($title)) {
@@ -350,7 +407,7 @@
 		<a href="<?php echo $u; ?>"><?php echo "(" . $u . ")";?></a>
 		<div><?php insertImage(); ?></div>
 	</div>
-	<div >
+	<div  id="main" style="font-size: 1.1em; line-height: 1.4;">
 		<?php
 		
 		if (count($articles) > 0) {
@@ -382,7 +439,8 @@
 		insertSubmitAddress();
 			
 		?>
-	</div>		
+	</div>	
+</div>
 </body>
 </html>
 			
