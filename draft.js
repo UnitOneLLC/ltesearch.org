@@ -3,7 +3,33 @@
 $(document).ready(function() {
 	setupClipboardResult();
 	$("#copyAndGoBtn").click(copyHeaderToClipboard);
+	setupAuthor();
 });
+
+
+function setupAuthor() {
+	var cookieLookup = parseCookie(document.cookie);
+	if (cookieLookup["author"]) {
+		$("#author").val(cookieLookup["author"]);
+	}
+	else {
+		$("#author").val("Enter your name");
+	}
+}
+
+function parseCookie(str) {
+	var retVal;
+	str
+	.split(';')
+	.map(v => v.split('='))
+	.reduce((acc, v) => {
+		acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim());
+		retVal = acc;
+		return acc;
+	}, {});
+	
+	return retVal;
+}
 
 
 function setupClipboardResult() {
@@ -14,13 +40,6 @@ function setupClipboardResult() {
 //	var authSpan = document.getElementById("author");
 //	authSpan.textContent = args.author;
 	
-}
-
-function updateAuthor(argAuth) {
-	if (argAuth != "" && argAuth != "YOUR NAME") {
-		chrome.storage.sync.set({"author": argAuth}, function() {});
-		_author = argAuth;
-	}
 }
 
 function formatDate(d) {
@@ -34,7 +53,10 @@ function formatDate(d) {
 
 function copyHeaderToClipboard() {
 	
-//	updateAuthor(args.author);
+	var author =  $("#author").val();
+	document.cookie = "author=" + author;
+	$("#auth_text").text(author);
+	$("#author").remove();
 	
 	// do the copy to clipboard
 	var result = false;

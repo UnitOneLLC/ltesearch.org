@@ -28,7 +28,7 @@
 		$ch = curl_init();
 		$timeout = 5;
 		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:95.0) Gecko/20100101 Firefox/95.0");
+		curl_setopt($ch, CURLOPT_USERAGENT, "Googlebot-News");
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,false);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
@@ -39,6 +39,8 @@
 		curl_close($ch);
 		return $data;
 	}
-	
+	# other user-agent
+	#"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:95.0) Gecko/20100101 Firefox/95.0"
+	#also see: https://developers.whatismybrowser.com/useragents/parse/
 
 ?>

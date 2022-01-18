@@ -75,7 +75,7 @@ Status<span style="font-size:8pt">&nbsp (DRAFT or SUBMITTED)</span>:&ensp;DRAFT<
 In response to:&nbsp;<a id="hyper" href="<?php echo $u;?>"><?php echo $title?></a><br>
 Newspaper:&ensp;<span id="newspaper"> <?php echo $paper["name"]; ?></span><br>
 Date:&ensp;<span id="date"></span><br><br>
-Author:&ensp;<span id="author">YOUR NAME</span><br>
+Author:&ensp;<span id="auth_container"><input id="author"><span id="auth_text"></span></span><br>
 Editors:&ensp;<br>
 Submit to:&ensp;<a id="submit_anchor"><span id="submit_addr"><?php echo $paper["lteaddr"];?></span></a><br><br>
 <span style="background-color: #1a73e8; color:white"><b>&nbsp;Share&nbsp;</b></span><span style="color:white">.</span>your draft in <u>comment</u> mode to your LTE Google Group.<hr><br><br>
