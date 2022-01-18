@@ -23,6 +23,7 @@ define('AUTH_ERROR', 'Authentication error');
 
 include "CustomSearch.php";
 include "lte_db.php";
+include "urlcode.php";
 
 	function return_error($error, $data) {
 		return '{"error": "' . $error . ': ' . $data . '"}';
@@ -241,6 +242,7 @@ include "lte_db.php";
 			foreach($all_results as &$result) {
 				$result["paper"] = find_paper_name($papers, $result["url"]);
 				$result["highlight"] = is_highlight($result);
+				$result["zlink"] = encode_url($result["url"]);
 			}
 			
 			$status = update_queries($conn, $region, $topic, count($all_results), $usertoken);

@@ -1,5 +1,7 @@
 <?php
+	include "version.php";
 	include "lte_db.php";
+	include "urlcode.php";
 	
 	$using_alternates = false;
 	$trace = 0;
@@ -94,7 +96,8 @@
 			}
 		}
 	}
-	
+	# need to handle this syntax:
+	#    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	function getCharSet($doc) {
 		$metas = $doc->getElementsByTagName("meta");
 		
@@ -226,22 +229,6 @@
 		
 	}
 	
-	function read_html_from_url($url) {
-		$ch = curl_init();
-		$timeout = 5;
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:95.0) Gecko/20100101 Firefox/95.0");
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,false);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
-		curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
-		$data = curl_exec($ch);
-		curl_close($ch);
-		return $data;
-	}
-	
 		
 	function insertImage() {
 		global $doc;
@@ -288,8 +275,14 @@
 		$u = $_GET['u'];
 		
 		if ($u == null) {
-			echo "no URL\n";
-			exit(0);
+			
+			$z = $_GET['z'];
+			$u = decode_url($z);
+			
+			if ($u == null) {
+				echo "no URL\n";
+				exit(0);
+			}
 		}
 		
 		$host = parse_url($u, PHP_URL_HOST);
@@ -304,7 +297,7 @@
 		dbg_trace(1, "target host", $targetHostPrefix);
 #		$d = file_get_contents($u);
 		$d = read_html_from_url($u);
-		dbg_trace(5, "html data", $d);
+		dbg_trace(5, "html data", htmlentities($d));
 		$doc = new DOMDocument();
 		$doc->loadHTML($d);
 		$charset = getCharSet($doc);
@@ -416,13 +409,13 @@
 				walkDom($article, $visitNode);
 			}
 			dbg_trace(1, "1st found para count", $found_para_count);
-			if ($found_para_count < 3) {
+			if ($found_para_count < 5) {
 				dbg_trace(1, "walk with paragraph vist");
 				foreach($articles as $article) {
 					walkDom($article, $paraVisit);
 				}
 			}
-			if ($found_para_count < 3 and !$using_alternates) {
+			if ($found_para_count < 5 and !$using_alternates) {
 				dbg_trace(1, "walk alternates with paragraph vist");				
 				$articles = getAlternateArticles($doc);
 				foreach($articles as $article) {

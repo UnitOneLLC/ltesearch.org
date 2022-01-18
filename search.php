@@ -1,8 +1,9 @@
 <?php
 $maintenance = false;
 
+include "version.php";
 include "lte_db.php";
-define("VERSION", "2.3.0/20220101");
+
 define("BOOKMARK_URL", "https://groups.google.com/forum/#!forum/350ma-cambridge-media-team");
 define("BOOKMARK_TEXT", "350 MA Cambridge Media Team");
 
@@ -106,10 +107,26 @@ function _bot_detected() {
             display: inline-block;
             margin: 0 10px;
         }
-        .preview-btn-img {
-            vertical-align:bottom;
-            height:25px;
-            cursor:pointer
+        .circle {
+            padding: 0 10px;
+            font-size: 16px;
+            vertical-align: top;
+            cursor: pointer;
+        }
+        table>tbody tr.selected-row, table>tbody tr.selected-row:hover  {
+            background-color: #6a7 !important;
+            color: white;
+        }
+        
+        #controls div select, #controls div button {
+            vertical-align: top;
+        }
+        #detail-select {
+            display: inline-block;
+        }
+        #copy-feedback {
+            margin-left: -20px;
+            vertical-align: top;
         }
      </style>
 </head>
@@ -163,8 +180,22 @@ function _bot_detected() {
                 <div class="spacer"></div>
                 <button id="fetch">Search</button>
                 <button id="sign-out">Sign out</button>
+                
+                <details id="detail-select">
+                    <summary id="sel-sum">Selection</summary>
+                    <fieldset style="display:inline-block">
+                        <button id="copy-selected">Copy selected</button><br>
+                        <input id="incl-text-only" type="checkbox" name="incl-text-only" style="margin-left:20px">
+                        <label for="incl-text-only" style="font-size:0.9em">include text-only links</label><br>
+                        <input id="incl-create-draft" type="checkbox" name="incl-create-draft" style="margin-left:20px">
+                        <label for="incl-create-draft" style="font-size:0.9em">include create draft links</label>
+                    </fieldset>
+                </details>
+                
+                <span id="copy-feedback"></span>
+
                 <select name="paper-lookup" style="float:right; width:150px;">
-                    <option value=",0">&lt;filter on paper&gt;</option>
+                <option value=",0">&lt;filter on paper&gt;</option>
                 </select>
             </div>
             <div class="spacer100">     </div>
@@ -176,7 +207,7 @@ function _bot_detected() {
          <div id="table-parent">
             <table id="digest" class="hover stripe">
                 <thead>
-                    <tr><th>Date</th><th>Source</th><th>Item</th><th>Summary</th></tr>
+                    <tr><th></th><th>Date</th><th>Source</th><th>Item</th><th>Summary</th></tr>
                 </thead>
                 <tbody>
 

@@ -1,5 +1,8 @@
 // ltesearch.js
 
+const READER_URL = "https://ltesearch.org/read";
+const DRAFT_URL = "https://ltesearch.org/draft";
+
 var USE_TEST_DATA = false;
 var DO_FILTER = true;
 
@@ -12,14 +15,19 @@ var DATA_TABLE_OPTIONS = {
     "paging": false,
     "scrollY": "75vh",
     "scrollCollapse": true,
-    "order": [ [0, "desc"], [1, "asc"]],
+    "order": [ [1, "desc"], [2, "asc"]],
     "columns": [
-        {type: "date", width: "100px"},
-        {type: "text", width: "150px"},
-        {type: "html"},
-        {type: "text"}
+        {type: "html", width: "25px"},  /* 0 check box */
+        {type: "date", width: "100px"}, /* 1 date */
+        {type: "text", width: "150px"}, /* 2 newspaper */
+        {type: "html"},                 /* 3 title/url */
+        {type: "text"},                 /* 4 snippet */
+        {type: "text", visible: false}  /* 5 zlink */
         ]
 }
+var ZLINK_COL_IDX = 5;
+
+var gResultData = null;
 
 $(document).ready(function() {
     docTitle = document.title;
@@ -27,7 +35,9 @@ $(document).ready(function() {
     $("#digest").hide();
     $("#loading").hide();
     $("#fetch").click(getDigest);
+    $("#copy-selected").click(copySelected);
     $("#sign-out").click(signOut);
+    $("#incl-text-only").prop("checked", true);
     
     var sel = document.querySelector("select[name=paper-lookup]");
     sel.addEventListener("change", doFilterPaper)
@@ -58,6 +68,152 @@ $(document).ready(function() {
 
     prepareAuth();
 });
+
+function createLink(paperName, text, url, readerUrl, draftUrl) {
+    var root = document.createElement("div");
+    var anch = document.createElement("a");
+    root.appendChild(document.createTextNode(paperName + ": "));
+    root.appendChild(anch);
+    anch.href = url;
+    var textNode = document.createTextNode(text);
+    anch.appendChild(textNode);
+    root.setAttribute("style","font-size:14.5px");
+    
+    if (readerUrl) {
+        var readerAnch = document.createElement("a");
+        readerAnch.setAttribute("title", "view text");
+        readerAnch.setAttribute("style", "font-size:1.05em; padding:0 9px;vertical-align:baseline; text-decoration:none;  cursor:pointer");        
+        root.appendChild(document.createTextNode("  "));
+        root.appendChild(readerAnch);
+        readerAnch.href = readerUrl;
+        readerAnch.innerHTML = " &#9417;";
+    }
+
+    if (draftUrl) {
+        var draftAnch = document.createElement("a");
+        draftAnch.setAttribute("title", "create draft letter");
+        draftAnch.setAttribute("style", "font-size:1.05em; padding:0 9px;vertical-align:baseline; text-decoration:none;  cursor:pointer");        
+        root.appendChild(document.createTextNode("  "));
+        root.appendChild(draftAnch);
+        draftAnch.href = draftUrl;
+        draftAnch.innerHTML = " &#9401;";
+    }
+    
+    return root;
+}
+
+function theDataTable() {
+    return $("#digest").DataTable();
+}
+
+function getZlink(domrow) {
+    return theDataTable().row(domrow).data()[ZLINK_COL_IDX];
+}
+
+function trimTitle(s) {
+    if (s.indexOf("The Recorder") == 0) {
+        return s.substring("The Recorder".length + 3);
+    }
+    var ix;
+    ix = s.indexOf(" |");
+    if (ix === -1)
+        ix = s.indexOf(" — "); // mdash
+    if (ix === -1) 
+        ix = s.indexOf(" – "); // ndash
+    if (ix === -1) 
+        ix = s.indexOf(" - "); // dash		
+    if (ix > 0) {
+        return s.substring(0, ix);
+    }
+    else {
+        ix = s.indexOf(" |");
+        if (ix > 0) {
+            return s.substring(0, ix);
+        }
+    }
+    return s;
+}
+
+
+function makeReaderUrl(z) {
+    return READER_URL + "?z=" + z;
+}
+
+function makeDraftUrl(z) {
+    return DRAFT_URL + "?z=" + z;
+}
+
+function setClipboardMulti(items) {
+    var outer = document.createElement("div");
+    var last = document.createElement("div");
+    var c = items.length;
+    if (c == 0)
+        return false;
+    else {
+        $(outer).css("background-color", "white");
+        $(outer).css("color", "black");
+        
+        var bInclReader = $("#incl-text-only").is(":checked");
+        var bIncDraft = $("#incl-create-draft").is(":checked");
+        
+        items.sort(function(a,b) {return a.title.localeCompare(b.title)});
+        
+        for (var i=0; i < items.length; ++i) {
+            var t = items[i];
+            var readerUrl = bInclReader ? makeReaderUrl(t.zlink) : null;
+            var draftUrl = bIncDraft ? makeDraftUrl(t.zlink) : null;
+            var link = createLink(t.paper, trimTitle(t.title), t.url, readerUrl, draftUrl);
+            outer.appendChild(link);
+        }
+        document.body.appendChild(outer);
+        document.body.appendChild(last);
+        var range = document.createRange();
+        
+        range.setStart(outer, 0);
+        range.setEnd(last, 0);
+        
+        var selObj = window.getSelection()
+        selObj.removeAllRanges();
+        selObj.addRange(range);
+
+        var nItems = $(".selected-row").length;
+
+        var ok;
+        if (document.execCommand('copy')) {
+            if (nItems === 1) {
+                $("#copy-feedback").text("1 article copied");
+            } else {
+                $("#copy-feedback").text("" + nItems + " articles copied");
+            }
+            ok = true;
+        } else {
+            console.error('failed to get multi clipboard content');
+            ok = false;
+        }
+        outer.remove();
+        last.remove();
+        return ok;
+    }
+    
+}
+
+function copySelected() {
+    var items = [];
+    var rowChecks = $("td>input[type=checkbox]");
+    for (var i=0; i < rowChecks.length; ++i) {
+        if ($(rowChecks[i]).is(":checked")) {
+            var selected = {};
+            var td = $(rowChecks[i]).parent().next("td");
+            selected["date"] = td.text(); td = td.next("td");
+            selected["paper"] = td.text(); td = td.next("td");
+            selected["url"] = $(td.find("a")[0]).attr("href");
+            selected["title"] = $(td.find("a")[0]).text();
+            selected["zlink"] = getZlink(td.parent());
+            items.push(selected);
+        }
+    }
+    setClipboardMulti(items);
+}
 
 function isLoggedIn() {
     var tkn = localStorage.getItem("token");
@@ -181,14 +337,27 @@ function dedupItems(items) {
 }
 
 function _preview(url) {
-    window.open("https://ltesearch.org/read?u=" + url);
+    window.open("https://ltesearch.org/read?z=" + url);
 }
 
-function previewButton(link) {
+function previewButton(zlink) {
     
-    var action = "javascript:_preview(\"" + link + "\")";
+    var action = "javascript:_preview(\"" + zlink + "\")";
     
-    return "<img class='preview-btn-img' onclick='" + action + "' src='images/eyes.png' alt='Preview'/>"
+    return "<span title='view article text' onclick='" + action +  "' class='circle'>&#9417;</span>";
+}
+
+function checkClick(checkbox) {
+    var row = $(checkbox).parent().parent();
+    if ($(checkbox).is(":checked")) {
+        row.addClass("selected-row");
+    }
+    else {
+        row.removeClass("selected-row");
+    }
+    var nSelected = $(".selected-row").length;
+    $("#sel-sum").text("Selection(" + nSelected + ")");
+    $("#copy-feedback").text("");
 }
 
 function buildResultTable(jsonArr) {
@@ -203,11 +372,11 @@ function buildResultTable(jsonArr) {
     if (!bFirstQuery) {
     	var parent = $("#table-parent");
     	$(parent.children()[0]).remove();
-    	var tblMarkup = "<table id='digest' class='hover stripe'><thead><tr><th>Date</th><th>Source</th><th>Item</th><th>Summary</th></tr></thead><tbody></tbody></table>";
+    	var tblMarkup = "<table id='digest' class='hover stripe'><thead><tr><th>Select</th><th>Date</th><th>Source</th><th>Item</th><th>Summary</th></tr></thead><tbody></tbody></table>";
     	parent.append(tblMarkup);
     	table = $('#digest');
-    	if (gDataTable)
-    		gDataTable.destroy();
+    	if (table.DataTable())
+    		table.DataTable().destroy();
     }
     else {
     	bFirstQuery = false;
@@ -229,10 +398,12 @@ function buildResultTable(jsonArr) {
         else {
             row = "<tr>";
         }
+        row += "<td>" + "<input type='checkbox' onchange='checkClick(this)'/>" + "</td>";
         row += "<td>" + date + "</td>";
         row += "<td>" + d.paper + "</td>";
-        row += "<td>" + "<a target='_blank' href='" + d.url + "'>" + d.title + "</a>" + previewButton(d.url) + "</td>";
+        row += "<td>" + "<a target='_blank' href='" + d.url + "'>" + d.title + "</a>" + previewButton(d.zlink) + "</td>";
         row += "<td>" + d.pubDate + " " + d.description + "</td>";
+        row += "<td>" + d.zlink + "</td>";        
         table.append(row);
         
         if (paperCounts[d.paper]) {
@@ -263,7 +434,7 @@ function buildResultTable(jsonArr) {
     
     document.title = docTitle + " (" + jsonArr.length + ")";
 
-    gDataTable = table.DataTable(DATA_TABLE_OPTIONS);
+    table.DataTable(DATA_TABLE_OPTIONS);
 }
 
 function walkUpToRow(e) {
@@ -283,6 +454,8 @@ function getDigest() {
     var area = $("#region").val();
     url += "?region=" + area;
     url += "&action=search";
+
+    $("#sel-sum").text("Selection");
     
     var topic = getQueryVariable("topic");
     if (topic) {
@@ -303,7 +476,7 @@ function getDigest() {
         url: url,
         type: 'POST',
         data: {"tkn":localStorage.getItem("token")},
-        success: function(data) { $("#digest").show(); $("#loading").hide(); buildResultTable(JSON.parse(data)) },
+        success: function(data) { gResultData = JSON.parse(data); $("#digest").show(); $("#loading").hide(); buildResultTable(gResultData) },
         cache: false,
         contentType: false,
         processData: true
