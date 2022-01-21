@@ -4,9 +4,6 @@ $maintenance = false;
 include "version.php";
 include "lte_db.php";
 
-define("BOOKMARK_URL", "https://groups.google.com/forum/#!forum/350ma-cambridge-media-team");
-define("BOOKMARK_TEXT", "350 MA Cambridge Media Team");
-
 function _bot_detected() {
 //https://stackoverflow.com/questions/677419/how-to-detect-search-engine-bots-with-php
     return (
@@ -88,9 +85,6 @@ function _bot_detected() {
         .row-highlight {
             background-color: #ffa !important;
         }
-        #bookmark {
-            float: right;
-        }
         #ver {
             position: absolute;
             bottom: 10px;
@@ -123,10 +117,6 @@ function _bot_detected() {
         }
         #detail-select {
             display: inline-block;
-        }
-        #copy-feedback {
-            margin-left: -20px;
-            vertical-align: top;
         }
      </style>
 </head>
@@ -184,11 +174,23 @@ function _bot_detected() {
                 <details id="detail-select">
                     <summary id="sel-sum">Selection</summary>
                     <fieldset style="display:inline-block">
-                        <button id="copy-selected">Copy selected</button><br>
-                        <input id="incl-text-only" type="checkbox" name="incl-text-only" style="margin-left:20px">
-                        <label for="incl-text-only" style="font-size:0.9em">include text-only links</label><br>
-                        <input id="incl-create-draft" type="checkbox" name="incl-create-draft" style="margin-left:20px">
-                        <label for="incl-create-draft" style="font-size:0.9em">include create draft links</label>
+                        <div style="display:inline-block">
+                            <button id="copy-selected">Copy selected</button><br>
+                            <input id="incl-text-only" type="checkbox" name="incl-text-only" style="margin-left:20px">
+                            <label for="incl-text-only" style="font-size:0.9em">include text-only links</label><br>
+                            <input id="incl-create-draft" type="checkbox" name="incl-create-draft" style="margin-left:20px">
+                            <label for="incl-create-draft" style="font-size:0.9em">include create draft links</label>
+                        </div>
+                        <div style="float:right">
+                            <button id="clear-selection">Clear selection</button>
+                        </div>
+                        <div style="margin-top:3px; font-size:smaller; font-family: arial;">
+                            Display:&nbsp
+                            <input type="radio" id="radio_all" name="disp_sel" value="all">
+                            <label for="all">all</label>
+                            <input type="radio" id="radio_sel" name="disp_sel" value="selected">
+                            <label for="css">selected only</label><br>
+                        </div>
                     </fieldset>
                 </details>
                 

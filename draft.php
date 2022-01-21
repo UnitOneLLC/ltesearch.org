@@ -59,12 +59,13 @@
 				margin-left: 20px; 
 				font-style: italic;
 				display: inline-block;
-				width: 60%;
+				width: 50%;
 			}
 			#copyAndGoBtn {
 				vertical-align: top;
 			}
 		</style>
+		<title>Create LTE Draft</title>
 	</head>
 	<body>
 <div id="startCopy">
@@ -75,7 +76,7 @@ Status<span style="font-size:8pt">&nbsp (DRAFT or SUBMITTED)</span>:&ensp;DRAFT<
 In response to:&nbsp;<a id="hyper" href="<?php echo $u;?>"><?php echo $title?></a><br>
 Newspaper:&ensp;<span id="newspaper"> <?php echo $paper["name"]; ?></span><br>
 Date:&ensp;<span id="date"></span><br><br>
-Author:&ensp;<span id="auth_container"><input id="author"><span id="auth_text"></span></span><br>
+Author:&ensp;<span id="auth_container"><input id="author" maxlength=24><span id="auth_text"></span></span><br>
 Editors:&ensp;<br>
 Submit to:&ensp;<a id="submit_anchor"><span id="submit_addr"><?php echo $paper["lteaddr"];?></span></a><br><br>
 <span style="background-color: #1a73e8; color:white"><b>&nbsp;Share&nbsp;</b></span><span style="color:white">.</span>your draft in <u>comment</u> mode to your LTE Google Group.<hr><br><br>
@@ -89,7 +90,7 @@ To the editor:
 			<button id="copyAndGoBtn">Copy header and create Google doc</button>
 			<div id="hint">
 				When the Google doc opens, you can click on the blank document and then paste in the header above.<br>
-				How to paste: press ^V (Windows) or &#8984;-V (Mac).
+				How to paste: For Window, press ^v (control v). For Mac &#8984;-v (command v).
 			</div>
 		</div>
 	</body>

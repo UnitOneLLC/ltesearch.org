@@ -37,7 +37,11 @@ $(document).ready(function() {
     $("#fetch").click(getDigest);
     $("#copy-selected").click(copySelected);
     $("#sign-out").click(signOut);
+    $("#clear-selection").click(onClearSelection);
     $("#incl-text-only").prop("checked", true);
+    $("#incl-create-draft").prop("checked", true);
+    $("#radio_all").prop("checked", true);
+    $("input[name=disp_sel]").on("change", onDisplaySelectChange);
     
     var sel = document.querySelector("select[name=paper-lookup]");
     sel.addEventListener("change", doFilterPaper)
@@ -82,21 +86,21 @@ function createLink(paperName, text, url, readerUrl, draftUrl) {
     if (readerUrl) {
         var readerAnch = document.createElement("a");
         readerAnch.setAttribute("title", "view text");
-        readerAnch.setAttribute("style", "font-size:1.05em; padding:0 9px;vertical-align:baseline; text-decoration:none;  cursor:pointer");        
+        readerAnch.setAttribute("style", "background-color: #11a;color: #fff;font-family: sans-serif;font-variant: small-caps;padding: 0px 2px 0px 2px;cursor: pointer;text-decoration: none;font-size:0.9em;font-weight:800");;
         root.appendChild(document.createTextNode("  "));
         root.appendChild(readerAnch);
         readerAnch.href = readerUrl;
-        readerAnch.innerHTML = " &#9417;";
+        readerAnch.innerHTML = " text";        
     }
 
     if (draftUrl) {
         var draftAnch = document.createElement("a");
         draftAnch.setAttribute("title", "create draft letter");
-        draftAnch.setAttribute("style", "font-size:1.05em; padding:0 9px;vertical-align:baseline; text-decoration:none;  cursor:pointer");        
+        draftAnch.setAttribute("style", "background-color: #11a;color: #fff;font-family: sans-serif;font-variant: small-caps;padding: 0px 2px 0px 2px;cursor: pointer;text-decoration: none;font-size:0.9em;font-weight:800");
         root.appendChild(document.createTextNode("  "));
         root.appendChild(draftAnch);
         draftAnch.href = draftUrl;
-        draftAnch.innerHTML = " &#9401;";
+        draftAnch.innerHTML = " draft"; 
     }
     
     return root;
@@ -141,6 +145,46 @@ function makeReaderUrl(z) {
 
 function makeDraftUrl(z) {
     return DRAFT_URL + "?z=" + z;
+}
+
+function onClearSelection() {
+    $("#digest tr").removeClass("selected-row");
+    $("#digest tr input[type=checkbox]").prop("checked", false);
+    $("#radio_all").prop("checked", true);
+    clearSearch();
+}
+
+function clearSearch() {
+    $.fn.dataTable.ext.search = [];        
+    theDataTable().draw();
+}
+
+
+function onDisplaySelectChange() {
+    var allSelected = theDataTable().rows(".selected-row");
+    const isSelected = (index) => {
+        for (var i=0; i < allSelected[0].length; ++i) {
+            if (allSelected[0][i] == index)
+                return true;
+        }
+        return false;
+    }
+    if($(this).val() == 'selected') {
+        $.fn.dataTable.ext.search.push(
+            function( settings, searchData, index, rowData, counter ) {
+                if (isSelected(index)) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            })
+        
+        theDataTable().draw();
+        
+    } else {
+        clearSearch();
+    }
 }
 
 function setClipboardMulti(items) {
@@ -301,14 +345,6 @@ function signOut() {
         prepareAuth();
     });
 }
-
-function hideShowBookMark() {
-    if ($("#region").val() === "Massachusetts")
-        $("#bookmark").show();
-    else 
-        $("#bookmark").hide();
-}
-
 
 function getUrlVars() {
     var vars = [], hash;
