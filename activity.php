@@ -1,6 +1,6 @@
 <?php
-define("VERSION", "2.2.1/20200909");
 include "lte_db.php";
+include "version.php"
 ?>
 <!DOCTYPE html>
 <head>

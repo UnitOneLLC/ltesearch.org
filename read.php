@@ -111,6 +111,12 @@
 				if (!empty($cs)) {
 					return $cs;
 				}
+				else {
+					$cs = $node->getAttribute("content");
+					if (stripos($cs, "utf-8") !== false) {
+						return "utf-8";
+					}
+				}
 			}
 		}
 		return null;
@@ -369,7 +375,7 @@
 
 </head>
 <body onload=setupFontControl() >
-<div id="font-control" style="position:fixed; left:30px; top:30px">
+<div id="font-control" style="position:fixed; left:5px; top:15px">
 	<table><tr>
 		<td>
 			<div>
@@ -382,8 +388,8 @@
 		
 		<td>
 			<div style="font-family:serif">
-				<span style="font-size:1.5em">A</span>
-				<span style="font-size:0.8em">A</span>
+				<span style="font-size:1.4em">A</span>
+				<span style="font-size:0.7em">A</span>
 			</div>
 		</td>
 	</tr></table>
