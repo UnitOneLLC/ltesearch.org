@@ -53,6 +53,15 @@ class LTE_DB {
 		$stmt = null;
 		return !empty($result);
 	}
+	/*
+	 * fetch the set of topics
+	 */
+	function fetch_topics() {
+		$stmt = $this->_conn->query("select distinct topic from keywords");
+		$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'topic');
+		$stmt = null;
+		return $result;
+	}
 	
 	/*
 	 * Fetch the set of keywords as an array for the specified topic and region.

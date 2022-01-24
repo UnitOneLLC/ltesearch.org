@@ -42,6 +42,9 @@ $(document).ready(function() {
     $("#incl-create-draft").prop("checked", true);
     $("#radio_all").prop("checked", true);
     $("input[name=disp_sel]").on("change", onDisplaySelectChange);
+    $("#param-summary").text(getParamsSummary());
+    $("#region").on("change", resetParamsSummary);
+    $("#topic").on("change", resetParamsSummary);    
     
     var sel = document.querySelector("select[name=paper-lookup]");
     sel.addEventListener("change", doFilterPaper)
@@ -49,26 +52,36 @@ $(document).ready(function() {
     var urlVars = getUrlVars();
 
     var reg = urlVars["region"];
-    var bRegionSet = false;    
     if (reg) {
-	  $("#region").val(reg);
-	  bRegionSet = true;
+        $("#region").val(reg);
+        $.cookie("region", reg);
     }
     else {
-    	var area = document.cookie.indexOf("region=");
-    	if (area != -1) {
-    		area = document.cookie.substr(area + "region=".length);
-    		if (area.indexOf(";") != -1)
-    			area = area.substr(0, area.indexOf(";"));
-    		if ((area.length > 0) && (area != "null")) {
-    		  $("#region").val(area);
-    		  bRegionSet = true;
-    		}
-    	}
+        reg = $.cookie("region");
+        if (reg) {
+            $("#region").val(reg); 
+        }
+        else {
+            $("#region").val("Massachusetts");
+        }
     }
-	if (!bRegionSet) {
-	  $("#region").val("Massachusetts");
-	}
+
+    var topic = urlVars["topic"];
+    if (topic) {
+        $("#topic").val(topic);
+        $.cookie("topic", topic);
+    }
+    else {
+        topic = $.cookie("topic");
+        if (topic) {
+            $("#topic").val(topic); 
+        }
+        else {
+            $("#topic").val("climate");
+        }
+    }
+    
+    $("#param-summary").text(getParamsSummary());
 
     prepareAuth();
 });
@@ -114,6 +127,16 @@ function getZlink(domrow) {
     return theDataTable().row(domrow).data()[ZLINK_COL_IDX];
 }
 
+function getParamsSummary() {
+    return $("#region").val() + "/" + $("#topic").val();
+}
+
+function resetParamsSummary() {
+    $.cookie("region",$("#region").val());
+    $.cookie("topic",$("#topic").val());    
+    $("#param-summary").text(getParamsSummary());
+}
+
 function trimTitle(s) {
     if (s.indexOf("The Recorder") == 0) {
         return s.substring("The Recorder".length + 3);
@@ -129,15 +152,8 @@ function trimTitle(s) {
     if (ix > 0) {
         return s.substring(0, ix);
     }
-    else {
-        ix = s.indexOf(" |");
-        if (ix > 0) {
-            return s.substring(0, ix);
-        }
-    }
     return s;
 }
-
 
 function makeReaderUrl(z) {
     return READER_URL + "?z=" + z;
@@ -158,7 +174,6 @@ function clearSearch() {
     $.fn.dataTable.ext.search = [];        
     theDataTable().draw();
 }
-
 
 function onDisplaySelectChange() {
     var allSelected = theDataTable().rows(".selected-row");
@@ -490,13 +505,10 @@ function getDigest() {
     var area = $("#region").val();
     url += "?region=" + area;
     url += "&action=search";
-
-    $("#sel-sum").text("Selection");
+    url += "&topic=" + $("#topic").val();
     
-    var topic = getQueryVariable("topic");
-    if (topic) {
-    	url += "&topic=" + topic;
-    }
+    $("#sel-sum").text("Selection");
+
     var specificSearch = getQueryVariable("s");
     if (specificSearch) {
         url += "&s=" + encodeURIComponent(specificSearch);
@@ -505,8 +517,6 @@ function getDigest() {
     if (filterStrength) {
     	url += "&filter=" + filterStrength;
     }
-    
-    document.cookie = "region=" + area + "; Max-Age=9999999";
 
     $.ajax({
         url: url,

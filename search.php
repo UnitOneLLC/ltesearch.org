@@ -23,13 +23,14 @@ function _bot_detected() {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
         <!-- OLD GOOGLE AUTH script src="https://apis.google.com/js/platform.js" async defer></script-->
-    <script src="ltesearch.js?ver=<?php echo VERSION;?>"></script>
+    <script src="ltesearch2.js?ver=<?php echo VERSION;?>"></script>
 <?php
     }
 ?>
     <title>LTE Article Search</title>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css"/>
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <!--meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/-->
 
     <style type="text/css">
@@ -118,6 +119,20 @@ function _bot_detected() {
         #detail-select {
             display: inline-block;
         }
+        #sign-out {
+            float:right;
+        }
+        #detail-params {
+            display: inline-block;
+            vertical-align: top;
+        }
+        #paper-lookup {
+            margin-left: 100px;
+            width: 120px;
+        }
+        #sign-out {
+            vertical-align: top;
+        }
      </style>
 </head>
 
@@ -155,21 +170,35 @@ function _bot_detected() {
         </div>
         <div id="controls">
             <div>
-                <select id="region">
-                <?php
-                    if (!$maintenance) {
-                        $conn = new LTE_DB();
-                        $regions = $conn->fetch_regions();
-                        foreach($regions as $region) {
-                            echo "<option>$region</option>";
-                        }
-                        $conn = null;
-                    }
-                ?>
-                </select>
-                <div class="spacer"></div>
                 <button id="fetch">Search</button>
-                <button id="sign-out">Sign out</button>
+                <details id="detail-params">
+                    <summary id="param-summary">_selected_region_/topic</summary>
+                    <select id="region">
+                        <?php
+                            if (!$maintenance) {
+                                $conn = new LTE_DB();
+                                $regions = $conn->fetch_regions();
+                                foreach($regions as $region) {
+                                    echo "<option>$region</option>";
+                                }
+                                $conn = null;
+                            }
+                        ?>
+                    </select>
+                    <select id="topic">
+                        <?php
+                            if (!$maintenance) {
+                                $conn = new LTE_DB();
+                                $topics = $conn->fetch_topics();
+                                foreach($topics as $topic) {
+                                    echo "<option>$topic</option>";
+                                }
+                                $conn = null;
+                            }
+                        ?>
+                    </select>
+                </details>
+                <div class="spacer"></div>
                 
                 <details id="detail-select">
                     <summary id="sel-sum">Selection</summary>
@@ -196,9 +225,10 @@ function _bot_detected() {
                 
                 <span id="copy-feedback"></span>
 
-                <select name="paper-lookup" style="float:right; width:150px;">
+                <select id="paper-lookup" name="paper-lookup" style="display:none">
                 <option value=",0">&lt;filter on paper&gt;</option>
                 </select>
+                <button id="sign-out">Sign out</button>
             </div>
             <div class="spacer100">     </div>
             <div id = "loading">
