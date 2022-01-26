@@ -21,7 +21,7 @@ function parseCookie(str) {
 	var retVal;
 	str
 	.split(';')
-	.map(v => v.split('='))
+	.map(v => {return v.split('=')})
 	.reduce((acc, v) => {
 		acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim());
 		retVal = acc;
@@ -34,12 +34,7 @@ function parseCookie(str) {
 
 function setupClipboardResult() {
 	// set the date field
-	document.getElementById("date").textContent = formatDate(new Date());
-	
-	// set the author field
-//	var authSpan = document.getElementById("author");
-//	authSpan.textContent = args.author;
-	
+	document.getElementById("date").textContent = formatDate(new Date());	
 }
 
 function formatDate(d) {

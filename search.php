@@ -23,7 +23,7 @@ function _bot_detected() {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
         <!-- OLD GOOGLE AUTH script src="https://apis.google.com/js/platform.js" async defer></script-->
-    <script src="ltesearch2.js?ver=<?php echo VERSION;?>"></script>
+    <script src="ltesearch.js?ver=<?php echo VERSION;?>"></script>
 <?php
     }
 ?>
@@ -31,6 +31,8 @@ function _bot_detected() {
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css"/>
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="https://apis.google.com/js/platform.js?onload=gapi_init" async defer></script>
+    
     <!--meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/-->
 
     <style type="text/css">
@@ -170,7 +172,6 @@ function _bot_detected() {
         </div>
         <div id="controls">
             <div>
-                <button id="fetch">Search</button>
                 <details id="detail-params">
                     <summary id="param-summary">_selected_region_/topic</summary>
                     <select id="region">
@@ -199,7 +200,8 @@ function _bot_detected() {
                     </select>
                 </details>
                 <div class="spacer"></div>
-                
+                <button id="fetch">Search</button>
+                <div class="spacer"></div>
                 <details id="detail-select">
                     <summary id="sel-sum">Selection</summary>
                     <fieldset style="display:inline-block">

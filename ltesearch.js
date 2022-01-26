@@ -89,6 +89,7 @@ $(document).ready(function() {
 function createLink(paperName, text, url, readerUrl, draftUrl) {
     var root = document.createElement("div");
     var anch = document.createElement("a");
+    anch.setAttribute("noreferrer","");
     root.appendChild(document.createTextNode(paperName + ": "));
     root.appendChild(anch);
     anch.href = url;
@@ -167,6 +168,8 @@ function onClearSelection() {
     $("#digest tr").removeClass("selected-row");
     $("#digest tr input[type=checkbox]").prop("checked", false);
     $("#radio_all").prop("checked", true);
+    $("#sel-sum").text("Selection");
+
     clearSearch();
 }
 
@@ -352,13 +355,23 @@ function onAuthFail(e) {
     $("body")[0].append(" [" + e.error + "]");
 }
 
-function signOut() {
-    var auth2 = gapi.auth2.getAuthInstance();
-    auth2.signOut().then(function () {
-        console.log('User signed out.');
-        localStorage.setItem("token", null);
-        prepareAuth();
+function gapi_init() {
+    gapi.load('auth2', function() {
+        /* Ready. Make a call to gapi.auth2.init or some other API */
     });
+}
+
+function signOut() {
+    localStorage.setItem("token", null);
+    var auth2 = gapi.auth2.getAuthInstance();
+    if (auth2) {
+        auth2.signOut().then(function () {
+            console.log('User signed out.');
+            
+            prepareAuth();
+        });
+    }
+    else prepareAuth();
 }
 
 function getUrlVars() {
@@ -452,7 +465,7 @@ function buildResultTable(jsonArr) {
         row += "<td>" + "<input type='checkbox' onchange='checkClick(this)'/>" + "</td>";
         row += "<td>" + date + "</td>";
         row += "<td>" + d.paper + "</td>";
-        row += "<td>" + "<a target='_blank' href='" + d.url + "'>" + d.title + "</a>" + previewButton(d.zlink) + "</td>";
+        row += "<td>" + "<a target='_blank' noreferrer href='" + d.url + "'>" + d.title + "</a>" + previewButton(d.zlink) + "</td>";
         row += "<td>" + d.pubDate + " " + d.description + "</td>";
         row += "<td>" + d.zlink + "</td>";        
         table.append(row);
