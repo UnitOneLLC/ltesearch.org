@@ -1,7 +1,7 @@
 <?php
-	include "version.php";
-	include "urlcode.php";
-	include "lte_db.php";
+	include "../common/version.php";
+	include "../common/urlcode.php";
+	include "../common/lte_db.php";
 	
 	$u = $_GET['u'];
 	

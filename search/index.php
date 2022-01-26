@@ -1,8 +1,8 @@
 <?php
 $maintenance = false;
 
-include "version.php";
-include "lte_db.php";
+include "../common/version.php";
+include "../common/lte_db.php";
 
 function _bot_detected() {
 //https://stackoverflow.com/questions/677419/how-to-detect-search-engine-bots-with-php

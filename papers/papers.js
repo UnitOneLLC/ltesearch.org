@@ -28,11 +28,15 @@ function buildPapersTable(jsonArr) {
     var table = $('#digest');
         
     for (i in jsonArr) {
-        d = jsonArr[i];
+        var d = jsonArr[i];
+        var url =d.domain;
+        if (url.indexOf("http") == -1) {
+            url = "http://" + url;
+        }
 
         var row = "<tr>";
         row += "<td>" + d.name + "</td>";
-        row += "<td>" + "<a href='http://" + d.domain + "' target=_blank>" + d.domain + "</a></td>";
+        row += "<td>" + "<a href='" + url + "' target=_blank>" + d.domain + "</a></td>";
         row += "<td>" + d.lteaddr + "</td>";
         row += "<td>" + d.max_words + "</td>";
         row += "</tr>";

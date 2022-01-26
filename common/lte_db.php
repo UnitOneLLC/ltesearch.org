@@ -8,7 +8,7 @@ class LTE_DB {
 	 * Get a connection to the lte search database. Throws on failure.
 	 */
 	function __construct() {
-		$dbjson = file_get_contents("../etc/ltesearch.org/db.json");
+		$dbjson = file_get_contents("../../etc/ltesearch.org/db.json");
 		$dbarr = json_decode($dbjson, TRUE);
   
 		$hostname = $dbarr['hostname'];

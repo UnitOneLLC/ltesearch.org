@@ -1,6 +1,6 @@
 <?php
-include "version.php";
-include "urlcode.php";
+include "../common/version.php";
+include "../common/urlcode.php";
 ?>
 <!DOCTYPE html>
 <head>
@@ -39,7 +39,7 @@ include "urlcode.php";
     <div id="container">
         <form method="POST">
             <label for="input_url">Enter URL:</label>&nbsp;
-            <input type="text" id="input_url" name="input_url" width="600px" value="">
+            <input type="text" id="input_url" name="input_url" width="800px" value="">
             <input type="submit" value="Submit">
         </form>
     </div>

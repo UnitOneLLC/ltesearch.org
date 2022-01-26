@@ -1,26 +1,21 @@
 <?php
-include "lte_db.php";
-include "version.php"
+include "../common/lte_db.php";
+include "../common/version.php"
 ?>
 <!DOCTYPE html>
 <head>
     <meta name="robots" content="noindex,nofollow">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="activity.js?ver=<?php echo VERSION;?>"></script>
+    <script src="papers.js?ver=<?php echo VERSION;?>"></script>
 
-    <title>LTE Search Activity</title>
+    <title>LTE Newspaper Database</title>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css"/>
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
  
-<!--    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css"/>
-    <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
--->   
-    <!--meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/-->
-
     <script type="text/javascript">
-        var activity_json = <?php
+        var papers_json = <?php
             $conn = new LTE_DB();
-            echo json_encode($conn->fetch_activity(100));
+            echo json_encode($conn->fetch_papers());
             $conn = null;
         ?>;
     </script>
@@ -63,7 +58,7 @@ include "version.php"
          <div id="table-parent">
 			<table id="digest" class="hover stripe">
 				<thead>
-					<tr><th>Date</th><th>Region</th><th>IP Address</th><th>Topic</th><th>Results</th><th>User</th></tr>
+					<tr><th>Name</th><th>Domain</th><th>LTE Address</th><th>Max words</th></tr>
 				</thead>
 				<tbody>
 

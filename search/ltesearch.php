@@ -22,8 +22,8 @@ define('HIGHLIGHT_THRESHOLD',4);
 define('AUTH_ERROR', 'Authentication error');
 
 include "CustomSearch.php";
-include "lte_db.php";
-include "urlcode.php";
+include "../common/lte_db.php";
+include "../common/urlcode.php";
 
 	function return_error($error, $data) {
 		return '{"error": "' . $error . ': ' . $data . '"}';

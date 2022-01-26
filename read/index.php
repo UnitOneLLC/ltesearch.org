@@ -1,7 +1,7 @@
 <?php
-	include "version.php";
-	include "lte_db.php";
-	include "urlcode.php";
+	include "../common/version.php";
+	include "../common/lte_db.php";
+	include "../common/urlcode.php";
 	
 	$using_alternates = false;
 	$trace = 0;
