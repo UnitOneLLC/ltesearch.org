@@ -76,13 +76,20 @@
 
 	$relativeUrlFix = function($elem) {
 		global $targetHostPrefix;
-#echo "rUF node name is '$elem->nodeName' <br>";
 		if ($elem->nodeName == 'a') {
 			$href = $elem->getAttribute("href");
 			$url = parse_url($href);
 			if (empty($url["host"])) {
 				$href = $targetHostPrefix . $href;
 				$elem->setAttribute("href", $href);
+			}
+		}
+		else if ($elem->nodeName == 'img') {
+			$src = $elem->getAttribute("src");
+			$url = parse_url($src);
+			if (empty($url["host"])) {
+				$src = $targetHostPrefix . $src;
+				$elem->setAttribute("src", $src);
 			}
 		}
 	};
