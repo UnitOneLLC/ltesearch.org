@@ -321,7 +321,6 @@ function handleGoogleAuth(credResponse) {
         payload = JSON.parse(decoded);
         localStorage.setItem("token", btoa(payload.email));
         prepareAuth();
-        getDigest();
     } catch (e) {
         console.log("auth exception: " + e.message);
         $("body")[0].append(" [" + e.message + "]");

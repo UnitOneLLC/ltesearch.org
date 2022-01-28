@@ -17,6 +17,9 @@ include "../common/urlcode.php";
             padding: 10px;
             overflow-wrap: break-word;
         }
+        #input_url {
+            width: 60%;
+        }
         
         @media  (min-width: 600px) {
         	#container {
@@ -39,7 +42,7 @@ include "../common/urlcode.php";
     <div id="container">
         <form method="POST">
             <label for="input_url">Enter URL:</label>&nbsp;
-            <input type="text" id="input_url" name="input_url" width="800px" value="">
+            <input type="text" id="input_url" name="input_url" value="">
             <input type="submit" value="Submit">
         </form>
     </div>

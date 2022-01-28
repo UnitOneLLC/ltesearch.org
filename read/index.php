@@ -5,6 +5,14 @@
 	
 	$using_alternates = false;
 	$trace = 0;
+	$user_agents = [ #https://developers.whatismybrowser.com/useragents/parse/
+		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36",
+		"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/18.17763",
+		"Googlebot-News",
+		"Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)",
+		"Mozilla/5.0 (compatible; DotBot/1.1; http://www.opensiteexplorer.org/dotbot, help@moz.com)"
+	];
 	
 	function walkDom($elem, $visit) {
 		global $trace;
@@ -91,7 +99,7 @@
 				foreach ($attrs as $attr) {
 					$n = $attr->name;
 					$v = $attr->nodeValue;
-					dbg_trace(2, "attr", "name=$n value=$v");
+					dbg_trace(2, "&#9;$n=$v");
 				}
 			}
 		}
@@ -297,33 +305,36 @@
 		}
 		dbg_trace(1, "global host set", "$host");
 		
-		
-		
 		$targetHostPrefix = parse_url($u, PHP_URL_SCHEME) . "://" . parse_url($u, PHP_URL_HOST);
 		dbg_trace(1, "target host", $targetHostPrefix);
-#		$d = file_get_contents($u);
-		$d = read_html_from_url($u);
-		dbg_trace(5, "html data", htmlentities($d));
-		$doc = new DOMDocument();
-		$doc->loadHTML($d);
-		$charset = getCharSet($doc);
-		dbg_trace(1, "char set", $charset);
 		
-		$need_utf8_decode  = (strcasecmp($charset, "utf-8") !== 0 or $host=='washingtonpost.com');
+		foreach ($user_agents as $ua) {
+			dbg_trace(1, "read with user-agent ", $ua);
+			$d = read_html_from_url($u, $ua);
+			dbg_trace(5, "html data", htmlentities($d));
+			$doc = new DOMDocument();
+			$doc->loadHTML($d);
+			$charset = getCharSet($doc);
+			dbg_trace(1, "char set", $charset);
+			$need_utf8_decode  = (strcasecmp($charset, "utf-8") !== 0 or $host=='washingtonpost.com');
+
+			$titles = $doc->getElementsByTagName("title");
+			if (count($titles) > 0) {
+				$title  = $titles->item(0)->textContent;
+				if (strcasecmp($charset, "utf-8") !== 0) {
+					$title = utf8_decode($title);
+				}
+				dbg_trace(1, "title", $title);
+				if (trim($title) !== "Access Denied") {
+					break;
+				}
+			}
+			else 
+				$title = null;
+		}
 		
 		dump_meta($doc);
-		
-		$titles = $doc->getElementsByTagName("title");
-		if (count($titles) > 0) {
-			$title  = $titles->item(0)->textContent;
-			if (strcasecmp($charset, "utf-8") !== 0) {
-				$title = utf8_decode($title);
-			}
-			dbg_trace(1, "title", $title);
-		}
-		else 
-			$title = null;
-		
+				
 		walkDom($doc, $relativeUrlFix);
 		
 		$articles = $doc->getElementsByTagName("article");

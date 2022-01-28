@@ -24,11 +24,14 @@
 		else return null;
 	}
 	
-	function read_html_from_url($url) {
+	function read_html_from_url($url, $ua="") {
+		if (empty($ua)) {
+			$ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36";
+		}
 		$ch = curl_init();
 		$timeout = 5;
 		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Googlebot-News");
+		curl_setopt($ch, CURLOPT_USERAGENT, $ua);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,false);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
