@@ -1,8 +1,9 @@
 
 
 $(document).ready(function() {
-	setupClipboardResult();
-	$("#copyAndGoBtn").click(copyHeaderToClipboard);
+	showSpin(false);
+	$("#date").text(formatDate(new Date()));
+	$("#copyAndGoBtn").click(createDraftAndGo);
 	setupAuthor();
 });
 
@@ -31,12 +32,6 @@ function parseCookie(str) {
 	return retVal;
 }
 
-
-function setupClipboardResult() {
-	// set the date field
-	document.getElementById("date").textContent = formatDate(new Date());	
-}
-
 function formatDate(d) {
 	var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 	var midx = d.getMonth();
@@ -46,39 +41,56 @@ function formatDate(d) {
 	return months[midx] + " " + day + ", " + year;
 }
 
-function copyHeaderToClipboard() {
+function showSpin(on) {
+	if (on) {
+		$("#spinner").show();
+		$("#spinner-prompt").show();		
+	}
+	else {
+		$("#spinner").hide();		
+		$("#spinner-prompt").hide();		
+	}
+}
+
+function createDraftAndGo() {
 	
 	var author =  $("#author").val();
 	document.cookie = "author=" + author;
 	$("#auth_text").text(author);
 	$("#author").remove();
 	
-	// do the copy to clipboard
-	var result = false;
-	var range = document.createRange();
-	var start = document.getElementById("startCopy");
-	var end = document.getElementById("endCopy");
-	range.setStart(start, 0);
-	range.setEnd(end, 0);
-	
-	var selObj = window.getSelection()
-	selObj.removeAllRanges();
-	selObj.addRange(range);
-	
-	if (document.execCommand('copy')) {
-		result = document.getElementById("header-markup").innerHTML;
-	} else {
-		console.error('failed to get clipboard content');
-		result = false;
-	}
-	
-	if (result !== false) {
-		var paperName = document.getElementById("newspaper").innerText;
-		var title = document.getElementById("hyper").innerText;
-		var url = "https://docs.google.com/document/create?title=LTE ";
-		title = encodeURIComponent(paperName + "- " + title.substring(0,31));
-		url += title;
+	var paperName = document.getElementById("newspaper").innerText;
+	var title = document.getElementById("hyper").innerText;
+	title = "LTE " + encodeURIComponent(paperName + "- " + title.substring(0,31));
 
-		location.replace(url);
+	var sanitized_link = $("#hyper").attr("href").replace("https", "PROTOCOL1").replace("http", "PROTOCOL2");
+	var sanitized_lteaddr = $("#submit_addr").text().replace("https", "PROTOCOL1").replace("http", "PROTOCOL2");
+	
+	var params = {
+		author: $("#auth_text").text().trim(),
+		paper: $("#newspaper").text().trim(),
+		responding_title: $("#hyper").text().trim(),
+		responding_url: sanitized_link,
+		lteaddr: sanitized_lteaddr,
+		title: title.trim()
 	}
+	
+	showSpin(true);
+	$.ajax("./createdraft.php", {data: params})
+		.done((resultString)=>{
+			showSpin(false);
+			try {
+				var result = JSON.parse(resultString);
+				var url = "https://docs.google.com/document/d/" + result.id + "/copy?title=" + title;
+				location.replace(url);
+			}
+			catch (e) {
+				alert("Unable to create the draft doc: " + (e.message ? e.message : e));
+				showSpin(false);
+			}
+		})
+		.fail((e)=>{
+			alert("Unable to create the draft doc: " + e);
+			showSpin(false);
+		});
 }

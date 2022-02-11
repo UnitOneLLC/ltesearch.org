@@ -40,6 +40,8 @@
 		}
 	}
 	
+
+	
 	
 ?>
 <!DOCTYPE html>
@@ -56,13 +58,18 @@
 				margin: 30px auto;
 			}
 			#hint {
-				margin-left: 20px; 
 				font-style: italic;
-				display: inline-block;
 				width: 50%;
+				margin-top: 20px;
 			}
 			#copyAndGoBtn {
 				vertical-align: top;
+			}
+			#spinner-prompt {
+				vertical-align: top;
+			}
+			#spinner {
+				margin-top: -15px;
 			}
 		</style>
 		<title>Create LTE Draft</title>
@@ -87,11 +94,11 @@ To the editor:
 <div id="endCopy">
 </div>
 		<div>
-			<button id="copyAndGoBtn">Copy header and create Google doc</button>
-			<div id="hint">
-				When the Google doc opens, you can click on the blank document and then paste in the header above.<br>
-				How to paste: For Window, press ^v (control v). For Mac &#8984;-v (command v).
-			</div>
+			<button id="copyAndGoBtn">Create a draft letter doc</button>
+			<span id="spinner-prompt">creating doc . . . </span><img id="spinner" height="45px" src="../search/loading_spinner.gif"/>
+		</div>
+		<div id="hint">
+			You will be asked to make a copy of a document. <br>Click the 'Make a copy' button.
 		</div>
 	</body>
 </html>

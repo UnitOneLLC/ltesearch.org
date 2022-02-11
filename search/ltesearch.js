@@ -222,7 +222,7 @@ function setClipboardMulti(items) {
         
         for (var i=0; i < items.length; ++i) {
             var t = items[i];
-            var readerUrl = bInclReader ? makeReaderUrl(t.zlink) : null;
+            var readerUrl = bInclReader && (t.zlink.indexOf(".pdf")==-1) ? makeReaderUrl(t.zlink) : null;
             var draftUrl = bIncDraft ? makeDraftUrl(t.zlink) : null;
             var link = createLink(t.paper, trimTitle(t.title), t.url, readerUrl, draftUrl);
             outer.appendChild(link);
@@ -510,7 +510,7 @@ function walkUpToRow(e) {
 
 function getDigest() {
     document.title = docTitle;
-    
+//    onClearSelection();
     $("#digest tbody tr").remove();
     $("#loading").show();
     var url = 'ltesearch.php';

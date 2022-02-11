@@ -6,8 +6,8 @@
 	$using_alternates = false;
 	$trace = 0;
 	$user_agents = [ #https://developers.whatismybrowser.com/useragents/parse/
-		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36",
 		"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36",
 		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/18.17763",
 		"Googlebot-News",
 		"Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)",
@@ -176,6 +176,12 @@
 		return $html;
 	}
 	
+	function hasKnownBodyClass($elem) {
+		$known_body_classes = ["lead "];
+		$classAttr = $elem->getAttribute("class");
+		return contains_any_of($classAttr, $known_body_classes);
+	}
+	
 	function looksLikeArticleBody($elem) {
 		global $trace;
 		$looksGood;
@@ -213,6 +219,10 @@
 					}
 				}
 			}
+			if (hasKnownBodyClass($elem)) {
+				$looksGood = true;
+			}
+				
 			if ($looksGood) {
 				return true;
 			}
@@ -220,7 +230,7 @@
 		return false;
 	}
 	
-	function insertSubmitAddress() {
+	function insertDraftButton() {
 		global $u;
 		global $host;
 		
@@ -230,16 +240,10 @@
 			$conn = null;
 			
 			if (!empty($paper["lteaddr"])) {
-				$lteaddr = $paper["lteaddr"];
-				if (strncmp($lteaddr, "http", 4) !== 0) { # form, build link
-					$link = "mailto:" . $lteaddr;
-				}
-				else {
-					$link = $lteaddr;
-				}
+				$link = "https://ltesearch.org/draft?z=" . encode_url($u);
 	?>
-				<div style="padding: 30px 0; font-weight:bold; font-family:arial">
-					Submit letters to <a href="<?php echo $link;?>"><?php echo $lteaddr?></a>
+				<div style="padding: 30px 0;">
+					<a target="_blank" href="<?php echo $link;?>">Create a draft letter</a>
 				</div>
 	<?php
 			}
@@ -453,7 +457,7 @@
 		}
 			
 		
-		insertSubmitAddress();
+		insertDraftButton();
 			
 		?>
 	</div>	
