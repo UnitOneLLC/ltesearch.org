@@ -2,19 +2,63 @@
 
 $(document).ready(function() {
 	showSpin(false);
-	$("#date").text(formatDate(new Date()));
 	$("#copyAndGoBtn").click(createDraftAndGo);
+	$("#author").on("keyup", onAuthChange);
+	$("#author").on("blur", onAuthBlur);	
+	$("#btn-chg-auth").click(onClickChangeAuthor);
 	setupAuthor();
 });
 
-
-function setupAuthor() {
-	var cookieLookup = parseCookie(document.cookie);
-	if (cookieLookup["author"]) {
-		$("#author").val(cookieLookup["author"]);
+function enableButton(enabled) {
+	if (enabled) {
+		$("#copyAndGoBtn").prop("disabled", false);		
+		$("#copyAndGoBtn").css("background-color", "rgba(30,30,120,1)");
 	}
 	else {
-		$("#author").val("Enter your name");
+		$("#copyAndGoBtn").prop("disabled", true);		
+		$("#copyAndGoBtn").css("background-color", "#999");		
+	}
+}
+
+
+function onAuthChange() {
+	if ($("#author").val())
+		enableButton(true);
+	else
+		enableButton(false);
+}
+
+function onAuthBlur() {
+	$.cookie("author", $("#author").val());
+}
+
+function onClickChangeAuthor() {
+	$.removeCookie("author");
+	setupAuthor();
+}
+
+
+function setupAuthor() {
+	var authorText = $.cookie("author");
+	if (authorText === "undefined" || authorText === null)
+		authorText = "";
+	if (authorText) {
+		$("#no-cookie").hide();
+		$("#have-cookie").show();
+		$("#btn-chg-auth").show();
+		$("#author").val(authorText);
+		$("#auth-text").text(authorText);
+		$("#author").hide();
+		enableButton(true);		
+	}
+	else {
+		$("#no-cookie").show();
+		$("#have-cookie").hide();
+		$("#btn-chg-auth").hide();
+		$("#author").show();
+		$("#author").val("");
+		$("#author").focus();
+		enableButton(false);		
 	}
 }
 
@@ -55,21 +99,20 @@ function showSpin(on) {
 function createDraftAndGo() {
 	
 	var author =  $("#author").val();
-	document.cookie = "author=" + author;
-	$("#auth_text").text(author);
+	$("#auth-text").text(author);
 	$("#author").remove();
 	
-	var paperName = document.getElementById("newspaper").innerText;
-	var title = document.getElementById("hyper").innerText;
+	var paperName = g_newspaper;
+	var title = g_title;
 	title = "LTE " + encodeURIComponent(paperName + "- " + title.substring(0,31));
 
-	var sanitized_link = $("#hyper").attr("href").replace("https", "PROTOCOL1").replace("http", "PROTOCOL2");
-	var sanitized_lteaddr = $("#submit_addr").text().replace("https", "PROTOCOL1").replace("http", "PROTOCOL2");
+	var sanitized_link = g_url.replace("https", "PROTOCOL1").replace("http", "PROTOCOL2");
+	var sanitized_lteaddr = g_lteaddr.replace("https", "PROTOCOL1").replace("http", "PROTOCOL2");
 	
 	var params = {
-		author: $("#auth_text").text().trim(),
-		paper: $("#newspaper").text().trim(),
-		responding_title: $("#hyper").text().trim(),
+		author: $("#auth-text").text().trim(),
+		paper: g_newspaper.trim(),
+		responding_title: g_title.trim(),
 		responding_url: sanitized_link,
 		lteaddr: sanitized_lteaddr,
 		title: title.trim()
