@@ -113,8 +113,7 @@
 	}
 	# need to handle this syntax:
 	#    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	function getCharSet($doc) {
-		$metas = $doc->getElementsByTagName("meta");
+	function getCharSet($metas) {
 		
 		foreach ($metas as $node) {
 			$cs = $node->getAttribute("charset");
@@ -132,6 +131,44 @@
 						return "utf-8";
 					}
 				}
+			}
+		}
+		return null;
+	}
+	
+	function getByLine($metas) {
+		foreach ($metas as $node) {
+			$time_string = "";
+			$name = $node->getAttribute("name");
+			if (!empty($name) && $name == "byl") {
+				$byline = $node->getAttribute("content");
+				dbg_trace(1, "byline found in meta=", $byline);
+				return $byline;
+			}
+		}
+		return null;
+	}
+	
+	function getPublishDate($metas) {
+		foreach ($metas as $node) {
+			$time_string = "";
+			$prop = $node->getAttribute("property");
+			if (!empty($prop) && $prop == "article:published_time") {
+				$time_string = $node->getAttribute("content");
+				dbg_trace(1, "prop article:published_time content=", $time_string);
+				break;
+			}
+			$prop = $node->getAttribute("itemprop");
+			if (!empty($prop) && ($prop == "dateCreated" || $prop=="datePublished")) {
+				$time_string = $node->getAttribute("content");
+				dbg_trace(1, "prop article:dateCreated content", $time_string);
+				break;
+			}
+			try {
+				$time_string = date_format(date_create($time_string),"M d, Y");
+				return $time_string;
+			} catch (Exception $e) {
+				return null;
 			}
 		}
 		return null;
@@ -325,8 +362,13 @@
 			dbg_trace(5, "html data", htmlentities($d));
 			$doc = new DOMDocument();
 			$doc->loadHTML($d);
-			$charset = getCharSet($doc);
-			dbg_trace(1, "char set", $charset);
+			$metas = $doc->getElementsByTagName("meta");
+			$charset = getCharSet($metas);
+			dbg_trace(1, "char set", $charset);			
+			$pub_time = getPublishDate($metas);
+			dbg_trace(1, "publish time: ", $pub_time);
+			$by_line = getByLine($metas);
+			
 			$need_utf8_decode  = (strcasecmp($charset, "utf-8") !== 0 or $host=='washingtonpost.com');
 
 			$titles = $doc->getElementsByTagName("title");
@@ -424,10 +466,25 @@
 			}
 		?>
 	</h2>
-	<div>
-		<a href="<?php echo $u; ?>"><?php echo "(" . $u . ")";?></a>
-		<div><?php insertImage(); ?></div>
+
+
+	<div style="font-size:0.8em;margin:8px 0">
+		<a href="<?php echo $u; ?>"><?php echo $u;?></a>
+		<div style="margin:8px 0"><?php insertImage(); ?></div>
 	</div>
+	<?php 
+			if (!empty($by_line)) { ?>
+				<div style="font-style: italic;"><?php echo $by_line?></div>
+			<?php
+			}
+			if (!empty($pub_time)) { ?>
+		<p id="pub-time" style="margin-top: 2px">
+			<?php
+				echo $pub_time;
+			?>
+		</p>
+	<?php }
+	?>
 	<div  id="main" style="font-size: 1.1em; line-height: 1.4;">
 		<?php
 		
