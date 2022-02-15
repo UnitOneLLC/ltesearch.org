@@ -74,26 +74,28 @@
 			}
 			h1 {
 				margin-bottom: 5px;
-				font-weight: 500;
-				background: linear-gradient(#eee, #ccc);
+				font-weight: 200;
+				background: linear-gradient(#f0f0f0, #d0d0d0);
 				padding: 10px;
+				font-size: 1.5em;
 			}
 			h2 {
-				font-size: 1.1em;
-				font-weight: 500;
+				font-size: 1.0em;
+				font-weight: 200;
 			}
 			#copyAndGoBtn {
 				vertical-align: top;
-				font-size: 1.1em;
+				font-size: 1.0em;
 				margin: 10px 0 10px 0;
 				background-color: rgba(30,30,120,1);
 				color: white;
-				padding: 2px 5px;
+				padding: 3px 7px;
 				border-radius: 8px;
 			}
 			#btn-chg-auth {
 				font-size: 0.75em;
 				margin-left: 5px;
+				padding: 0 2px 2px 2px;
 			}
 			#spinner-prompt {
 				vertical-align: super;
