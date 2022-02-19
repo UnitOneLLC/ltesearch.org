@@ -1,6 +1,6 @@
 <?php
 	// This is the URL from the app deployment
-	$url ="https://script.google.com/macros/s/AKfycbyIG_9PlyZ_zv1QxLItMVA82z18FDcug2T9tZOt4MeBFCklDlBCzKkfRjN_dvJzwtSQ/exec";
+	$url ="https://script.google.com/macros/s/AKfycbx8cKGhFC440b_FwdZa4fYgyTy3uZ--g8S6YA7supo38BrPJwORjbpRzPtYvSuaj2Ps/exec";
 
 	echo file_get_contents($url . "?" . $_SERVER['QUERY_STRING']);
 	

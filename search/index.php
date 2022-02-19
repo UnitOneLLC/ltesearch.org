@@ -115,6 +115,10 @@ function _bot_detected() {
             color: white;
         }
         
+        table>tbody tr.selected-row a  {
+            color: yellow !important;
+        }
+            
         #controls div select, #controls div button {
             vertical-align: top;
         }

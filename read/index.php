@@ -35,15 +35,24 @@
 	$visitNode = function ($elem) {
 		global $found_para_count;
 		global $using_alternates;
-		global $relativeUrlFix;
+		global $preFilterDOM;
 		
-		if ($elem->nodeName == 'article' or ($using_alternates and ($elem->nodeName == 'div'))) {
+		if ($elem->nodeName == 'article' or ($using_alternates and (($elem->nodeName == 'div') or ($elem->nodeName == 'section')))) {
 			$visited = $elem->getAttribute("ltesearch");
 			if ($visited == 'true') {
 				return;
 			}
 			else {
 				$elem->setAttribute("ltesearch", "true");
+			}
+		}
+		if ($elem->nodeName == "div") {
+			$cls = $elem->getAttribute("class");
+			if ((stripos($cls, "byline") !== false) || 
+				(stripos($cls, "by_") !== false) ||
+				(stripos($cls, "authors") !== false)) {
+				echo innerHtml($elem);
+				return;
 			}
 		}
 		
@@ -74,7 +83,7 @@
 		}
 	};
 
-	$relativeUrlFix = function($elem) {
+	$preFilterDOM = function($elem) {
 		global $targetHostPrefix;
 		if ($elem->nodeName == 'a') {
 			$href = $elem->getAttribute("href");
@@ -92,10 +101,16 @@
 				$elem->setAttribute("src", $src);
 			}
 		}
+		else if ($elem->nodeName == "svg") {
+			$elem->parentNode->removeChild($elem);
+		}
 	};
 	
 	function dump_meta($doc) {
 		global $trace;
+		
+		if (empty($doc)) return;
+		
 		dbg_trace(2, "enter dump meta");
 		if ($trace >= 2) {
 			$metas = $doc->getElementsByTagName("meta");
@@ -149,6 +164,8 @@
 	}
 	
 	function getPublishDate($metas) {
+		global $u;
+		
 		foreach ($metas as $node) {
 			$time_string = "";
 			$prop = $node->getAttribute("property");
@@ -175,9 +192,29 @@
 			}
 		}
 
+		$dt = get_date_from_url($u);
+		if ($dt !== false) {
+			return strval($dt["month"]) . "/" . strval($dt["day"]) . "/" . strval($dt["year"]);
+		}
+		
 		return null;
 	}
+	
+	function get_date_from_url($surl) {
+		$reg_ex = "/\/(20\d\d)\/(\d\d)\/(\d\d)\//";
+		if (preg_match($reg_ex, $surl, $matches) > 0) {
+			$dt = array();
+			$dt["day"] = $matches[3];
+			$dt["month"] = $matches[2];
+			$dt["year"] = $matches[1];
+			return $dt;
+		}
+		else {
+			return false;
+		}
+	}
 
+	
 	function contains_any_of($str, $needles) {
 		if (empty($str))
 			return false;
@@ -299,6 +336,8 @@
 	function insertImage() {
 		global $doc;
 		
+		if (empty($doc)) return;
+		
 		$image = null;
 		
 		$metas = $doc->getElementsByTagName("meta");
@@ -363,6 +402,7 @@
 		foreach ($user_agents as $ua) {
 			dbg_trace(1, "read with user-agent ", $ua);
 			$d = read_html_from_url($u, $ua);
+			if (empty($d)) continue;
 			dbg_trace(5, "html data", htmlentities($d));
 			$doc = new DOMDocument();
 			$doc->loadHTML($d);
@@ -391,17 +431,19 @@
 				$title = null;
 		}
 		
-		dump_meta($doc);
-				
-		walkDom($doc, $relativeUrlFix);
-		
-		$articles = $doc->getElementsByTagName("article");
-		dbg_trace(1, "article count", strval(count($articles)));
-
-		if (empty($articles) or (count($articles) == 0)) {
-			$articles = getAlternateArticles($doc);
-			$using_alternates = true;
-			dbg_trace(1, "using alternates");
+		if (!empty($doc)) {
+			dump_meta($doc);
+			
+			walkDom($doc, $preFilterDOM);
+			
+			$articles = $doc->getElementsByTagName("article");
+			dbg_trace(1, "article count", strval(count($articles)));
+			
+			if (empty($articles) or (count($articles) == 0)) {
+				$articles = getAlternateArticles($doc);
+				$using_alternates = true;
+				dbg_trace(1, "using alternates");
+			}
 		}
 	}
 	catch (Exception $e) {
@@ -443,7 +485,7 @@
 	</script>
 
 </head>
-<body onload=setupFontControl() >
+<body onload=setupFontControl() style="background-color: #eee;">
 <div id="font-control" style="position:fixed; left:5px; top:15px">
 	<table><tr>
 		<td>
@@ -463,7 +505,7 @@
 		</td>
 	</tr></table>
 </div>
-<div style="max-width:700px; margin: 0 auto; font-family:arial;">
+<div style="max-width:700px; margin: 0 auto; font-family:arial; background-color: white; padding: 20px; filter: drop-shadow(0 0 4px #bbb);">
 	<h2>
 		<?php
 			if (!empty($title)) {
@@ -493,7 +535,7 @@
 	<div  id="main" style="font-size: 1.1em; line-height: 1.4;">
 		<?php
 		
-		if (count($articles) > 0) {
+		if (!empty($articles) and (count($articles) > 0)) {
 			dbg_trace(1, "begin main dom walk");
 			foreach($articles as $article) {
 				walkDom($article, $visitNode);

@@ -1,6 +1,7 @@
 <?php
 include "../common/version.php";
 include "../common/urlcode.php";
+
 ?>
 <!DOCTYPE html>
 <head>
@@ -61,6 +62,21 @@ include "../common/urlcode.php";
         $encoded = encode_url($url);
         $text_url = "https://ltesearch.org/read?z=" . $encoded;
         $draft_url = "https://ltesearch.org/draft?z=" . $encoded;
+        
+        
+        
+        $title = $url;
+        $html = read_html_from_url($url);
+        $titleOffset = strpos($html, "<title>");
+        if ($titleOffset !== false) {
+            $titleOffset += strlen("<title>");
+            $titleEnd = strpos($html, "</title>");
+            if ($titleEnd !== false) {
+                $title = substr($html, $titleOffset, $titleEnd-$titleOffset);
+            }
+        }
+        $alt_style = "background-color: #11a;color: #fff;font-family: sans-serif;font-variant: small-caps;padding: 0px 2px 0px 2px;cursor:pointer;text-decoration: none;font-size:0.9em;font-weight:800";
+        
     }
     catch (Exception $e) {
         $valid_url = false;
@@ -72,6 +88,10 @@ include "../common/urlcode.php";
                 if ($valid_url) {
                     echo "<p>Text:&#9;<a href='$text_url'>$text_url</a></p>";
                     echo "<p>Draft:&#9;<a href='$draft_url'>$draft_url</a></p>";
+                    echo "<p>Link:&#9;<a href='$url'>$title</a>&nbsp;
+                          <a style='$alt_style' href='$text_url'>text</a>&nbsp;
+                          <a style='$alt_style' href='$draft_url'>draft</a></p>
+                        </p>";
                 }
                 else {
                     echo "<p>The input URL is invalid.</p>&nbsp;<a href='./geturl.php'>Back</a>";
