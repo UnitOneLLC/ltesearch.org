@@ -168,5 +168,14 @@ class LTE_DB {
 		$stmt = null;
 		return $result;
 	}
+	/*
+	 * Get the URL of the webapp used to create draft docs
+	 */
+	function get_draft_webapp_url() {
+		$stmt = $this->_conn->query("select url from draft_webapp where is_current=true");
+		$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'url');
+		$stmt = null;
+		return $result;		
+	}
 }
 ?>
