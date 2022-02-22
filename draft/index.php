@@ -2,6 +2,8 @@
 	include "../common/version.php";
 	include "../common/urlcode.php";
 	include "../common/lte_db.php";
+
+	error_reporting(E_ERROR | E_PARSE);
 	
 	$u = $_GET['u'];
 	
@@ -30,18 +32,17 @@
 	
 	
 	$title = $u;
+	$title=str_replace("https://", "", $title);
+	$title=str_replace("http://", "", $title);
 	$html = read_html_from_url($u);
-	$titleOffset = strpos($html, "<title>");
+	$titleOffset = strpos($html, "<title");
 	if ($titleOffset !== false) {
-		$titleOffset += strlen("<title>");
+		$titleOffset = strpos($html, ">", $titleOffset)+1;
 		$titleEnd = strpos($html, "</title>");
 		if ($titleEnd !== false) {
 			$title = substr($html, $titleOffset, $titleEnd-$titleOffset);
 		}
 	}
-	
-	
-	
 	
 ?>
 <!DOCTYPE html>

@@ -52,31 +52,33 @@ include "../common/urlcode.php";
 <?php } else if ($_SERVER['REQUEST_METHOD'] === 'POST') { 
     $valid_url = true;
     try {    
-        $url = $_POST["input_url"];
-        $parsed = parse_url($url);
-        
-        if (empty($url) or  ($parsed["scheme"] != "http" and $parsed["scheme"] != "https") or empty($parsed["host"])) {
-            throw new Exception("bogus url");
+      $url = $_POST["input_url"];
+      $parsed = parse_url($url);
+      
+      if (empty($url) or  ($parsed["scheme"] != "http" and $parsed["scheme"] != "https") or empty($parsed["host"])) {
+        throw new Exception("bogus url");
+      }
+      
+      $encoded = encode_url($url);
+      $text_url = "https://ltesearch.org/read?z=" . $encoded;
+      $draft_url = "https://ltesearch.org/draft?z=" . $encoded;
+      
+      $title = $url;
+      $title=str_replace("https://", "", $title);
+      $title=str_replace("http://", "", $title);
+      
+      $html = read_html_from_url($url);
+      $titleOffset = strpos($html, "<title");
+      if ($titleOffset !== false) {
+        $titleOffset = strpos($html, ">", $titleOffset)+1;
+        $titleEnd = strpos($html, "</title>");
+        if ($titleEnd !== false) {
+          $title = substr($html, $titleOffset, $titleEnd-$titleOffset);
         }
-        
-        $encoded = encode_url($url);
-        $text_url = "https://ltesearch.org/read?z=" . $encoded;
-        $draft_url = "https://ltesearch.org/draft?z=" . $encoded;
-        
-        
-        
-        $title = $url;
-        $html = read_html_from_url($url);
-        $titleOffset = strpos($html, "<title>");
-        if ($titleOffset !== false) {
-            $titleOffset += strlen("<title>");
-            $titleEnd = strpos($html, "</title>");
-            if ($titleEnd !== false) {
-                $title = substr($html, $titleOffset, $titleEnd-$titleOffset);
-            }
-        }
-        $alt_style = "background-color: #11a;color: #fff;font-family: sans-serif;font-variant: small-caps;padding: 0px 2px 0px 2px;cursor:pointer;text-decoration: none;font-size:0.9em;font-weight:800";
-        
+      }
+      
+      $alt_style = "background-color: #11a;color: #fff;font-family: sans-serif;font-variant: small-caps;padding: 0px 2px 0px 2px;cursor:pointer;text-decoration: none;font-size:0.9em;font-weight:800";
+      
     }
     catch (Exception $e) {
         $valid_url = false;

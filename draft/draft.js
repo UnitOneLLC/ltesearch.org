@@ -125,7 +125,7 @@ function createDraftAndGo() {
 			try {
 				var result = JSON.parse(resultString);
 				var url = "https://docs.google.com/document/d/" + result.id + "/copy?title=" + title;
-				location.replace(url);
+				location.assign(url);
 			}
 			catch (e) {
 				alert("Unable to create the draft doc: " + (e.message ? e.message : e));
