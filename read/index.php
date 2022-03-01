@@ -419,11 +419,11 @@
 			$titles = $doc->getElementsByTagName("title");
 			if (count($titles) > 0) {
 				$title  = $titles->item(0)->textContent;
-				if (strcasecmp($charset, "utf-8") !== 0) {
+				if (strcasecmp($charset, "utf-8") !== 0) {	
 					$title = utf8_decode($title);
 				}
 				dbg_trace(1, "title", $title);
-				if (trim($title) !== "Access Denied") {
+				if ((trim($title) !== "Access Denied") && (stripos($title, "are you a robot") == false)) {
 					break;
 				}
 			}
@@ -464,16 +464,25 @@
 		?>
 	</title>
 	<meta charset="UTF-8"/>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+	
 	<script type="text/javascript">
+		const FONT_COOKIE_NAME = "reader-font-size";
 		function setupFontControl() {
 			document.getElementById("btn-font-up").addEventListener("click", ()=>incrFont());
-			document.getElementById("btn-font-down").addEventListener("click", ()=>decrFont());        
+			document.getElementById("btn-font-down").addEventListener("click", ()=>decrFont());
+			var fontSize = $.cookie(FONT_COOKIE_NAME);
+			if (fontSize) {
+				document.getElementById("main").style.fontSize = fontSize.toString() + "em";				
+			}
 		}
 		
 		function incrFont() {
 			var fs = parseFloat(document.getElementById("main").style.fontSize);
 			fs += 0.1;
 			document.getElementById("main").style.fontSize = fs.toString() + "em";
+			$.cookie(FONT_COOKIE_NAME, fs.toString());
 		}
 		
 		function decrFont() {
@@ -481,6 +490,9 @@
 			fs -= 0.1;
 			if (fs > 0.2)
 				document.getElementById("main").style.fontSize = fs.toString() + "em";
+			else fs = 0.3;
+			
+			$.cookie(FONT_COOKIE_NAME, fs.toString());			
 		}
 	</script>
 

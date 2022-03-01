@@ -34,7 +34,7 @@
 	$title = $u;
 	$title=str_replace("https://", "", $title);
 	$title=str_replace("http://", "", $title);
-	$html = read_html_from_url($u);
+	$html = read_html_from_url($u,"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)");
 	$titleOffset = strpos($html, "<title");
 	if ($titleOffset !== false) {
 		$titleOffset = strpos($html, ">", $titleOffset)+1;
