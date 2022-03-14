@@ -45,6 +45,7 @@ $(document).ready(function() {
     $("#param-summary").text(getParamsSummary());
     $("#region").on("change", resetParamsSummary);
     $("#topic").on("change", resetParamsSummary);    
+    $("#table-builder").click(onBuildTable);
     
     var sel = document.querySelector("select[name=paper-lookup]");
     sel.addEventListener("change", doFilterPaper)
@@ -119,6 +120,7 @@ function createLink(paperName, text, url, readerUrl, draftUrl) {
     
     return root;
 }
+
 
 function theDataTable() {
     return $("#digest").DataTable();
@@ -259,7 +261,71 @@ function setClipboardMulti(items) {
     
 }
 
-function copySelected() {
+/*** not used
+function setClipboardMultiTable(items)
+{
+    var outer = document.createElement("div");
+    var last = document.createElement("div");
+    var table = document.createElement("table");
+    var tbody = document.createElement("tbody");
+    table.appendChild(tbody);
+    outer.appendChild(table);
+
+    var c = items.length;
+    if (c == 0)
+        return false;
+    else {
+        $(outer).css("background-color", "white");
+        $(outer).css("color", "black");
+        
+        var bInclReader = $("#incl-text-only").is(":checked");
+        var bIncDraft = $("#incl-create-draft").is(":checked");
+        
+        items.sort(function(a,b) {return a.title.localeCompare(b.title)});
+        
+        for (var i=0; i < items.length; ++i) {
+            var t = items[i];
+            var readerUrl = bInclReader && (t.zlink.indexOf(".pdf")==-1) ? makeReaderUrl(t.zlink) : null;
+            var draftUrl = bIncDraft ? makeDraftUrl(t.zlink) : null;
+            var row = createRow(t.paper, trimTitle(t.title), t.url, readerUrl, draftUrl);
+            tbody.appendChild(row);
+        }
+        document.body.appendChild(outer);
+        document.body.appendChild(last);
+        var range = document.createRange();
+        
+        range.setStart(outer, 0);
+        range.setEnd(last, 0);
+        
+        var selObj = window.getSelection()
+        selObj.removeAllRanges();
+        selObj.addRange(range);
+        
+        var nItems = $(".selected-row").length;
+        
+        var ok;
+        if (document.execCommand('copy')) {
+            if (nItems === 1) {
+                $("#copy-feedback").text("1 article copied");
+            } else {
+                $("#copy-feedback").text("" + nItems + " articles copied");
+            }
+            ok = true;
+        } else {
+            console.error('failed to get multi clipboard content');
+            ok = false;
+        }
+        outer.remove();
+        last.remove();
+        return ok;
+    }
+}
+****/
+
+function copySelected(obj, fnDomBuilder) {
+    if (!fnDomBuilder) {
+        fnDomBuilder = setClipboardMulti;
+    }
     var items = [];
     var rowChecks = $("td>input[type=checkbox]");
     for (var i=0; i < rowChecks.length; ++i) {
@@ -274,7 +340,16 @@ function copySelected() {
             items.push(selected);
         }
     }
-    setClipboardMulti(items);
+    fnDomBuilder(items);
+}
+
+function onBuildTable() {
+    copySelected(null, postSelectedToEditor);
+}
+
+function postSelectedToEditor(items) {
+    $("#items_json").val(JSON.stringify(items));
+    $("#edit-form").submit();
 }
 
 function isLoggedIn() {

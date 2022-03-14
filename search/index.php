@@ -219,6 +219,12 @@ function _bot_detected() {
                         <div style="float:right">
                             <button id="clear-selection">Clear selection</button>
                         </div>
+                        <div style="float:right">
+                            <form id="edit-form" action="../editor/index.php" method="post">
+                                <button id="table-builder">Beta</button>
+                                <input id="items_json" name="items_json" type="hidden"/>
+                            </form>
+                        </div>
                         <div style="margin-top:3px; font-size:smaller; font-family: arial;">
                             Display:&nbsp
                             <input type="radio" id="radio_all" name="disp_sel" value="all">
