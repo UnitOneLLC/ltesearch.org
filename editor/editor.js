@@ -123,6 +123,7 @@ function createCommentRow(seq) {
         xrow.appendChild(cell);
     }
     
+    $(xrow).css("font-weight", "bold");
     return xrow;
 }
 
@@ -130,7 +131,7 @@ function doCopy() {
     var rows = $("#result_table tbody tr");
     for (var i=0; i < rows.length; ++i) {
         var firstCell = rows[i].firstChild;
-        firstCell.style.color= "#ffffff";
+        $(firstCell).text(" ");
     }
 
     for (i = rows.length-1; i >= rows.length/2; --i) {
@@ -168,7 +169,7 @@ function doCopy() {
 
     for (i=0; i < rows.length; ++i) {
         var firstCell = rows[i].firstChild;
-        firstCell.style.color= "#000000";
+        $(firstCell).text(i.toString());
     }
     if (window.getSelection().empty)
         window.getSelection().empty();
