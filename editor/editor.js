@@ -1,4 +1,4 @@
-// ltesearch.js
+// editor.js
 
 var USE_TEST_DATA = false;
 
@@ -21,8 +21,16 @@ var DATA_TABLE_OPTIONS = {
         ]
 }
 
+var helpString = "You can reorder the rows of the table by dragging lines up and down. Click and hold on " + 
+    "the sequence number in the leftmost column to drag. You can write comments in the blank " +
+    "areas and drag them to the appropriate position in the table.";
+
 $(document).ready(function() {
     $("#copy-btn").click(doCopy);
+    $("#add-url-btn").click(doAddUrl);
+    $("#toggle-help").click(doToggleHelp);
+    $("#help-pane").hide();
+    $("#help-pane").text(helpString);
     buildResultTable(items);
 });
 
@@ -48,7 +56,7 @@ function createRow(seq, paperName, text, url, readerUrl, draftUrl) {
     anch.href = url;
     var textNode = document.createTextNode(text);
     anch.appendChild(textNode);
-    linkCell.setAttribute("style","font-size:14.5px");
+//    linkCell.setAttribute("style","font-size:14.5px");
     
     if (readerUrl) {
         var readerAnch = document.createElement("a");
@@ -173,4 +181,68 @@ function doCopy() {
     }
     if (window.getSelection().empty)
         window.getSelection().empty();
+}
+
+function doAddUrl() {
+
+    var url = $("#url-to-add-input").val();
+    if (url.length == 0)
+        return;
+
+    var params = {
+        action: "lookup",
+        url: url
+    }
+    
+    $.ajax("./editor_ajax.php", {data: params})
+    .done((resultString)=>{
+        try {
+            console.log(resultString);
+            var rowData = JSON.parse(resultString);
+            
+            var readerUrl = rowData.zlink ? makeReaderUrl(rowData.zlink) : "#";
+            var draftUrl = rowData.zlink ? makeDraftUrl(rowData.zlink) : "#";
+            var nRows = $('#result_table tr').length;
+
+            var newRow = createRow(nRows, rowData.paper, rowData.title, url, readerUrl, draftUrl);
+
+            gDataTable.row.add([
+                nRows-1,
+                rowData.paper,
+                newRow.childNodes[2].innerHTML,
+                newRow.childNodes[3].innerHTML,
+                newRow.childNodes[4].innerHTML
+            ]);
+            
+            var commentRow = createCommentRow(nRows);
+            gDataTable.row.add([
+                nRows,
+                commentRow.childNodes[1].innerHTML,
+                commentRow.childNodes[2].innerHTML,
+                commentRow.childNodes[3].innerHTML,
+                commentRow.childNodes[4].innerHTML
+            ]);
+            
+            gDataTable.draw();
+            
+            var allRows = $("#result_table tr");
+            var commentRow = allRows[allRows.length-2];
+            allRows[allRows.length-3].childNodes[1].style = "padding-left:30px";
+            commentRow.childNodes[1].style = "font-weight:bold";
+            commentRow.childNodes[1].setAttribute("contenteditable", "true");
+            commentRow.childNodes[1].setAttribute("colspan", 4);
+        }
+        catch (e) {
+            alert("Unable to get info for URL: " + (e.message ? e.message : e));
+        }
+    })
+    .fail((e)=>{
+        alert("Unable to add the URL" + e);
+        showSpin(false);
+    });
+
+}
+
+function doToggleHelp() {
+    $("#help-pane").toggle();
 }

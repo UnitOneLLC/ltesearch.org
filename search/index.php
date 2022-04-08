@@ -210,6 +210,12 @@ function _bot_detected() {
                     <summary id="sel-sum">Selection</summary>
                     <fieldset style="display:inline-block">
                         <div style="display:inline-block">
+                            <div style="display:inline-block">
+                                <form id="edit-form" action="../editor/index.php" method="post">
+                                    <button id="table-builder">Editor</button>
+                                    <input id="items_json" name="items_json" type="hidden"/>
+                                </form>
+                            </div>
                             <button id="copy-selected">Copy selected</button><br>
                             <input id="incl-text-only" type="checkbox" name="incl-text-only" style="margin-left:20px">
                             <label for="incl-text-only" style="font-size:0.9em">include text-only links</label><br>
@@ -218,12 +224,6 @@ function _bot_detected() {
                         </div>
                         <div style="float:right">
                             <button id="clear-selection">Clear selection</button>
-                        </div>
-                        <div style="float:right">
-                            <form id="edit-form" action="../editor/index.php" method="post">
-                                <button id="table-builder">Beta</button>
-                                <input id="items_json" name="items_json" type="hidden"/>
-                            </form>
                         </div>
                         <div style="margin-top:3px; font-size:smaller; font-family: arial;">
                             Display:&nbsp

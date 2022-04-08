@@ -50,15 +50,29 @@ include "../common/version.php";
         
         td:first-child {cursor: grab}
         
-        #copy-btn {
-            margin-top:10px;
+        #copy-btn, #add-url-btn {
+            margin:10px 0 0 0;
+        }
+        #url-to-add-input {
+            width: 300px;
+        }
+        #controls {
+            background-color: #777;
+            color: white;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        #help-pane {
+            padding: 3px;
+            margin: 5px 0;
+            font-style: italic;
         }
         
      </style>
 </head>
 
 <body>
-    <div id="container">
+    <div contenteditable id="container">
         <div id="head" contenteditable style="min-height:20px;">
             Good Morning,<br>
             <br>
@@ -75,10 +89,20 @@ include "../common/version.php";
             <br>
             Thanks for writing.<br>
             <br>
-            sig
+            &lt;signature&gt;
             <br>
         </div>
         <div id="_end_"></div>
-        <button id="copy-btn">Copy</button>&nbsp;<span id="copy-feedback"></span>
+        <div id="controls">
+            <div>
+                <button id="copy-btn" title="Copy the letter to the clipboard">Copy</button>&nbsp;<span id="copy-feedback"></span>
+            </div>
+            <div>
+                <span>Add another link:</span>&nbsp;<input id="url-to-add-input" type="text"><button id="add-url-btn">Add</button>
+                <button id="toggle-help" style="display:inline-div;float:right">?</button>
+            </div>
+            <div id="help-pane">
+            </div>
+        </div>
     </div>
 </body>
