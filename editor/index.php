@@ -67,6 +67,14 @@ include "../common/version.php";
             margin: 5px 0;
             font-style: italic;
         }
+        .del-btn {
+            font-weight: 800;
+            color: red;
+            text-align: center;
+            cursor:pointer;
+            background-color: transparent;
+            user-select: none;
+        }
         
      </style>
 </head>

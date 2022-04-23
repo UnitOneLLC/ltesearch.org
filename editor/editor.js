@@ -14,6 +14,7 @@ var DATA_TABLE_OPTIONS = {
     "rowReorder": true,
     "columns": [
         {type: "num" },
+        {type: "html"},
         {type: "text"},
         {type: "html"},
         {type: "html"},
@@ -31,23 +32,27 @@ $(document).ready(function() {
     $("#toggle-help").click(doToggleHelp);
     $("#help-pane").hide();
     $("#help-pane").text(helpString);
-    buildResultTable(items);
+    gDataTable = buildResultTable(items);
 });
 
 function createRow(seq, paperName, text, url, readerUrl, draftUrl) {
     var row = document.createElement("tr");
     var handle = document.createElement("td");
+    var delBtnCell = document.createElement("td");
     var paperCell = document.createElement("td");
     var linkCell = document.createElement("td");
     var textLinkCell = document.createElement("td");
     var draftLinkCell = document.createElement("td");
     row.appendChild(handle);
+    row.appendChild(delBtnCell);
     row.appendChild(paperCell);
     row.appendChild(linkCell);
     row.appendChild(textLinkCell);
     row.appendChild(draftLinkCell);
     
     handle.appendChild(document.createTextNode(seq.toString()));
+    delBtnCell.innerHTML = "<span onclick='deleteRow(this)' class=del-btn contenteditable=false>x</span>";
+    $(delBtnCell).addClass("del-btn");
     paperCell.appendChild(document.createTextNode(paperName));
     paperCell.setAttribute("style", "padding-left:30px");
     var anch = document.createElement("a");
@@ -61,20 +66,20 @@ function createRow(seq, paperName, text, url, readerUrl, draftUrl) {
     if (readerUrl) {
         var readerAnch = document.createElement("a");
         readerAnch.setAttribute("title", "view text");
-        readerAnch.setAttribute("style", "background-color: #11a;color: #fff;font-family: sans-serif;font-variant: small-caps;padding: 0px 2px 0px 2px;cursor: pointer;text-decoration: none;font-size:0.9em;font-weight:800");;
+        readerAnch.setAttribute("style", "background-color: #11a;color: #fff;font-family: sans-serif;font-variant: small-caps;padding: 0px 2px 0px 2px;cursor: pointer;text-decoration: none;font-size:0.85em;font-weight:600");;
         textLinkCell.appendChild(document.createTextNode("  "));
         textLinkCell.appendChild(readerAnch);
         readerAnch.href = readerUrl;
-        readerAnch.innerHTML = " text";        
+        readerAnch.innerHTML = "&nbsp;text&nbsp;";        
     }
     
     if (draftUrl) {
         var draftAnch = document.createElement("a");
         draftAnch.setAttribute("title", "create draft letter");
-        draftAnch.setAttribute("style", "background-color: #11a;color: #fff;font-family: sans-serif;font-variant: small-caps;padding: 0px 2px 0px 2px;cursor: pointer;text-decoration: none;font-size:0.9em;font-weight:800");
+        draftAnch.setAttribute("style", "background-color: #11a;color: #fff;font-family: sans-serif;font-variant: small-caps;padding: 0px 2px 0px 2px;cursor: pointer;text-decoration: none;font-size:0.85em;font-weight:600");
         draftLinkCell.appendChild(draftAnch);
         draftAnch.href = draftUrl;
-        draftAnch.innerHTML = " draft"; 
+        draftAnch.innerHTML = "&nbsp;draft&nbsp;"; 
     }
     
     return row;
@@ -112,7 +117,7 @@ function buildResultTable(jsonArr) {
         tbody[0].appendChild(commentRow);
     }
     
-    gDataTable = table.DataTable(DATA_TABLE_OPTIONS);
+    return table.DataTable(DATA_TABLE_OPTIONS);
 }
 
 function createCommentRow(seq) {
@@ -120,9 +125,13 @@ function createCommentRow(seq) {
     var seqCell = document.createElement("td");
     seqCell.appendChild(document.createTextNode(seq.toString()))
     xrow.appendChild(seqCell);
+    var delCell = document.createElement("td");
+    $(delCell).addClass("del-btn");
+    $(delCell).css("background-color", "#d0d0d0");
     var bigcol = document.createElement("td");
     bigcol.setAttribute("contenteditable", "true");
     bigcol.setAttribute("colspan", 4);
+    xrow.appendChild(delCell);
     xrow.appendChild(bigcol);
     
     for (var i=0; i < 3; ++i) {
@@ -135,7 +144,24 @@ function createCommentRow(seq) {
     return xrow;
 }
 
+function deleteRow(cell) {
+    gDataTable
+    .row( $(cell).parents('tr') )
+    .remove()
+    .draw();    
+}
+
 function doCopy() {
+    var btns = $(".del-btn");
+    
+    btns.each(
+        b=>{
+            if ($(btns[b]).text() == "x") {
+                $(btns[b]).text("");
+                $(btns[b]).css("user-select", "auto");
+            }
+        }
+    )
     var rows = $("#result_table tbody tr");
     for (var i=0; i < rows.length; ++i) {
         var firstCell = rows[i].firstChild;
@@ -143,7 +169,7 @@ function doCopy() {
     }
 
     for (i = rows.length-1; i >= rows.length/2; --i) {
-        firstCell = rows[i].firstChild.nextSibling;
+        firstCell = rows[i].firstChild.nextSibling.nextSibling;
         if ($(firstCell).text() == "") {
             rows[i].remove();
         }
@@ -171,7 +197,7 @@ function doCopy() {
         }
         ok = true;
     } else {
-        console.error('failed to get multi clipboard content');
+        console.error('failed to get clipboard content');
         ok = false;
     }
 
