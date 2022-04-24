@@ -120,8 +120,14 @@ function buildResultTable(jsonArr) {
     return table.DataTable(DATA_TABLE_OPTIONS);
 }
 
+
+function getArticleCount() {
+    return $("#result_table tr").length - 1 /* header */ - $(".comment-row").length;
+}
+
 function createCommentRow(seq) {
     var xrow = document.createElement("tr");
+    xrow.classList.add("comment-row");
     var seqCell = document.createElement("td");
     seqCell.appendChild(document.createTextNode(seq.toString()))
     xrow.appendChild(seqCell);
@@ -168,10 +174,10 @@ function doCopy() {
         $(firstCell).text(" ");
     }
 
-    for (i = rows.length-1; i >= rows.length/2; --i) {
-        firstCell = rows[i].firstChild.nextSibling.nextSibling;
-        if ($(firstCell).text() == "") {
-            rows[i].remove();
+    for (i = rows.length-1; i >= 0; --i) {
+        if ($(rows[i]).hasClass("comment-row")) {
+            if (rows[i].textContent == " ")
+                rows[i].remove();
         }
     }
 
@@ -188,7 +194,7 @@ function doCopy() {
     selObj.addRange(range);
 
     var ok;
-    var nItems = items.length;
+    var nItems = getArticleCount();
     if (document.execCommand('copy')) {
         if (nItems === 1) {
             $("#copy-feedback").text("1 article copied");
@@ -234,10 +240,11 @@ function doAddUrl() {
 
             gDataTable.row.add([
                 nRows-1,
-                rowData.paper,
+                newRow.childNodes[1].innerHTML,
                 newRow.childNodes[2].innerHTML,
                 newRow.childNodes[3].innerHTML,
-                newRow.childNodes[4].innerHTML
+                newRow.childNodes[4].innerHTML,
+                newRow.childNodes[5].innerHTML
             ]);
             
             var commentRow = createCommentRow(nRows);
@@ -246,17 +253,27 @@ function doAddUrl() {
                 commentRow.childNodes[1].innerHTML,
                 commentRow.childNodes[2].innerHTML,
                 commentRow.childNodes[3].innerHTML,
-                commentRow.childNodes[4].innerHTML
+                commentRow.childNodes[4].innerHTML,
+                commentRow.childNodes[5].innerHTML                
             ]);
             
             gDataTable.draw();
             
             var allRows = $("#result_table tr");
+            allRows[allRows.length-3].childNodes[2].style = "padding-left:30px";
+            
+            var delCell = allRows[allRows.length-3].childNodes[1];
+            delCell.classList.add("del-btn");
+
             var commentRow = allRows[allRows.length-2];
-            allRows[allRows.length-3].childNodes[1].style = "padding-left:30px";
-            commentRow.childNodes[1].style = "font-weight:bold";
-            commentRow.childNodes[1].setAttribute("contenteditable", "true");
-            commentRow.childNodes[1].setAttribute("colspan", 4);
+            
+            delCell = allRows[allRows.length-2].childNodes[1];
+            $(delCell).css("background-color", "#d0d0d0");
+            
+            var commentCell = commentRow.childNodes[2];
+            commentCell.style = "font-weight:bold";
+            commentCell.setAttribute("contenteditable", "true");
+            commentCell.setAttribute("colspan", 4);
         }
         catch (e) {
             alert("Unable to get info for URL: " + (e.message ? e.message : e));
