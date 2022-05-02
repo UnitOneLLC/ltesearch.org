@@ -165,6 +165,7 @@ function doCopy() {
             if ($(btns[b]).text() == "x") {
                 $(btns[b]).text("");
                 $(btns[b]).css("user-select", "auto");
+                $(btns[b]).css("background-color", "transparent");
             }
         }
     )
@@ -175,11 +176,22 @@ function doCopy() {
     }
 
     for (i = rows.length-1; i >= 0; --i) {
+        $(rows[i].childNodes[0]).css("width", "1px");
+        $(rows[i].childNodes[0]).css("padding", "0 0 0 0"); 
+        $(rows[i].childNodes[1]).css("width", "1px");
+        $(rows[i].childNodes[1]).css("padding", "0 0 0 0");        
+        
         if ($(rows[i]).hasClass("comment-row")) {
-            if (rows[i].textContent == " ")
+            if (rows[i].textContent.trim() == "") {
                 rows[i].remove();
+            }
+            else {
+                $(rows[i].childNodes[1]).css("background-color", "transparent");
+            }
         }
     }
+    
+    $("#result_table thead tr")[0].remove();
 
     var tab = $("#head")[0];
     var end = $("#_end_")[0];        
@@ -202,6 +214,9 @@ function doCopy() {
             $("#copy-feedback").text("" + nItems + " articles copied");
         }
         ok = true;
+        alert($("#copy-feedback").text());
+        window.location.assign("../search");
+        
     } else {
         console.error('failed to get clipboard content');
         ok = false;

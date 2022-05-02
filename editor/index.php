@@ -69,11 +69,14 @@ include "../common/version.php";
         }
         .del-btn {
             font-weight: 800;
-            color: red;
+            color: white;
             text-align: center;
             cursor:pointer;
             background-color: transparent;
             user-select: none;
+        }
+        tr:hover .del-btn {
+            color: red;
         }
         
      </style>
@@ -101,6 +104,7 @@ include "../common/version.php";
             <br>
         </div>
         <div id="_end_"></div>
+        <div id="buffer-for-chrome">&nbsp</div>
         <div id="controls">
             <div>
                 <button id="copy-btn" title="Copy the letter to the clipboard">Copy</button>&nbsp;<span id="copy-feedback"></span>
