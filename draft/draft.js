@@ -43,8 +43,8 @@ function setupAuthor() {
 	if (authorText === "undefined" || authorText === null)
 		authorText = "";
 	if (authorText) {
-		$("#no-cookie").hide();
-		$("#have-cookie").show();
+		$("#lte-no-cookie").hide();
+		$("#lte-have-cookie").show();
 		$("#btn-chg-auth").show();
 		$("#author").val(authorText);
 		$("#auth-text").text(authorText);
@@ -52,8 +52,8 @@ function setupAuthor() {
 		enableButton(true);		
 	}
 	else {
-		$("#no-cookie").show();
-		$("#have-cookie").hide();
+		$("#lte-no-cookie").show();
+		$("#lte-have-cookie").hide();
 		$("#btn-chg-auth").hide();
 		$("#author").show();
 		$("#author").val("");

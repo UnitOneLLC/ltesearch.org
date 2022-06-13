@@ -1,3 +1,3 @@
 <?php
-	define("VERSION", "2.4.3/20220420");
+	define("VERSION", "2.4.5/20220610");
 ?>

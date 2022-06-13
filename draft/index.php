@@ -123,8 +123,8 @@
 					<span id="newspaper"> <?php echo $paper["name"]; ?>: </span><a id="hyper" href="<?php echo $u;?>"><?php echo $title?></a><br>
 				</h2>
 				<div>
-					<span id="no-cookie">Enter your name: <input id="author" maxlength=24/></span>
-					<span id="have-cookie">Your name: <span id="auth-text"> </span> <button id="btn-chg-auth">Change</button></span>
+					<span id="lte-no-cookie">Enter your name: <input id="author" maxlength=24/></span>
+					<span id="lte-have-cookie">Your name: <span id="auth-text"> </span> <button id="btn-chg-auth">Change</button></span>
 				</div>
 				
 				<div>

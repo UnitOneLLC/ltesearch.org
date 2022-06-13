@@ -122,7 +122,7 @@ function buildResultTable(jsonArr) {
 
 
 function getArticleCount() {
-    return $("#result_table tr").length - 1 /* header */ - $(".comment-row").length;
+    return $("#result_table tr").length - $(".comment-row").length;
 }
 
 function createCommentRow(seq) {
@@ -205,7 +205,7 @@ function doCopy() {
     selObj.removeAllRanges();
     selObj.addRange(range);
 
-    var ok;
+
     var nItems = getArticleCount();
     if (document.execCommand('copy')) {
         if (nItems === 1) {
@@ -213,13 +213,8 @@ function doCopy() {
         } else {
             $("#copy-feedback").text("" + nItems + " articles copied");
         }
-        ok = true;
-        alert($("#copy-feedback").text());
-        window.location.assign("../search");
-        
     } else {
         console.error('failed to get clipboard content');
-        ok = false;
     }
 
     for (i=0; i < rows.length; ++i) {
