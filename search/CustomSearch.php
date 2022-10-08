@@ -280,7 +280,21 @@ class CustomSearch {
 		return $passes;
 	}
 	
+	function looks_like_rollup($s) {
+		$pattern = "/^([a-zA-Z]+)\s+\|\s+[A-Za-z]+/";
+		if (preg_match($pattern, $s) == 1) {
+			return true;
+		}
+		$pattern = "/^([a-zA-Z]+)\s+\–\s+[A-Za-z]+/";
+		if (preg_match($pattern, $s) == 1) {
+			return true;
+		}
+	}
+	
 	function filter_titles($title) {
+		if ($this->looks_like_rollup($title))
+			return false;
+		
 		$passes = true;
 		
 		foreach ($this->_title_filters as &$t) {

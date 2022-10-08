@@ -97,7 +97,6 @@ include "../common/version.php";
             <div id="after-table">&nbsp;</div>
 		</div>
         <div id="foot" contenteditable style="min-height:20px;">
-            <br>
             Thanks for writing.<br>
             <br>
             &lt;signature&gt;
@@ -107,11 +106,11 @@ include "../common/version.php";
         <div id="buffer-for-chrome">&nbsp</div>
         <div id="controls">
             <div>
-                <button id="copy-btn" title="Copy the letter to the clipboard">Copy</button>&nbsp;<span id="copy-feedback"></span>
-            </div>
-            <div>
                 <span>Add another link:</span>&nbsp;<input id="url-to-add-input" type="text"><button id="add-url-btn">Add</button>
                 <button id="toggle-help" style="display:inline-div;float:right">?</button>
+            </div>
+            <div>
+                <button id="copy-btn" title="Copy the letter to the clipboard">Copy email to clipboard</button>&nbsp;<span id="copy-feedback"></span>
             </div>
             <div id="help-pane">
             </div>
