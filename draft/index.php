@@ -108,10 +108,10 @@
 			}
 		</style>
 		<script type="text/javascript">
-			var g_title = "<?php echo $title; ?>";
-			var g_url = "<?php echo $u; ?>";
-			var g_newspaper = "<?php echo $paper["name"] ?>";
-			var g_lteaddr = "<?php echo $paper["lteaddr"]; ?>";
+			var g_title = "<?php echo trim($title); ?>";
+			var g_url = "<?php echo trim($u); ?>";
+			var g_newspaper = "<?php echo trim($paper["name"]) ?>";
+			var g_lteaddr = "<?php echo trim($paper["lteaddr"]) ?>";
 		</script>
 		<title>Create LTE Draft</title>
 	</head>
