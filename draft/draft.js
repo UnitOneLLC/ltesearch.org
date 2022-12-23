@@ -2,12 +2,51 @@
 
 $(document).ready(function() {
 	showSpin(false);
+	showSpin(false, "tp");	
 	$("#copyAndGoBtn").click(createDraftAndGo);
 	$("#author").on("keyup", onAuthChange);
 	$("#author").on("blur", onAuthBlur);	
 	$("#btn-chg-auth").click(onClickChangeAuthor);
+	$("#btn-get-tp").click(onGetTalkingPoints);
 	setupAuthor();
 });
+
+function onGetTalkingPoints() {
+	var pro, radioChecked = document.querySelector('input[name="tp"]:checked');
+	if (radioChecked == null) {
+		alert("You must check either 'supporting' or 'in opposition to'");
+		return;
+	}
+	else {
+		pro = radioChecked.value;
+	}
+	$("#tp-cell").empty();
+	showSpin(true, "tp");
+	var qStringParams = new URLSearchParams(window.location.search);
+	var url = "./aitp.php?z=" + qStringParams.get('z') + "&pro=" + pro;
+	$.ajax(url)
+	.done((resultString)=>{
+		showSpin(false, "tp");
+		try {
+			var cellDiv = $("#tp-cell");
+			var results = JSON.parse(resultString);
+			cellDiv.empty();
+			cellDiv.append($("<ul id='tp-list'></ul>"));
+			var i, list=$("#tp-list"), keys = Object.keys(results);
+			for (i=0; i < keys.length; ++i) {
+				list.append($("<li>" + results[keys[i]].trim() + "</li>"));
+			}
+		}
+		catch (e) {
+			alert("Unable to get talking points: " + (e.message ? e.message : e));
+			showSpin(false, "tp");
+		}
+	})
+	.fail((e)=>{
+		alert("Unable to get talking points: " + e);
+		showSpin(false, "tp");
+	});
+}
 
 function enableButton(enabled) {
 	if (enabled) {
@@ -85,14 +124,19 @@ function formatDate(d) {
 	return months[midx] + " " + day + ", " + year;
 }
 
-function showSpin(on) {
+function showSpin(on, prefix) {
+	if (prefix == null)
+		prefix = "";
+	else
+		prefix = prefix + "-";
+	
 	if (on) {
-		$("#spinner").show();
-		$("#spinner-prompt").show();		
+		$("#" + prefix + "spinner").show();
+		$("#" + prefix + "spinner-prompt").show();		
 	}
 	else {
-		$("#spinner").hide();		
-		$("#spinner-prompt").hide();		
+		$("#" + prefix + "spinner").hide();		
+		$("#" + prefix + "spinner-prompt").hide();		
 	}
 }
 

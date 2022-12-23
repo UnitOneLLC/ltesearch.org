@@ -53,7 +53,7 @@
 		<meta name="google-signin-client_id" content="139675035932-s3i8081v6er03o89aes68ujirk1b99d6.apps.googleusercontent.com">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-		<script src="draft.js?v=<?php echo VERSION;?>"></script>
+		<script src="draft2.js?v=<?php echo VERSION;?>"></script>
 		<style type="text/css">
 			body {
 				background-color: rgba(30,30,120,1);
@@ -66,7 +66,7 @@
 				padding: 5px 0 15px 0;
 				border-radius: 10px;
 			}
-			#inner {
+			#inner, #tpdiv {
 				padding: 0 15px;
 			}
 			#hint {
@@ -106,6 +106,17 @@
 			#hidden-inputs {
 				display: none;
 			}
+			input[type=radio] {
+				margin-left: 25px;
+			}
+			#tp-cell {
+				max-height: 180px;
+				overflow-y: scroll;
+			}
+			#tp-table {
+				border-top: solid 1px black;
+				border-bottom: solid 1px black;
+			}
 		</style>
 		<script type="text/javascript">
 			var g_title = "<?php echo trim($title); ?>";
@@ -117,6 +128,23 @@
 	</head>
 	<body>
 		<div id="container">
+			<h1>Get talking points for this article</h1>
+			<table id="tp-table">
+				<tbody><tr>
+					<td style="width:40%">
+						<div id="tpdiv">
+							<div style="margin-bottom:5px";>Get talking points</div>
+							<div><input type="radio" id="in_favor" name="tp" value="1"> supporting</div>
+							<div><input type="radio" id="opposed" name="tp" value="0"> in opposition to</div>
+							<div style="margin-top:5px">the views expressed in the article.  <button id="btn-get-tp">Go</button></div>
+						</div>
+					</td>
+					<td style="width:60%; max-height:180px;overflow-y:auto">
+						<div id="tp-cell"></div>
+						<span id="tp-spinner-prompt">Retrieving . . . </span><img id="tp-spinner" height="45px" src="../search/loading_spinner.gif"/>
+					</td>
+				</tr></tbody>
+			</table>
 			<h1>Create a draft LTE Google document</h1>
 			<div id="inner">
 				<h2>
