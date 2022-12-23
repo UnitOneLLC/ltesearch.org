@@ -42,7 +42,7 @@
 		
 		if ($decoded && is_array($decoded->choices) && $decoded->choices[0]->text) {
 			$output = $decoded->choices[0]->text;
-			$splat = preg_split("/\d\./", $output);
+			$splat = preg_split("/\s\d\./", $output); // split on space number period
 			
 			if (count($splat) > 5) {
 				unset($splat[0]);

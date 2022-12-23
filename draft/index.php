@@ -53,7 +53,7 @@
 		<meta name="google-signin-client_id" content="139675035932-s3i8081v6er03o89aes68ujirk1b99d6.apps.googleusercontent.com">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-		<script src="draft2.js?v=<?php echo VERSION;?>"></script>
+		<script src="draft.js?v=<?php echo VERSION;?>"></script>
 		<style type="text/css">
 			body {
 				background-color: rgba(30,30,120,1);
