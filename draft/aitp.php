@@ -15,7 +15,7 @@
 		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, [
 			'Content-Type: application/json',
-			'Authorization: Bearer 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'
+			'Authorization: Bearer '
 		]);
 		curl_setopt( $ch, CURLOPT_POSTFIELDS, $payload );
 		$result = curl_exec($ch);
@@ -37,7 +37,7 @@
 			"max_tokens" => $max_tokens,
 			"temperature" => $temperature
 		);
-		
+		echo ("got here 2 " . $instru);
 		$decoded = json_decode(fetch_from_openai(json_encode($postData)));
 		
 		if ($decoded && is_array($decoded->choices) && $decoded->choices[0]->text) {
@@ -74,6 +74,6 @@
 		$pro = false;
 	else 
 		$pro = true;
-	
+	echo ("got here 1");
 	echo get_talking_points($u, $pro);
 ?>
