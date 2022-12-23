@@ -1,10 +1,33 @@
 <?php
 	include "../common/version.php";
 	include "../common/urlcode.php";
+	include "../common/lte_db.php";
 	
 	define("OPEN_AI_COMPLETION", "https://api.openai.com/v1/completions");
 	
+	
+	function get_api_key() {
+		try {
+			$conn = new LTE_DB();
+			$keys = $conn->get_openai_api_key();
+			$conn = null;
+			
+			foreach($keys as $k) {
+				$key = $k;
+				break;
+			}
+		}
+		catch (PDOException $e) {
+			$conn = null;
+			$key = "PDO EXCEPTION";
+		}
+		
+		return $key;
+	}
+	
 	function fetch_from_openai($payload) {
+		$key = get_api_key();
+		$auth_header = 'Authorization: Bearer ' . $key;
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:97.0) Gecko/20100101 Firefox/97.0");
 		curl_setopt($ch, CURLOPT_URL, OPEN_AI_COMPLETION);
@@ -15,7 +38,7 @@
 		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, [
 			'Content-Type: application/json',
-			'Authorization: Bearer '
+			$auth_header
 		]);
 		curl_setopt( $ch, CURLOPT_POSTFIELDS, $payload );
 		$result = curl_exec($ch);
@@ -37,7 +60,7 @@
 			"max_tokens" => $max_tokens,
 			"temperature" => $temperature
 		);
-		echo ("got here 2 " . $instru);
+
 		$decoded = json_decode(fetch_from_openai(json_encode($postData)));
 		
 		if ($decoded && is_array($decoded->choices) && $decoded->choices[0]->text) {
@@ -74,6 +97,6 @@
 		$pro = false;
 	else 
 		$pro = true;
-	echo ("got here 1");
+
 	echo get_talking_points($u, $pro);
 ?>

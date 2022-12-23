@@ -177,5 +177,14 @@ class LTE_DB {
 		$stmt = null;
 		return $result;		
 	}
+	/*
+	* Get the api key for openai
+	*/
+	function get_openai_api_key() {
+		$stmt = $this->_conn->query("select apikey from openai_key where is_current=true");
+		$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'apikey');
+		$stmt = null;
+		return $result;		
+	}
 }
 ?>
