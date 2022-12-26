@@ -79,6 +79,32 @@
 		}
 	}
 	
+	function suggest_angles($url, $pro, $max_tokens = 800, $temperature = 1.0) {
+		$instru = "Suggest an angle for a letter to the editor about this article: " . $url . ". ";
+		if ($pro) {
+			$instru = $instru . "The letter should argue in support of the article's content.";
+		}
+		else {
+			$instru = $instru . "The letter should argue against the article's content.";
+		}
+		
+		$postData = array(
+			"model" => "text-davinci-003",
+			"prompt" => $instru,
+			"max_tokens" => $max_tokens,
+			"temperature" => $temperature
+		);
+		
+		$decoded = json_decode(fetch_from_openai(json_encode($postData)));
+		
+		if ($decoded && is_array($decoded->choices) && $decoded->choices[0]->text) {
+			return json_encode($decoded->choices[0]);
+		}
+		else {
+			return '{error: ' . '"' . $postData . '"}';
+		}
+	}
+	
 	$u = $_GET['u'];
 	
 	if ($u == null) {
@@ -98,5 +124,15 @@
 	else 
 		$pro = true;
 
-	echo get_talking_points($u, $pro);
+
+	$req = $_GET['req'];
+	if ($req == 'tp') {
+		echo get_talking_points($u, $pro);
+	}
+	else if ($req = 'angles') {
+		echo suggest_angles($u, $pro);
+	}
+	else {
+		echo ("Bad request. No request type was given.");
+	}
 ?>

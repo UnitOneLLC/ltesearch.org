@@ -8,6 +8,7 @@ $(document).ready(function() {
 	$("#author").on("blur", onAuthBlur);	
 	$("#btn-chg-auth").click(onClickChangeAuthor);
 	$("#btn-get-tp").click(onGetTalkingPoints);
+	$("#btn-get-angles").click(onSuggestAngles);
 	setupAuthor();
 });
 
@@ -23,12 +24,12 @@ function onGetTalkingPoints() {
 	$("#tp-cell").empty();
 	showSpin(true, "tp");
 	var qStringParams = new URLSearchParams(window.location.search);
-	var url = "./aitp.php?z=" + qStringParams.get('z') + "&pro=" + pro;
+	var url = "./aitp.php?z=" + qStringParams.get('z') + "&pro=" + pro + "&req=tp";;
 	$.ajax(url)
 	.done((resultString)=>{
 		showSpin(false, "tp");
+		var cellDiv = $("#tp-cell");
 		try {
-			var cellDiv = $("#tp-cell");
 			var results = JSON.parse(resultString);
 			cellDiv.empty();
 			cellDiv.append($("<ul id='tp-list'></ul>"));
@@ -38,6 +39,7 @@ function onGetTalkingPoints() {
 			}
 		}
 		catch (e) {
+			cellDiv.empty();
 			alert("Unable to get talking points: " + (e.message ? e.message : e));
 			showSpin(false, "tp");
 		}
@@ -47,6 +49,43 @@ function onGetTalkingPoints() {
 		showSpin(false, "tp");
 	});
 }
+
+
+function onSuggestAngles() {
+	var pro, radioChecked = document.querySelector('input[name="tp"]:checked');
+	if (radioChecked == null) {
+		alert("You must select either 'in support of' or 'in opposition to'");
+		return;
+	}
+	else {
+		pro = radioChecked.value;
+	}
+	$("#tp-cell").empty();
+	showSpin(true, "tp");
+	var qStringParams = new URLSearchParams(window.location.search);
+	var url = "./aitp.php?z=" + qStringParams.get('z') + "&pro=" + pro + "&req=angles";
+	$.ajax(url)
+	.done((resultString)=>{
+		showSpin(false, "tp");
+		var cellDiv = $("#tp-cell");
+		try {
+			var results = JSON.parse(resultString.trim());
+			cellDiv.empty();
+			cellDiv.append($("<div>" + results["text"] + "</div>"));
+		}
+		catch (e) {
+			cellDiv.empty();
+			alert("Unable to get angle suggestions: " + (e.message ? e.message : e));
+			showSpin(false, "tp");
+		}
+	})
+	.fail((e)=>{
+		alert("Unable to get angle suggestions: " + e);
+		showSpin(false, "tp");
+	});
+}
+
+
 
 function enableButton(enabled) {
 	if (enabled) {
