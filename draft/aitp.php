@@ -42,16 +42,17 @@
 		]);
 		curl_setopt( $ch, CURLOPT_POSTFIELDS, $payload );
 		$result = curl_exec($ch);
+		curl_close($ch);
 		return $result;
 	}
 
 	function get_talking_points($url, $pro, $count = 5, $max_tokens = 800, $temperature = 1.0) {
 		
 		if ($pro) {
-			$instru = "Create a list of " . $count . " points in support of the views in this article: " . $url;
+			$instru = "Create a list of " . $count . " points in support of the views in the article at the following URL: " . $url;
 		}
 		else {
-			$instru = "Create a list of " . $count . " points critical of the views in this article: " . $url;
+			$instru = "Create a list of " . $count . " points critical of the views in the article at the following URL: " . $url;
 		}
 		
 		$postData = array(
@@ -80,7 +81,7 @@
 	}
 	
 	function suggest_angles($url, $pro, $max_tokens = 800, $temperature = 1.0) {
-		$instru = "Suggest an angle for a letter to the editor about this article: " . $url . ". ";
+		$instru = "Suggest an angle for a letter to the editor about the article found at the following URL: " . $url . ". ";
 		if ($pro) {
 			$instru = $instru . "The letter should argue in support of the article's content.";
 		}

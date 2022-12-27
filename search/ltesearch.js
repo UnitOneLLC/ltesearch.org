@@ -485,6 +485,18 @@ function previewButton(zlink) {
     return "<span title='view article text' onclick='" + action +  "' class='circle'>&#9417;</span>";
 }
 
+function _summarize(url) {
+    window.open("https://ltesearch.org/summary?z=" + url);
+}
+
+
+function summarizeButton(zlink) {
+    
+    var action = "javascript:_summarize(\"" + zlink + "\")";
+    
+    return "<span title='view a summary of the article' onclick='" + action +  "' class='circle'>&#9416;</span>";
+}
+
 function checkClick(checkbox) {
     var row = $(checkbox).parent().parent();
     if ($(checkbox).is(":checked")) {
@@ -539,7 +551,8 @@ function buildResultTable(jsonArr) {
         row += "<td>" + "<input type='checkbox' onchange='checkClick(this)'/>" + "</td>";
         row += "<td>" + date + "</td>";
         row += "<td>" + d.paper + "</td>";
-        row += "<td>" + "<a target='_blank' noreferrer href='" + d.url + "'>" + d.title + "</a>" + previewButton(d.zlink) + "</td>";
+        row += "<td>" + "<a target='_blank' noreferrer href='" + d.url + "'>" + d.title + "</a>" + previewButton(d.zlink) +  
+            summarizeButton(d.zlink) + "</td>";
         row += "<td>" + d.pubDate + " " + d.description + "</td>";
         row += "<td>" + d.zlink + "</td>";        
         table.append(row);

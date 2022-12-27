@@ -105,7 +105,7 @@ function _bot_detected() {
             margin: 0 10px;
         }
         .circle {
-            padding: 0 10px;
+            padding: 0 4px;
             font-size: 16px;
             vertical-align: top;
             cursor: pointer;
