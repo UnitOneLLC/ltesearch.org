@@ -46,7 +46,7 @@
 
 #===================================================
 	$summary = "Summary is not available.";
-	$length = 150;
+	$length = 400;
 	error_reporting(E_ERROR | E_PARSE);
 	
 	try {
@@ -63,9 +63,9 @@
 			}
 		}
 		
-		$max_tokens = 800;
+		$max_tokens = $length;
 		$temperature = 1.0;
-		$instru = "Summarize the article found at the following URL in $length words: " . $u;
+		$instru = "Summarize the article at : " . $u . ". Include the title of the article and its URL in the summary.";
 		$postData = array(
 			"model" => "text-davinci-003",
 			"prompt" => $instru,
@@ -83,6 +83,7 @@
 		// Check for errors
 		if (curl_errno($ch)) {
 			// There was an error executing the curl request
+			$summary = $summary . "( Error: " . curl_error($ch) . ")";
 			echo "Error: " . curl_error($ch);
 		} else {
 			if ($decoded && is_array($decoded->choices) && $decoded->choices[0]->text) {
