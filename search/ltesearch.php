@@ -243,6 +243,14 @@ include "../common/urlcode.php";
 				$result["paper"] = find_paper_name($papers, $result["url"]);
 				$result["highlight"] = is_highlight($result);
 				$result["zlink"] = encode_url($result["url"]);
+				
+				$ft = trim($result["title"]);
+				if (endsWith($ft, "...")) {
+					$ft = get_full_title($result["url"]);
+					if ($ft != null) {
+						$result["title"] = $ft;
+					}
+				}
 			}
 			
 			$status = update_queries($conn, $region, $topic, count($all_results), $usertoken);
@@ -261,6 +269,31 @@ include "../common/urlcode.php";
 			echo return_error(DATABASE_FAILURE, $e->getMessage());
 			return;
 		}
+	}
+
+	function endsWith($string, $ending) {
+		$endingLength = strlen($ending);
+		if ($endingLength > strlen($string)) {
+			return false;
+		}
+		$substring = substr($string, -$endingLength);
+		return $substring === $ending;
+	}
+	
+	function get_full_title($url) {
+		$html = file_get_contents($url);
+		
+		$title_regex = '/<title.*>(.*)<\/title>/';
+		
+		preg_match($title_regex, $html, $title_matches);
+		
+		if (is_array($title_matches) && (count($title_matches) > 1)) {
+			$title = $title_matches[1];
+		}
+		else {
+			$title = null;
+		}
+		return $title;
 	}
 	
 	function get_ip_address() {

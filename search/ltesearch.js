@@ -17,12 +17,12 @@ var DATA_TABLE_OPTIONS = {
     "scrollCollapse": true,
     "order": [ [1, "desc"], [2, "asc"]],
     "columns": [
-        {type: "html", width: "25px"},  /* 0 check box */
-        {type: "date", width: "100px"}, /* 1 date */
-        {type: "text", width: "150px"}, /* 2 newspaper */
-        {type: "html"},                 /* 3 title/url */
-        {type: "text"},                 /* 4 snippet */
-        {type: "text", visible: false}  /* 5 zlink */
+        {type: "html", width: "5%"},  /* 0 check box */
+        {type: "date", width: "10%"},  /* 1 date */
+        {type: "text", width: "15%"},  /* 2 newspaper */
+        {type: "html", width: "30%"},  /* 3 title/url */
+        {type: "text", width: "40%"},  /* 4 snippet */
+        {type: "text", visible: false} /* 5 zlink */
         ]
 }
 var ZLINK_COL_IDX = 5;

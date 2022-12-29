@@ -82,6 +82,9 @@ function _bot_detected() {
         #loading img {
             vertical-align: middle;
         }
+        #digest {
+            table-layout: fixed;
+        }
         #digest_length {
             display: none;  /* don't show page length control */
         }

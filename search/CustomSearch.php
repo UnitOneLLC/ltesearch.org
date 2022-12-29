@@ -1,4 +1,5 @@
 <?php
+	
 define("SECONDS_PER_DAY", 60*60*24);
 
 function dbg($label, $var) {
@@ -140,7 +141,7 @@ class CustomSearch {
 				curl_setopt($curlObj, CURLOPT_HTTPGET, TRUE);
 				$json = curl_exec($curlObj);
 				/*dbg("JSON", $json);*/
-
+				curl_close($curlObj);
 				$result_aa = json_decode($json, TRUE);
 				$items = $result_aa["items"];
 				if (is_null($items)) {
@@ -214,7 +215,7 @@ class CustomSearch {
 
 		return $ret_arr;
 	}
-	
+
 	function filter_url($url) {
 		$passes = true;
 		$lurl = strtolower($url);
