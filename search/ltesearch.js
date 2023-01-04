@@ -15,17 +15,19 @@ var DATA_TABLE_OPTIONS = {
     "paging": false,
     "scrollY": "75vh",
     "scrollCollapse": true,
-    "order": [ [1, "desc"], [2, "asc"]],
+    "order": [ [6, "asc"], [1, "desc"], [2, "asc"]],
     "columns": [
         {type: "html", width: "5%"},  /* 0 check box */
         {type: "date", width: "10%"},  /* 1 date */
         {type: "text", width: "15%"},  /* 2 newspaper */
         {type: "html", width: "30%"},  /* 3 title/url */
         {type: "text", width: "40%"},  /* 4 snippet */
-        {type: "text", visible: false} /* 5 zlink */
+        {type: "text", visible: false},/* 5 zlink */
+        {type: "num",  visible: false} /* 6 rank */
         ]
 }
 var ZLINK_COL_IDX = 5;
+var RANK_COL_IDX = 6;
 
 var gResultData = null;
 
@@ -207,7 +209,7 @@ function onDisplaySelectChange() {
     }
 }
 
-function setClipboardMulti(items) {
+function setClipboardMulti(items, event) {
     var outer = document.createElement("div");
     var last = document.createElement("div");
     var c = items.length;
@@ -322,7 +324,7 @@ function setClipboardMultiTable(items)
 }
 ****/
 
-function copySelected(obj, fnDomBuilder) {
+function copySelected(obj, fnDomBuilder, event) {
     if (!fnDomBuilder) {
         fnDomBuilder = setClipboardMulti;
     }
@@ -340,16 +342,17 @@ function copySelected(obj, fnDomBuilder) {
             items.push(selected);
         }
     }
-    fnDomBuilder(items);
+    fnDomBuilder(items, event);
 }
 
-function onBuildTable() {
-    copySelected(null, postSelectedToEditor);
+function onBuildTable(event) {
+    copySelected(null, postSelectedToEditor, event);
 }
 
-function postSelectedToEditor(items) {
+function postSelectedToEditor(items, event) {
     $("#items_json").val(JSON.stringify(items));
     $("#edit-form").submit();
+    event.stopPropagation();
 }
 
 function isLoggedIn() {
@@ -491,10 +494,12 @@ function _summarize(url) {
 
 
 function summarizeButton(zlink) {
-    
+/* 
     var action = "javascript:_summarize(\"" + zlink + "\")";
     
     return "<span title='view a summary of the article' onclick='" + action +  "' class='circle'>&#9416;</span>";
+*/
+    return "";
 }
 
 function checkClick(checkbox) {
@@ -543,18 +548,19 @@ function buildResultTable(jsonArr) {
         date = Intl.DateTimeFormat('en-US').format(date);
         
         if (d.highlight == "true") {
-            row = "<tr class=row-highlight>";
+//            row = "<tr class=row-highlight>";
+            d.rank = 0;
         }
-        else {
-            row = "<tr>";
-        }
+
+        row = "<tr>";
         row += "<td>" + "<input type='checkbox' onchange='checkClick(this)'/>" + "</td>";
         row += "<td>" + date + "</td>";
         row += "<td>" + d.paper + "</td>";
         row += "<td>" + "<a target='_blank' noreferrer href='" + d.url + "'>" + d.title + "</a>" + previewButton(d.zlink) +  
             summarizeButton(d.zlink) + "</td>";
         row += "<td>" + d.pubDate + " " + d.description + "</td>";
-        row += "<td>" + d.zlink + "</td>";        
+        row += "<td>" + d.zlink + "</td>";
+        row += "<td>" + d.rank + "</td>";
         table.append(row);
         
         if (paperCounts[d.paper]) {

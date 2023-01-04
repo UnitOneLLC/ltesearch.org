@@ -214,7 +214,7 @@ function _bot_detected() {
                     <fieldset style="display:inline-block">
                         <div style="display:inline-block">
                             <div style="display:inline-block">
-                                <form id="edit-form" action="../editor/index.php" method="post">
+                                <form id="edit-form" action="../editor/index.php" target="_blank" method="post">
                                     <button id="table-builder">Editor</button>
                                     <input id="items_json" name="items_json" type="hidden"/>
                                 </form>

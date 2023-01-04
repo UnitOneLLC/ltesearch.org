@@ -159,7 +159,9 @@ class CustomSearch {
 
 				$now = time();
 				date_default_timezone_set('America/New_York');
+				$counter = -1;
 				foreach($items as $item) {
+					$counter += 1;
 					$date_aa = self::estimate_item_date($item);
 					
 					/* ignore items older than two days */
@@ -202,6 +204,7 @@ class CustomSearch {
 						"pubDate" => $date_aa['year'].'-'. $date_aa['month'].'-'. $date_aa['day'],      
 						"url" => $item["link"], 
 						"title" => $item["title"],
+						"rank" => $current_index + $counter,
 						"description" => $descr);
 						
 					array_push($ret_arr, $ret_item);

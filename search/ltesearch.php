@@ -20,10 +20,12 @@ define('UNKNOWN_TOPIC', 'Unknown topic specified');
 define('BAD_FILTER_VALUE', 'Invalid filter argument');
 define('HIGHLIGHT_THRESHOLD',4);
 define('AUTH_ERROR', 'Authentication error');
+define('MIN_SCREEN_RANK', 60);
 
 include "CustomSearch.php";
-include "../common/lte_db.php";
-include "../common/urlcode.php";
+include_once "../common/lte_db.php";
+include_once "../common/urlcode.php";
+include_once "../common/aiutility.php";
 
 	function return_error($error, $data) {
 		return '{"error": "' . $error . ': ' . $data . '"}';
@@ -69,6 +71,11 @@ include "../common/urlcode.php";
 		
 		return $results;
 	}
+
+	function word_count($string) {
+		$words = preg_split('/[\t\s\-]+/', $string);
+		return count($words);
+	}	
 	
 	function get_bold_word_count($str)
 	{
@@ -239,20 +246,32 @@ include "../common/urlcode.php";
 			$all_results = remove_duplicate_urls($all_results);
 			
 			$papers = $conn->fetch_papers();
+			$min_rank = round(count($all_results)/3);
 			foreach($all_results as &$result) {
+				$n_bold = get_bold_word_count($item["description"]);
+				$result["rank"] -= $n_bold;
 				$result["paper"] = find_paper_name($papers, $result["url"]);
-				$result["highlight"] = is_highlight($result);
+				$result["highlight"] = false; // is_highlight($result);
 				$result["zlink"] = encode_url($result["url"]);
-				
-				$ft = trim($result["title"]);
-				if (endsWith($ft, "...")) {
-					$ft = get_full_title($result["url"]);
-					if ($ft != null) {
-						$result["title"] = $ft;
+				if ($result["rank"] < $min_rank) {
+					$ft = trim($result["title"]);
+					if (endsWith($ft, "...")) {
+//					if (str_pos($ft, "...") !== -1) {
+						$ft = get_full_title($result["url"]);
+						if ($ft != null) {
+							$result["title"] = $ft;
+						}
 					}
 				}
+				
+				$result["rank"] -= word_count($result["title"])-3;
 			}
-			
+
+			$screen = $conn->fetch_screen($topic);
+			if ($screen != null) {
+				$all_results = do_ai_screen($min_rank, $screen, $all_results);
+			}
+
 			$status = update_queries($conn, $region, $topic, count($all_results), $usertoken);
 
 			$conn = null;
@@ -269,6 +288,46 @@ include "../common/urlcode.php";
 			echo return_error(DATABASE_FAILURE, $e->getMessage());
 			return;
 		}
+	}
+	
+	function do_ai_screen($max_rank, $screen, $results) {
+		
+		$ret_array = array();
+		foreach ($results as $key => $value) {
+			if ($value["rank"] > $max_rank) {
+				array_push($ret_array, $value);
+				continue;
+			}
+			
+			$title = $value["title"];
+			$instru = str_replace("#title", $title, $screen);
+			$postData = array(
+				"model" => "text-davinci-003",
+				"prompt" => $instru,
+				"max_tokens" => 128,
+				"temperature" => 0.5
+			);
+			
+			$encoded_postData = json_encode($postData);
+			$ai_returned_string = fetch_from_openai($encoded_postData);
+
+			$decoded = json_decode($ai_returned_string);
+			if ($decoded && is_array($decoded->choices) && $decoded->choices[0]->text) {
+				$answer = $decoded->choices[0]->text;
+			}
+			else {
+				$answer = "No";
+			}
+			if (strcasecmp(trim($answer), "Yes") !== 0) {
+				$value["rank"] += 100;
+			}
+			else {
+				$value["rank"] -= 25;
+			}
+			array_push($ret_array, $value);
+		}
+		
+		return $ret_array;
 	}
 
 	function endsWith($string, $ending) {
@@ -322,3 +381,4 @@ include "../common/urlcode.php";
       return $e->getMessage();
     }
   }
+	

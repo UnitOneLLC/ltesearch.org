@@ -72,7 +72,20 @@ class LTE_DB {
 		$stmt = null;
 		return $result;
 	 }
+	/* 
+	 * Fetch the OpenAI screening question for a topic
+	 */
+	function fetch_screen($topic) {
+		
+		$stmt = $this->_conn->query("select screen from ai_screen where topic='$topic'");
 
+		$screens = $stmt->fetchAll(PDO::FETCH_COLUMN, 'screen');
+		$stmt = null;
+		foreach($screens as $s) {
+			return $s;
+		}
+		return null;
+	}
 	/*
 	 * Fetch the set of configured regions.
 	 */
