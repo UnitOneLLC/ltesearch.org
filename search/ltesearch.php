@@ -15,12 +15,12 @@ define('GETPAPERDB', 'getpaperdb');
 define('DATABASE_FAILURE', 'Database failure');
 define('MISSING_PARAM', "A required parameter is missing");
 define('REGION_INVALID', "Specified region not configured");
-define('MAX_RESULTS', 200);
+define('MAX_RESULTS', 75);
 define('UNKNOWN_TOPIC', 'Unknown topic specified');
 define('BAD_FILTER_VALUE', 'Invalid filter argument');
 define('HIGHLIGHT_THRESHOLD',4);
 define('AUTH_ERROR', 'Authentication error');
-define('MIN_SCREEN_RANK', 60);
+define('MIN_SCREEN_RANK', 40);
 
 include "CustomSearch.php";
 include_once "../common/lte_db.php";
@@ -103,7 +103,25 @@ include_once "../common/aiutility.php";
 		}
 		return $result;
 	}
+
+	function trim_title($ttl) {
+		$ttl = substr($ttl, 0, strpos($ttl, " - "));
+		$ttl = substr($ttl, 0, strpos($ttl, " | "));
+		return $ttl;
+	}
+	
+	function get_trimmed_title($str) {
+		$pos1 = strpos($str, " - ");
+		$pos2 = strpos($str, " | ");
 		
+		if ($pos1 === false && $pos2 === false) {
+			return $str;
+		}
+		
+		$pos = ($pos1 !== false) ? $pos1 : $pos2;
+		return trim(substr($str, 0, $pos));
+	}	
+
 	# begin script
 
 	$parts = parse_url($_SERVER['REQUEST_URI']);
@@ -246,17 +264,18 @@ include_once "../common/aiutility.php";
 			$all_results = remove_duplicate_urls($all_results);
 			
 			$papers = $conn->fetch_papers();
-			$min_rank = round(count($all_results)/3);
+			$min_rank = round(count($all_results)/1.5);
 			foreach($all_results as &$result) {
 				$n_bold = get_bold_word_count($item["description"]);
-				$result["rank"] -= $n_bold;
+				$result["rank"] -= $n_bold*3;
 				$result["paper"] = find_paper_name($papers, $result["url"]);
 				$result["highlight"] = false; // is_highlight($result);
 				$result["zlink"] = encode_url($result["url"]);
+				$result["title"] = get_trimmed_title($result["title"]);
+				
 				if ($result["rank"] < $min_rank) {
-					$ft = trim($result["title"]);
+					$ft = $result["title"];
 					if (endsWith($ft, "...")) {
-//					if (str_pos($ft, "...") !== -1) {
 						$ft = get_full_title($result["url"]);
 						if ($ft != null) {
 							$result["title"] = $ft;
@@ -264,7 +283,7 @@ include_once "../common/aiutility.php";
 					}
 				}
 				
-				$result["rank"] -= word_count($result["title"])-3;
+				$result["rank"] -= word_count($result["title"]);
 			}
 
 			$screen = $conn->fetch_screen($topic);
@@ -319,10 +338,11 @@ include_once "../common/aiutility.php";
 				$answer = "No";
 			}
 			if (strcasecmp(trim($answer), "Yes") !== 0) {
-				$value["rank"] += 100;
+				$n_bold = get_bold_word_count($value["description"]);
+				$value["rank"] += (50 - $n_bold*5);
 			}
 			else {
-				$value["rank"] -= 25;
+				$value["rank"] -= 35;
 			}
 			array_push($ret_array, $value);
 		}
@@ -381,4 +401,5 @@ include_once "../common/aiutility.php";
       return $e->getMessage();
     }
   }
+	
 	
