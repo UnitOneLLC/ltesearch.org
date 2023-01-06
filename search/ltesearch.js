@@ -92,14 +92,7 @@ $(document).ready(function() {
 function createLink(paperName, text, url, readerUrl, draftUrl) {
     var root = document.createElement("div");
     var anch = document.createElement("a");
-    anch.setAttribute("noreferrer","");
-    root.appendChild(document.createTextNode(paperName + ": "));
-    root.appendChild(anch);
-    anch.href = url;
-    var textNode = document.createTextNode(text);
-    anch.appendChild(textNode);
-    root.setAttribute("style","font-size:14.5px");
-    
+
     if (readerUrl) {
         var readerAnch = document.createElement("a");
         readerAnch.setAttribute("title", "view text");
@@ -109,7 +102,7 @@ function createLink(paperName, text, url, readerUrl, draftUrl) {
         readerAnch.href = readerUrl;
         readerAnch.innerHTML = " text";        
     }
-
+    
     if (draftUrl) {
         var draftAnch = document.createElement("a");
         draftAnch.setAttribute("title", "create draft letter");
@@ -119,6 +112,18 @@ function createLink(paperName, text, url, readerUrl, draftUrl) {
         draftAnch.href = draftUrl;
         draftAnch.innerHTML = " draft"; 
     }
+    
+    anch.setAttribute("noreferrer","");
+    var paperSpan = document.createElement("span");
+    $(paperSpan).css("padding-left", "15px");
+    paperSpan.appendChild(document.createTextNode("    " + paperName + ": "));
+    root.appendChild(paperSpan);
+    root.appendChild(anch);
+    anch.href = url;
+    var textNode = document.createTextNode(text);
+    anch.appendChild(textNode);
+    root.setAttribute("style","font-size:14.5px");
+    
     
     return root;
 }
