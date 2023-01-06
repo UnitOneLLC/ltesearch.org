@@ -351,7 +351,7 @@ function onBuildTable(event) {
 
 function postSelectedToEditor(items, event) {
     $("#items_json").val(JSON.stringify(items));
-    $("#edit-form").submit();
+//    $("#edit-form").submit();
     event.stopPropagation();
 }
 

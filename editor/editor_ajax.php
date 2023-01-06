@@ -28,14 +28,17 @@
 		$title=str_replace("https://", "", $title);
 		$title=str_replace("http://", "", $title);
 		$html = read_html_from_url($u,"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)");
-		$titleOffset = strpos($html, "<title");
-		if ($titleOffset !== false) {
-			$titleOffset = strpos($html, ">", $titleOffset)+1;
-			$titleEnd = strpos($html, "</title>");
-			if ($titleEnd !== false) {
-				$title = substr($html, $titleOffset, $titleEnd-$titleOffset);
-			}
+
+		$title_regex = '/<title.*>(.*)<\/title>/';
+		preg_match($title_regex, $html, $title_matches);
+		if (is_array($title_matches) && (count($title_matches) > 1)) {
+			$title = trim($title_matches[1]);
+			$title = get_trimmed_title($title);
 		}
+		else {
+			$title = "<title not found>";
+		}
+		
 		$encoded = encode_url($u);
 		
 		$result = ["paper" => $paper["name"], "title" => $title, "zlink" => $encoded];

@@ -158,6 +158,8 @@ function deleteRow(cell) {
 }
 
 function doCopy() {
+    $("#result_table").css("width", "500px").css("margin", "0 10px");
+    
     var btns = $(".del-btn");
     
     btns.each(
@@ -223,6 +225,8 @@ function doCopy() {
     }
     if (window.getSelection().empty)
         window.getSelection().empty();
+
+    $("#result_table").css("width", "").css("margin", "");
 }
 
 function doAddUrl() {

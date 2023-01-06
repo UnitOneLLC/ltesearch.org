@@ -46,4 +46,16 @@
 	#"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:95.0) Gecko/20100101 Firefox/95.0"
 	#also see: https://developers.whatismybrowser.com/useragents/parse/
 
+	function get_trimmed_title($str) {
+		$pos1 = strpos($str, " - ");
+		$pos2 = strpos($str, " | ");
+		
+		if ($pos1 === false && $pos2 === false) {
+			return $str;
+		}
+		
+		$pos = ($pos1 !== false) ? $pos1 : $pos2;
+		return trim(substr($str, 0, $pos));
+	}	
+	
 ?>

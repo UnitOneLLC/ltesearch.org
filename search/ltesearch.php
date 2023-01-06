@@ -110,18 +110,6 @@ include_once "../common/aiutility.php";
 		return $ttl;
 	}
 	
-	function get_trimmed_title($str) {
-		$pos1 = strpos($str, " - ");
-		$pos2 = strpos($str, " | ");
-		
-		if ($pos1 === false && $pos2 === false) {
-			return $str;
-		}
-		
-		$pos = ($pos1 !== false) ? $pos1 : $pos2;
-		return trim(substr($str, 0, $pos));
-	}	
-
 	# begin script
 
 	$parts = parse_url($_SERVER['REQUEST_URI']);
