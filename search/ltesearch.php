@@ -323,16 +323,19 @@ include_once "../common/aiutility.php";
 				$answer = $decoded->choices[0]->text;
 			}
 			else {
-				$answer = "No";
+				$answer = "Maybe";
 			}
-			if (strcasecmp(trim($answer), "Yes") !== 0) {
-				$n_bold = get_bold_word_count($value["description"]);
-				$value["rank"] += (50 - $n_bold*5);
+
+			if (strcasecmp(trim($answer), "Very likely") == 0) {
+				array_push($ret_array, $value);
+				$value["rank"] -= 100;
 			}
-			else {
-				$value["rank"] -= 35;
+			if (strcasecmp(trim($answer), "Maybe") == 0) {
+				array_push($ret_array, $value);
 			}
-			array_push($ret_array, $value);
+			else if (strcasecmp(trim($answer), "Very unlikely") == 0) {
+				// do not add to return value array
+			}
 		}
 		
 		return $ret_array;
