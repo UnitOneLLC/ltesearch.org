@@ -70,7 +70,7 @@ Access denied.
       $postData = array(
         "model" => "text-davinci-003",
         "prompt" => $ai_prompt,
-        "max_tokens" => 512,
+        "max_tokens" => 1024,
         "temperature" => 1.0
       );
 
@@ -94,6 +94,9 @@ Access denied.
             <?php echo($ai_prompt);?>
             <br><br>
             <?php echo($answer)?>
+          </div>
+          <div>
+            <button><a href="./?action=form">New query</a></button>
           </div>
         </div>
     </body>

@@ -20,7 +20,7 @@ define('UNKNOWN_TOPIC', 'Unknown topic specified');
 define('BAD_FILTER_VALUE', 'Invalid filter argument');
 define('HIGHLIGHT_THRESHOLD',4);
 define('AUTH_ERROR', 'Authentication error');
-define('MIN_SCREEN_RANK', 40);
+define('MIN_RANK', 40);
 
 include "CustomSearch.php";
 include_once "../common/lte_db.php";
@@ -252,7 +252,7 @@ include_once "../common/aiutility.php";
 			$all_results = remove_duplicate_urls($all_results);
 			
 			$papers = $conn->fetch_papers();
-			$min_rank = round(count($all_results)/1.5);
+			$min_rank = MIN_RANK;
 			foreach($all_results as &$result) {
 				$n_bold = get_bold_word_count($item["description"]);
 				$result["rank"] -= $n_bold*3;
@@ -278,6 +278,11 @@ include_once "../common/aiutility.php";
 			if ($screen != null) {
 				$all_results = do_ai_screen($min_rank, $screen, $all_results);
 			}
+			
+			foreach($all_results as &$result) {
+				$rank = $result["rank"];
+				$result["description"] .= "/r$rank";
+			}
 
 			$status = update_queries($conn, $region, $topic, count($all_results), $usertoken);
 
@@ -297,12 +302,12 @@ include_once "../common/aiutility.php";
 		}
 	}
 	
-	function do_ai_screen($max_rank, $screen, $results) {
+	function do_ai_screen($min_rank, $screen, $results) {
 		
 		$ret_array = array();
 		foreach ($results as $key => $value) {
-			if ($value["rank"] > $max_rank) {
-				array_push($ret_array, $value);
+			if ($value["rank"] > $min_rank) {
+// Ignore unlikely results				array_push($ret_array, $value);
 				continue;
 			}
 			
@@ -327,17 +332,20 @@ include_once "../common/aiutility.php";
 			}
 
 			if (strcasecmp(trim($answer), "Very likely") == 0) {
+				$rank = $value["rank"] -= 100;
+				$value["description"] .= " /s+";
 				array_push($ret_array, $value);
-				$value["rank"] -= 100;
 			}
 			if (strcasecmp(trim($answer), "Maybe") == 0) {
+				$rank = $value["rank"];
+				$value["description"] .= " /s0";			
 				array_push($ret_array, $value);
 			}
 			else if (strcasecmp(trim($answer), "Very unlikely") == 0) {
 				// do not add to return value array
 			}
 		}
-		
+	
 		return $ret_array;
 	}
 
