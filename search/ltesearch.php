@@ -20,7 +20,7 @@ define('UNKNOWN_TOPIC', 'Unknown topic specified');
 define('BAD_FILTER_VALUE', 'Invalid filter argument');
 define('HIGHLIGHT_THRESHOLD',4);
 define('AUTH_ERROR', 'Authentication error');
-define('MIN_RANK', 40);
+define('MIN_RANK', 50);
 
 include "CustomSearch.php";
 include_once "../common/lte_db.php";
@@ -307,7 +307,7 @@ include_once "../common/aiutility.php";
 		$ret_array = array();
 		foreach ($results as $key => $value) {
 			if ($value["rank"] > $min_rank) {
-// Ignore unlikely results				array_push($ret_array, $value);
+// do not return unlikely resutls				array_push($ret_array, $value);
 				continue;
 			}
 			
