@@ -42,7 +42,7 @@ include_once "../common/aiutility.php"
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   
   
-      if ($_GET["action"] == "form") {
+      if ($_GET["action"] == "openai") {
 ?>
         <body>
             <div id="container">
@@ -96,7 +96,7 @@ Access denied.
             <?php echo($answer)?>
           </div>
           <div>
-            <button><a href="./?action=form">New query</a></button>
+            <button><a href="./?action=openai">New query</a></button>
           </div>
         </div>
     </body>
