@@ -21,6 +21,7 @@ define('BAD_FILTER_VALUE', 'Invalid filter argument');
 define('HIGHLIGHT_THRESHOLD',4);
 define('AUTH_ERROR', 'Authentication error');
 define('MIN_RANK', 50);
+define('AI_SCREEN_TEMPLATE', 'Would you guess that an article titled "#title" is about any of the following: #subjects? Answer one of the following: Very likely, Maybe, Very unlikely.');
 
 include "CustomSearch.php";
 include_once "../common/lte_db.php";
@@ -128,6 +129,10 @@ include_once "../common/aiutility.php";
 			echo json_encode($papers);
 		}
 		catch (PDOException $e) {
+			$conn = null;
+			return_error(DATABASE_FAILURE, "papers");
+		}
+		finally {
 			$conn = null;
 		}
 		return;
@@ -274,7 +279,7 @@ include_once "../common/aiutility.php";
 				$result["rank"] -= word_count($result["title"]);
 			}
 
-			$screen = $conn->fetch_screen($topic);
+			$screen = build_ai_screen_prompt_template($topic);
 			if ($screen != null) {
 				$all_results = do_ai_screen($min_rank, $screen, $all_results);
 			}
@@ -299,6 +304,24 @@ include_once "../common/aiutility.php";
 			$conn = null;
 			echo return_error(DATABASE_FAILURE, $e->getMessage());
 			return;
+		}
+	}
+	
+	function build_ai_screen_prompt_template($topic) {
+		try {
+			$conn = new LTE_DB();
+			$subjects = $conn->fetch_screen_subjects($topic);
+			if (count($subjects) === 0) {
+				return null;
+			}
+			$subj_list = implode(",", $subjects);
+			$prompt = str_replace("#subjects", $subj_list, AI_SCREEN_TEMPLATE);
+			$conn = null;			
+			return $prompt;
+		}
+		catch (PDOException $e) {
+			$conn = null;			
+			return null;
 		}
 	}
 	
