@@ -40,15 +40,15 @@ include_once "../common/aiutility.php"
 </head>
 <?php 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-  
-  
+
       if ($_GET["action"] == "openai") {
+        $prompt = $_GET["prompt"];
 ?>
         <body>
             <div id="container">
                 <form method="POST">
                     <label for="input_url">Enter Prompt:</label><br>
-                    <textarea id="input_url" rows="6" cols="80" name="payload" value=""></textarea>
+                    <textarea id="input_url" rows="6" cols="80" name="payload" value=""><?php echo($prompt);?></textarea>
                     <br>
                     <input type="submit" value="Submit">
                 </form>
@@ -63,6 +63,9 @@ Access denied.
   }
 ?>
 <?php } else if ($_SERVER['REQUEST_METHOD'] === 'POST') { 
+  
+  if ($_GET["action"] == "openai") {
+  
     $valid_url = true;
     try {    
       $ai_prompt = $_POST["payload"];
@@ -86,6 +89,7 @@ Access denied.
     catch (Exception $e) {
       $answer = "An exception occurred: " . $e.message();
     }
+  }
 ?>
     <body>
         <div id="container">
@@ -96,7 +100,7 @@ Access denied.
             <?php echo($answer)?>
           </div>
           <div>
-            <button><a href="./?action=openai">New query</a></button>
+            <button><a href="./?action=openai&prompt=<?php echo(urlencode($ai_prompt)); ?>">New query</a></button>
           </div>
         </div>
     </body>

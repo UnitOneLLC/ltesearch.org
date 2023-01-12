@@ -106,6 +106,7 @@ include_once "../common/aiutility.php";
 	}
 
 	function trim_title($ttl) {
+		$ttl = trim(str_replace("\xa0", ' ', $ttl));
 		$ttl = substr($ttl, 0, strpos($ttl, " - "));
 		$ttl = substr($ttl, 0, strpos($ttl, " | "));
 		return $ttl;
