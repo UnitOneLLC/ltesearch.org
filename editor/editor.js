@@ -80,6 +80,7 @@ function createRow(seq, paperName, text, url, readerUrl, draftUrl, twitterUrl, f
         readerAnch.setAttribute("title", "view text");
         readerAnch.setAttribute("style", "background-color: #11a;color: #fff;font-family: sans-serif;font-variant: small-caps;padding: 0px 2px 0px 2px;cursor: pointer;text-decoration: none;font-size:0.85em;font-weight:600");;
         textLinkCell.appendChild(document.createTextNode("  "));
+        textLinkCell.setAttribute("style", "width:40px");        
         textLinkCell.appendChild(readerAnch);
         readerAnch.href = readerUrl;
         readerAnch.innerHTML = "&nbsp;text&nbsp;";        
@@ -89,6 +90,7 @@ function createRow(seq, paperName, text, url, readerUrl, draftUrl, twitterUrl, f
         var draftAnch = document.createElement("a");
         draftAnch.setAttribute("title", "create draft letter");
         draftAnch.setAttribute("style", "background-color: #11a;color: #fff;font-family: sans-serif;font-variant: small-caps;padding: 0px 2px 0px 2px;cursor: pointer;text-decoration: none;font-size:0.85em;font-weight:600");
+        draftLinkCell.setAttribute("style", "width:50px");
         draftLinkCell.appendChild(draftAnch);
         draftAnch.href = draftUrl;
         draftAnch.innerHTML = "&nbsp;draft&nbsp;"; 
@@ -203,7 +205,7 @@ function deleteRow(cell) {
 }
 
 function doCopy() {
-    $("#result_table").css("width", "500px").css("margin", "0 10px");
+    $("#result_table").css("width", "600px").css("margin", "0 10px");
     
     var btns = $(".del-btn");
     
