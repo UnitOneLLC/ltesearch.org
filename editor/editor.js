@@ -205,7 +205,7 @@ function deleteRow(cell) {
 }
 
 function doCopy() {
-    $("#result_table").css("width", "600px").css("margin", "0 10px");
+    $("#result_table").css("width", "640px").css("margin", "0 10px");
     
     var btns = $(".del-btn");
     
