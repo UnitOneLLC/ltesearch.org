@@ -106,7 +106,7 @@ include_once "../common/aiutility.php";
 	}
 
 	function trim_title($ttl) {
-		$ttl = trim(str_replace("\xa0", ' ', $ttl));
+		$ttl = trim(str_replace("&#160;", ' ', $ttl));
 		$ttl = substr($ttl, 0, strpos($ttl, " - "));
 		$ttl = substr($ttl, 0, strpos($ttl, " | "));
 		return $ttl;
@@ -344,15 +344,21 @@ include_once "../common/aiutility.php";
 				"temperature" => 0.5
 			);
 			
-			$encoded_postData = json_encode($postData);
-			$ai_returned_string = fetch_from_openai($encoded_postData);
-
-			$decoded = json_decode($ai_returned_string);
-			if ($decoded && is_array($decoded->choices) && $decoded->choices[0]->text) {
-				$answer = $decoded->choices[0]->text;
+			if (stripos($title, "letter") !== false) {
+				$answer = "Maybe";
 			}
 			else {
-				$answer = "Maybe";
+				
+				$encoded_postData = json_encode($postData);
+				$ai_returned_string = fetch_from_openai($encoded_postData);
+				
+				$decoded = json_decode($ai_returned_string);
+				if ($decoded && is_array($decoded->choices) && $decoded->choices[0]->text) {
+					$answer = $decoded->choices[0]->text;
+				}
+				else {
+					$answer = "Maybe";
+				}
 			}
 
 			if (strcasecmp(trim($answer), "Very likely") == 0) {

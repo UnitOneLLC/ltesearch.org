@@ -4,6 +4,8 @@ var USE_TEST_DATA = false;
 
 const READER_URL = "https://ltesearch.org/read";
 const DRAFT_URL = "https://ltesearch.org/draft";
+const TWITTER_URL = "https://twitter.com/intent/tweet";
+const FACEBOOK_URL = "https://www.facebook.com/dialog/share?app_id=80401312489";
 
 var gDataTable = null;
 
@@ -16,6 +18,7 @@ var DATA_TABLE_OPTIONS = {
         {type: "num" },
         {type: "html"},
         {type: "text"},
+        {type: "html"},
         {type: "html"},
         {type: "html"},
         {type: "html"}
@@ -35,7 +38,7 @@ $(document).ready(function() {
     gDataTable = buildResultTable(items);
 });
 
-function createRow(seq, paperName, text, url, readerUrl, draftUrl) {
+function createRow(seq, paperName, text, url, readerUrl, draftUrl, twitterUrl, fbUrl) {
     var row = document.createElement("tr");
     var handle = document.createElement("td");
     var delBtnCell = document.createElement("td");
@@ -43,18 +46,27 @@ function createRow(seq, paperName, text, url, readerUrl, draftUrl) {
     var linkCell = document.createElement("td");
     var textLinkCell = document.createElement("td");
     var draftLinkCell = document.createElement("td");
+    var socialCell = document.createElement("td");
     row.appendChild(handle);
     row.appendChild(delBtnCell);
     row.appendChild(paperCell);
     row.appendChild(linkCell);
     row.appendChild(textLinkCell);
     row.appendChild(draftLinkCell);
+    row.appendChild(socialCell);
     
     handle.appendChild(document.createTextNode(seq.toString()));
     delBtnCell.innerHTML = "<span onclick='deleteRow(this)' class=del-btn contenteditable=false>x</span>";
     $(delBtnCell).addClass("del-btn");
     paperCell.appendChild(document.createTextNode(paperName));
     paperCell.setAttribute("style", "padding-left:30px");
+    if (bEnableSocial) {
+        socialCell.setAttribute("style", "width:40px");
+    }
+    else {
+        socialCell.setAttribute("style", "width:1px");
+    }
+        
     var anch = document.createElement("a");
     anch.setAttribute("noreferrer","");
     linkCell.appendChild(anch);
@@ -81,6 +93,29 @@ function createRow(seq, paperName, text, url, readerUrl, draftUrl) {
         draftAnch.href = draftUrl;
         draftAnch.innerHTML = "&nbsp;draft&nbsp;"; 
     }
+
+    if (bEnableSocial) {
+        if (twitterUrl) {
+            var twitterAnch = document.createElement("a");
+            twitterAnch.setAttribute("title", "tweet this article");
+            twitterAnch.setAttribute("style", "width:16px");
+            socialCell.appendChild(document.createTextNode("  "));
+            socialCell.appendChild(twitterAnch);
+            twitterAnch.href = twitterUrl;
+            twitterAnch.innerHTML = '<img style="height:16px; vertical-align: middle" src="https://www.gstatic.com/alerts/images/tw-24.png">';
+        }
+        
+        if (fbUrl) {
+            socialCell.appendChild(document.createTextNode("  "));
+            var fbAnch = document.createElement("a");
+            fbAnch.setAttribute("title", "share on Facebook");
+            fbAnch.setAttribute("style", "width:16px");
+            socialCell.appendChild(document.createTextNode("  "));
+            socialCell.appendChild(fbAnch);
+            fbAnch.href = fbUrl;
+            fbAnch.innerHTML = '<img style="height:16px; vertical-align: middle" src="https://www.gstatic.com/alerts/images/fb-24.png">';
+        }
+    }
     
     return row;
 }
@@ -92,6 +127,14 @@ function makeReaderUrl(z) {
 
 function makeDraftUrl(z) {
     return DRAFT_URL + "?z=" + z;
+}
+
+function makeTwitterUrl(u, title) {
+    return TWITTER_URL + "?url=" + encodeURIComponent(u) + "&text=" + encodeURIComponent(title);
+}
+
+function makeFacebookUrl(u, title) {
+    return FACEBOOK_URL + "&href=" + encodeURIComponent(u);
 }
 
 function buildResultTable(jsonArr) {
@@ -107,7 +150,9 @@ function buildResultTable(jsonArr) {
         d = jsonArr[i];
         var readerUrl = d.zlink ? makeReaderUrl(d.zlink) : "#";
         var draftUrl = d.zlink ? makeDraftUrl(d.zlink) : "#";
-        var row = createRow(i, d.paper, d.title, d.url, readerUrl, draftUrl);
+        var twitterUrl = d.url ? makeTwitterUrl(d.url, d.title) : "#";
+        var facebookUrl = d.url ? makeFacebookUrl(d.url, d.title) : "#";
+        var row = createRow(i, d.paper, d.title, d.url, readerUrl, draftUrl, twitterUrl, facebookUrl);
         tbody[0].appendChild(row);
     }
     
@@ -136,11 +181,11 @@ function createCommentRow(seq) {
     $(delCell).css("background-color", "#d0d0d0");
     var bigcol = document.createElement("td");
     bigcol.setAttribute("contenteditable", "true");
-    bigcol.setAttribute("colspan", 4);
+    bigcol.setAttribute("colspan", 5);
     xrow.appendChild(delCell);
     xrow.appendChild(bigcol);
     
-    for (var i=0; i < 3; ++i) {
+    for (var i=0; i < 4; ++i) {
         var cell = document.createElement("td");
         cell.style.display = "none";
         xrow.appendChild(cell);
@@ -248,9 +293,11 @@ function doAddUrl() {
             
             var readerUrl = rowData.zlink ? makeReaderUrl(rowData.zlink) : "#";
             var draftUrl = rowData.zlink ? makeDraftUrl(rowData.zlink) : "#";
+            var twitterUrl = rowData.url ? makeTwitterUrl(rowData.url, rowData.title) : "#";
+            var facebookUrl = rowData.url ? makeFacebookUrl(rowData.url, rowData.title) : "#";
             var nRows = $('#result_table tr').length;
 
-            var newRow = createRow(nRows, rowData.paper, rowData.title, url, readerUrl, draftUrl);
+            var newRow = createRow(nRows, rowData.paper, rowData.title, url, readerUrl, draftUrl, twitterUrl, facebookUrl);
 
             gDataTable.row.add([
                 nRows-1,
@@ -258,7 +305,8 @@ function doAddUrl() {
                 newRow.childNodes[2].innerHTML,
                 newRow.childNodes[3].innerHTML,
                 newRow.childNodes[4].innerHTML,
-                newRow.childNodes[5].innerHTML
+                newRow.childNodes[5].innerHTML,
+                newRow.childNodes[6].innerHTML                
             ]);
             
             var commentRow = createCommentRow(nRows);
@@ -268,7 +316,8 @@ function doAddUrl() {
                 commentRow.childNodes[2].innerHTML,
                 commentRow.childNodes[3].innerHTML,
                 commentRow.childNodes[4].innerHTML,
-                commentRow.childNodes[5].innerHTML                
+                commentRow.childNodes[5].innerHTML,
+                commentRow.childNodes[6].innerHTML
             ]);
             
             gDataTable.draw();

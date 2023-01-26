@@ -15,6 +15,9 @@ include "../common/version.php";
         var items = <?php
             echo $_POST["items_json"];
         ?>;
+        var bEnableSocial = <?php
+            echo $_POST["enable_social"];
+        ?>
     </script>
 
     <style type="text/css">

@@ -2,6 +2,8 @@
 
 const READER_URL = "https://ltesearch.org/read";
 const DRAFT_URL = "https://ltesearch.org/draft";
+const TWITTER_URL = "https://twitter.com/intent/tweet";
+const FACEBOOK_URL = "https://www.facebook.com/dialog/share?app_id=80401312489";
 
 var USE_TEST_DATA = false;
 var DO_FILTER = true;
@@ -89,7 +91,7 @@ $(document).ready(function() {
     prepareAuth();
 });
 
-function createLink(paperName, text, url, readerUrl, draftUrl) {
+function createLink(paperName, text, url, readerUrl, draftUrl, twitterUrl, fbUrl) {
     var root = document.createElement("div");
     var anch = document.createElement("a");
 
@@ -111,6 +113,26 @@ function createLink(paperName, text, url, readerUrl, draftUrl) {
         root.appendChild(draftAnch);
         draftAnch.href = draftUrl;
         draftAnch.innerHTML = " draft"; 
+    }
+    
+    if (twitterUrl) {
+        var twitterAnch = document.createElement("a");
+        twitterAnch.setAttribute("title", "tweet this article");
+        twitterAnch.setAttribute("style", "width:16px; vertical-align:text-bottom");
+        root.appendChild(document.createTextNode("  "));
+        root.appendChild(twitterAnch);
+        twitterAnch.href = twitterUrl;
+        twitterAnch.innerHTML = '<img style="height:16px; vertical-align: bottom" src="https://www.gstatic.com/alerts/images/tw-24.png">';
+    }
+    
+    if (fbUrl) {
+        var fbAnch = document.createElement("a");
+        fbAnch.setAttribute("title", "share on Facebook");
+        fbAnch.setAttribute("style", "width:16px;vertical-align:text-bottom");
+        root.appendChild(document.createTextNode("  "));
+        root.appendChild(fbAnch);
+        fbAnch.href = fbUrl;
+        fbAnch.innerHTML = '<img style="height:16px; vertical-align: bottom" src="https://www.gstatic.com/alerts/images/fb-24.png">';
     }
     
     anch.setAttribute("noreferrer","");
@@ -173,6 +195,14 @@ function makeDraftUrl(z) {
     return DRAFT_URL + "?z=" + z;
 }
 
+function makeTwitterUrl(u, title) {
+    return TWITTER_URL + "?url=" + encodeURIComponent(u) + "&text=" + encodeURIComponent(title);
+}
+
+function makeFacebookUrl(u, title) {
+    return FACEBOOK_URL + "&href=" + encodeURIComponent(u);
+}
+
 function onClearSelection() {
     $("#digest tr").removeClass("selected-row");
     $("#digest tr input[type=checkbox]").prop("checked", false);
@@ -226,6 +256,7 @@ function setClipboardMulti(items, event) {
         
         var bInclReader = $("#incl-text-only").is(":checked");
         var bIncDraft = $("#incl-create-draft").is(":checked");
+        var bIncSocial = $("#incl-social").is(":checked");
         
         items.sort(function(a,b) {return a.title.localeCompare(b.title)});
         
@@ -233,7 +264,9 @@ function setClipboardMulti(items, event) {
             var t = items[i];
             var readerUrl = bInclReader && (t.zlink.indexOf(".pdf")==-1) ? makeReaderUrl(t.zlink) : null;
             var draftUrl = bIncDraft ? makeDraftUrl(t.zlink) : null;
-            var link = createLink(t.paper, trimTitle(t.title), t.url, readerUrl, draftUrl);
+            var twitterUrl = bIncSocial ? makeTwitterUrl(t.url, t.title) : null;
+            var fbUrl = bIncSocial ? makeFacebookUrl(t.url, t.title) : null;
+            var link = createLink(t.paper, trimTitle(t.title), t.url, readerUrl, draftUrl, twitterUrl, fbUrl);
             outer.appendChild(link);
         }
         document.body.appendChild(outer);
@@ -356,6 +389,7 @@ function onBuildTable(event) {
 
 function postSelectedToEditor(items, event) {
     $("#items_json").val(JSON.stringify(items));
+    $("#enable_social").val($("#incl-social").is(":checked"));
 //    $("#edit-form").submit();
     event.stopPropagation();
 }
