@@ -148,9 +148,13 @@
 						</div>
 					</td>
 					<td style="width:60%; max-height:180px;overflow-y:auto">
-						<div id="tp-cell"></div>
+						<div id="tp-cell"></div><div id="end-copy"></div>
 						<span id="tp-spinner-prompt">Retrieving . . . </span><img id="tp-spinner" height="45px" src="../search/loading_spinner.gif"/>
 					</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><button style="float:right" id="btn-copy-ai">Copy</button>
 				</tr></tbody>
 			</table>
 			<h1>Create a draft LTE Google document</h1>

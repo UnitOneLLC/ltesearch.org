@@ -106,7 +106,13 @@ include_once "../common/aiutility.php";
 	}
 
 	function trim_title($ttl) {
-		$ttl = trim(str_replace("&#160;", ' ', $ttl));
+		$ch = " - ";
+		if (strpos($ttl, $ch) === false) { 
+			$sub = $ttl; 
+		} else {
+			$sub = substr($ttl, 0, strpos($ttl, $ch)); 
+		}
+		$ttl = trim(str_replace("&#160;", ' ', $sub));
 		$ttl = substr($ttl, 0, strpos($ttl, " - "));
 		$ttl = substr($ttl, 0, strpos($ttl, " | "));
 		return $ttl;

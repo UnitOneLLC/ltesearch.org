@@ -9,6 +9,8 @@ $(document).ready(function() {
 	$("#btn-chg-auth").click(onClickChangeAuthor);
 	$("#btn-get-tp").click(onGetTalkingPoints);
 	$("#btn-get-angles").click(onSuggestAngles);
+	$("#btn-copy-ai").click(onCopyAi);
+	$("#btn-copy-ai").attr("disabled", true);
 	setupAuthor();
 });
 
@@ -37,10 +39,11 @@ function onGetTalkingPoints() {
 			for (i=0; i < keys.length; ++i) {
 				list.append($("<li>" + results[keys[i]].trim() + "</li>"));
 			}
+			$("#btn-copy-ai").attr("disabled", false);
 		}
 		catch (e) {
 			cellDiv.empty();
-			alert("Unable to get talking points: " + (e.message ? e.message : e));
+			alert("Unable to get talking points. Try again in a few moments. " + " (System response was: " + resultString + ")");
 			showSpin(false, "tp");
 		}
 	})
@@ -72,10 +75,11 @@ function onSuggestAngles() {
 			var results = JSON.parse(resultString.trim());
 			cellDiv.empty();
 			cellDiv.append($("<div>" + results["text"] + "</div>"));
+			$("#btn-copy-ai").attr("disabled", false);
 		}
 		catch (e) {
 			cellDiv.empty();
-			alert("Unable to get angle suggestions: " + (e.message ? e.message : e));
+			alert("Unable to get angle suggestions. Try again in a few moments." + " (System response: " + resultString + ")");
 			showSpin(false, "tp");
 		}
 	})
@@ -85,7 +89,20 @@ function onSuggestAngles() {
 	});
 }
 
-
+function onCopyAi() {
+	var range = document.createRange();
+	range.selectNodeContents($("#tp-cell")[0]);	
+	
+	var selObj = window.getSelection()
+	selObj.removeAllRanges();
+	selObj.addRange(range);
+	
+	if (!document.execCommand('copy')) {
+		console.error('failed to copy to clipboard');
+		alert("oops . . . failed to copy!");
+	}
+	window.getSelection().removeAllRanges();	
+}
 
 function enableButton(enabled) {
 	if (enabled) {
