@@ -3,8 +3,7 @@
 const READER_URL = "https://ltesearch.org/read";
 const DRAFT_URL = "https://ltesearch.org/draft";
 const TWITTER_URL = "https://twitter.com/intent/tweet";
-const FACEBOOK_URL = "https://www.facebook.com/dialog/share?app_id=80401312489";
-
+const FACEBOOK_URL = "https://www.facebook.com/share.php?u=";
 var USE_TEST_DATA = false;
 var DO_FILTER = true;
 
@@ -200,7 +199,7 @@ function makeTwitterUrl(u, title) {
 }
 
 function makeFacebookUrl(u, title) {
-    return FACEBOOK_URL + "&href=" + encodeURIComponent(u);
+    return FACEBOOK_URL + encodeURIComponent(u);
 }
 
 function onClearSelection() {

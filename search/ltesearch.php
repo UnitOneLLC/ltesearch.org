@@ -21,7 +21,7 @@ define('BAD_FILTER_VALUE', 'Invalid filter argument');
 define('HIGHLIGHT_THRESHOLD',4);
 define('AUTH_ERROR', 'Authentication error');
 define('MIN_RANK', 50);
-define('AI_SCREEN_TEMPLATE', 'Would you guess that an article titled "#title" is about any of the following: #subjects? Answer one of the following: Very likely, Maybe, Very unlikely.');
+define('AI_SCREEN_TEMPLATE', 'Would you guess that the subject matter of a news article entitled "#title" is related to any of the following: #subjects? Answer one of the following: Very likely, Maybe, Very unlikely.');
 
 include "CustomSearch.php";
 include_once "../common/lte_db.php";
@@ -347,7 +347,7 @@ include_once "../common/aiutility.php";
 				"model" => "text-davinci-003",
 				"prompt" => $instru,
 				"max_tokens" => 128,
-				"temperature" => 0.5
+				"temperature" => 1.0
 			);
 			
 			if (stripos($title, "letter") !== false) {
