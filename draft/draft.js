@@ -15,14 +15,7 @@ $(document).ready(function() {
 });
 
 function onGetTalkingPoints() {
-	var pro, radioChecked = document.querySelector('input[name="tp"]:checked');
-	if (radioChecked == null) {
-		alert("You must check either 'supporting' or 'in opposition to'");
-		return;
-	}
-	else {
-		pro = radioChecked.value;
-	}
+	var pro = true;
 	$("#tp-cell").empty();
 	showSpin(true, "tp");
 	var qStringParams = new URLSearchParams(window.location.search);
@@ -55,14 +48,7 @@ function onGetTalkingPoints() {
 
 
 function onSuggestAngles() {
-	var pro, radioChecked = document.querySelector('input[name="tp"]:checked');
-	if (radioChecked == null) {
-		alert("You must select either 'in support of' or 'in opposition to'");
-		return;
-	}
-	else {
-		pro = radioChecked.value;
-	}
+	var pro = true;
 	$("#tp-cell").empty();
 	showSpin(true, "tp");
 	var qStringParams = new URLSearchParams(window.location.search);

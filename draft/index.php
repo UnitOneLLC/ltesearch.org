@@ -138,23 +138,19 @@
 			<h1>Get talking points or angle suggestions for this article</h1>
 			<table id="tp-table">
 				<tbody><tr>
-					<td style="width:40%">
+					<td style="width:35%; vertical-align: top;">
 						<div id="tpdiv">
-							<div style="margin:5px 0";>I want to argue</div>
-							<div><input type="radio" id="in_favor" name="tp" value="1"> in support of</div>
-							<div><input type="radio" id="opposed" name="tp" value="0"> in opposition to</div>
-							<div style="margin-top:5px">the content of the article.</div>
 							<div><button id="btn-get-tp">Get talking points</button> <button id="btn-get-angles">Suggest angles</button></div>
 						</div>
 					</td>
-					<td style="width:60%; max-height:180px;overflow-y:auto">
+					<td style="width:65%; max-height:180px;overflow-y:auto">
 						<div id="tp-cell"></div><div id="end-copy"></div>
 						<span id="tp-spinner-prompt">Retrieving . . . </span><img id="tp-spinner" height="45px" src="../search/loading_spinner.gif"/>
 					</td>
 				</tr>
 				<tr>
 					<td></td>
-					<td><button style="float:right" id="btn-copy-ai">Copy</button>
+					<td><button style="float:right" id="btn-copy-ai">Copy</button></td>
 				</tr></tbody>
 			</table>
 			<h1>Create a draft LTE Google document</h1>

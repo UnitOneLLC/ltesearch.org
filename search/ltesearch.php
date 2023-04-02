@@ -20,8 +20,11 @@ define('UNKNOWN_TOPIC', 'Unknown topic specified');
 define('BAD_FILTER_VALUE', 'Invalid filter argument');
 define('HIGHLIGHT_THRESHOLD',4);
 define('AUTH_ERROR', 'Authentication error');
-define('MIN_RANK', 50);
-define('AI_SCREEN_TEMPLATE', 'Would you guess that the subject matter of a news article entitled "#title" is related to any of the following: #subjects? Answer one of the following: Very likely, Maybe, Very unlikely.');
+//define('AI_SCREEN_TEMPLATE', 'Would you guess that the subject matter of a news article entitled "#title" is related to any of the following: #subjects? Answer one of the following: Very likely, Maybe, Very unlikely.');
+
+define('AI_SCREEN_TEMPLATE', 'On a scale of 1 to 100, 100 meaning most likely, how likely is a news article with entitled "#title" to be related to any one of the following subjects: #subjects ? Just reply with a number and no additional text.');
+define('MIN_RANK', 40);
+define('AI_CUTOFF', 20);
 
 include "CustomSearch.php";
 include_once "../common/lte_db.php";
@@ -283,7 +286,11 @@ include_once "../common/aiutility.php";
 					}
 				}
 				
-				$result["rank"] -= word_count($result["title"]);
+				$title_word_count = word_count($result["title"]); 
+				if ($title_word_count == 1){
+					$result["rank"] += 100;					
+				}
+				$result["rank"] -= $title_word_count;
 			}
 
 			$screen = build_ai_screen_prompt_template($topic);
@@ -351,7 +358,7 @@ include_once "../common/aiutility.php";
 			);
 			
 			if (stripos($title, "letter") !== false) {
-				$answer = "Maybe";
+				$answer = 50;
 			}
 			else {
 				
@@ -360,25 +367,21 @@ include_once "../common/aiutility.php";
 				
 				$decoded = json_decode($ai_returned_string);
 				if ($decoded && is_array($decoded->choices) && $decoded->choices[0]->text) {
-					$answer = $decoded->choices[0]->text;
+					$answerText = trim($decoded->choices[0]->text);
+					$answer = intval($answerText);
+					if ($answer == 0) {
+						$answer = 50;
+					}
 				}
 				else {
-					$answer = "Maybe";
+					$answer = 50;
 				}
 			}
-
-			if (strcasecmp(trim($answer), "Very likely") == 0) {
-				$rank = $value["rank"] -= 100;
-				$value["description"] .= " /s+";
+			
+			if ($answer >= AI_CUTOFF) {
+				$value["rank"] -= $answer;
+				$value["description"] .= " /s" . $answer;
 				array_push($ret_array, $value);
-			}
-			if (strcasecmp(trim($answer), "Maybe") == 0) {
-				$rank = $value["rank"];
-				$value["description"] .= " /s0";			
-				array_push($ret_array, $value);
-			}
-			else if (strcasecmp(trim($answer), "Very unlikely") == 0) {
-				// do not add to return value array
 			}
 		}
 	
