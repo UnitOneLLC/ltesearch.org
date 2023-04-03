@@ -4,10 +4,17 @@
 	include_once "../common/lte_db.php";
 	include_once "../common/aiutility.php";
 	
-	function get_talking_points($url, $pro, $text, $count = 5, $max_tokens = 2000, $temperature = 1.0) {
+	function get_talking_points($topic, $url, $pro, $text, $count = 5, $max_tokens = 2000, $temperature = 1.0) {
 		$head = substr($text, 0, 1500);
-		
-		$instru = "Create a list of " . $count . " points about this article from the perspective of a person concerned about climate change:" . $head;
+	
+		$conn = new LTE_DB();
+		$key_phrase = $conn->fetch_key_ai_screen_phrase_for_topic($topic);
+		$conn = null;
+		if (is_null($key_phrase))
+			$key_phrase = 'climate change';
+	
+		$instru = "Create a list of " . $count . " points about this article from the perspective of a person concerned about #key_phrase:" . $head;
+		$instru = str_replace("#key_phrase", $key_phrase, $instru);
 		
 		$postData = array(
 			"model" => "text-davinci-003",
@@ -35,10 +42,19 @@
 		}
 	}
 	
-	function suggest_angles($url, $pro, $text, $max_tokens = 2000, $temperature = 1.0) {
+	function suggest_angles($topic, $url, $pro, $text, $max_tokens = 2000, $temperature = 1.0) {
 		$head = substr($text, 0, 1500);
 	
-		$instru = "Suggest an angle for a letter to the editor about this article from the perspective of someone concerned about climate change: " . $head;
+
+		$conn = new LTE_DB();
+		$key_phrase = $conn->fetch_key_ai_screen_phrase_for_topic($topic);
+		$conn = null;
+		if (is_null($key_phrase))
+			$key_phrase = 'climate change';
+		
+		$instru = "Suggest an angle for a letter to the editor about this article from the perspective of someone concerned about #key_phrase: " . $head;
+		$instru = str_replace("#key_phrase", $key_phrase, $instru);
+	
 	
 		$postData = array(
 			"model" => "text-davinci-003",
@@ -99,6 +115,10 @@
 
 	$innerText = $element->textContent;
 
+	$topic = $_GET["topic"];
+	if (empty($topic)) {
+		$topic = 'climate';
+	}
 	
 	$pro = $_GET['pro'];
 	if ($pro == '0')
@@ -109,10 +129,10 @@
 
 	$req = $_GET['req'];
 	if ($req == 'tp') {
-		echo get_talking_points($u, $pro, $innerText);
+		echo get_talking_points($topic, $u, $pro, $innerText);
 	}
 	else if ($req = 'angles') {
-		echo suggest_angles($u, $pro, $innerText);
+		echo suggest_angles($topic, $u, $pro, $innerText);
 	}
 	else {
 		echo ("Bad request. No request type was given.");

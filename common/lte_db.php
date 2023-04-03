@@ -194,5 +194,20 @@ class LTE_DB {
 		$stmt = null;
 		return $result;
 	}
+
+	/*
+	 * fetch the phrase for a subject that is used for talking points and angles
+	 */
+	function fetch_key_ai_screen_phrase_for_topic($topic) {
+		$stmt = $this->_conn->query("select screen from ai_screen where topic='$topic' and is_key_phrase=1");
+		$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'screen');
+		$stmt = null;
+		if (count($result) === 0) {
+			return null;
+		}
+		return $result[0];
+	}
+	
+	
 }
 ?>

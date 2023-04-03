@@ -31,6 +31,7 @@ var ZLINK_COL_IDX = 5;
 var RANK_COL_IDX = 6;
 
 var gResultData = null;
+var theTopic = "";
 
 $(document).ready(function() {
     docTitle = document.title;
@@ -84,6 +85,7 @@ $(document).ready(function() {
             $("#topic").val("climate");
         }
     }
+    theTopic = $("#topic").val();
     
     $("#param-summary").text(getParamsSummary());
 
@@ -166,6 +168,7 @@ function resetParamsSummary() {
     $.cookie("region",$("#region").val());
     $.cookie("topic",$("#topic").val());    
     $("#param-summary").text(getParamsSummary());
+    theTopic = $("#topic").val();
 }
 
 function trimTitle(s) {
@@ -191,7 +194,11 @@ function makeReaderUrl(z) {
 }
 
 function makeDraftUrl(z) {
-    return DRAFT_URL + "?z=" + z;
+    var u = DRAFT_URL + "?z=" + z;
+    if (theTopic) {
+        u += "&topic=" + theTopic;
+    }
+    return u;
 }
 
 function makeTwitterUrl(u, title) {

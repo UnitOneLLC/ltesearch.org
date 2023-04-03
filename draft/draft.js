@@ -19,7 +19,7 @@ function onGetTalkingPoints() {
 	$("#tp-cell").empty();
 	showSpin(true, "tp");
 	var qStringParams = new URLSearchParams(window.location.search);
-	var url = "./aitp.php?z=" + qStringParams.get('z') + "&pro=" + pro + "&req=tp";;
+	var url = "./aitp.php?z=" + qStringParams.get('z') + "&pro=" + pro + "&req=tp" + "&topic=" + theTopic;
 	$.ajax(url)
 	.done((resultString)=>{
 		showSpin(false, "tp");
@@ -52,7 +52,7 @@ function onSuggestAngles() {
 	$("#tp-cell").empty();
 	showSpin(true, "tp");
 	var qStringParams = new URLSearchParams(window.location.search);
-	var url = "./aitp.php?z=" + qStringParams.get('z') + "&pro=" + pro + "&req=angles";
+	var url = "./aitp.php?z=" + qStringParams.get('z') + "&pro=" + pro + "&req=angles" + "&topic=" + theTopic;
 	$.ajax(url)
 	.done((resultString)=>{
 		showSpin(false, "tp");
