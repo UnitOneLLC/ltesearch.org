@@ -290,7 +290,10 @@ include_once "../common/aiutility.php";
 				if ($title_word_count == 1){
 					$result["rank"] += 100;					
 				}
-				$result["rank"] -= $title_word_count;
+				else if ($title_word_count == 2) {
+					$result["rank"] += 40;
+				}
+				$result["rank"] -= $title_word_count*2;
 			}
 
 			$screen = build_ai_screen_prompt_template($topic);

@@ -4,8 +4,20 @@
 	include_once "../common/lte_db.php";
 	include_once "../common/aiutility.php";
 	
-	function get_talking_points($topic, $url, $pro, $text, $count = 5, $max_tokens = 2000, $temperature = 1.0) {
-		$head = substr($text, 0, 1500);
+	define(INPUT_SIZE, 500);
+	
+	function sanitizeString($input) {
+        // Define the allowed characters as a regular expression
+        $allowedChars= '/[^a-zA-Z0-9\s\.,?!@#$%^&*()\-_+=;:"\'<>]/';
+        // Remove any characters that are not allowed
+        $sanitizedString = preg_replace($allowedChars, '', $input);
+
+        // Return the sanitized string
+        return $sanitizedString;
+    }
+
+	function get_talking_points($topic, $url, $pro, $text, $count = 5, $max_tokens = 500, $temperature = 1.0) {
+		$head = substr(sanitizeString($text), 0, INPUT_SIZE);
 	
 		$conn = new LTE_DB();
 		$key_phrase = $conn->fetch_key_ai_screen_phrase_for_topic($topic);
@@ -42,8 +54,8 @@
 		}
 	}
 	
-	function suggest_angles($topic, $url, $pro, $text, $max_tokens = 2000, $temperature = 1.0) {
-		$head = substr($text, 0, 1500);
+	function suggest_angles($topic, $url, $pro, $text, $max_tokens = 500, $temperature = 1.0) {
+		$head = substr(sanitizeString($text), 0, INPUT_SIZE);
 	
 
 		$conn = new LTE_DB();
@@ -52,9 +64,9 @@
 		if (is_null($key_phrase))
 			$key_phrase = 'climate change';
 		
-		$instru = "Suggest an angle for a letter to the editor about this article from the perspective of someone concerned about #key_phrase: " . $head;
+		$instru = "Suggest an angle for a letter to the editor from someone concerned with #key_phrase about this article : " . $head;
+		
 		$instru = str_replace("#key_phrase", $key_phrase, $instru);
-	
 	
 		$postData = array(
 			"model" => "text-davinci-003",
@@ -72,7 +84,7 @@
 			return json_encode($decoded->choices[0]);
 		}
 		else {
-			return '{input_len: ' . strval(strlen($text)) . ', error: ' . '"' . $returnString . '"}';
+			return '{input_len: ' . strval(strlen($text)) . ', error: ' . '"' . $returnString . ' . '  /*.  $instru*/ . '"}';
 		}
 	}
 	
