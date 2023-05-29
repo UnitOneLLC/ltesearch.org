@@ -80,7 +80,7 @@
 				padding: 5px 0 15px 0;
 				border-radius: 10px;
 			}
-			#inner, #tpdiv {
+			#inner {
 				padding: 0 15px;
 			}
 			#hint {
@@ -113,7 +113,7 @@
 				padding: 0 2px 2px 2px;
 			}
 			#spinner-prompt {
-				vertical-align: super;
+				vertical-align: baseline;
 			}
 			#spinner {
 			}
@@ -128,6 +128,7 @@
 				overflow-y: scroll;
 			}
 			#tp-table {
+				margin: 15px 10px;
 				border-top: solid 1px black;
 				border-bottom: solid 1px black;
 			}
@@ -136,7 +137,7 @@
 			}
 			#btn-get-angles {
 				padding-right: 8px;
-				margin: 10px 0 10px 20px;
+				margin: 10px 0 10px 0px;
 			}
 		</style>
 		<script type="text/javascript">
@@ -149,24 +150,6 @@
 	</head>
 	<body>
 		<div id="container">
-			<h1>Get talking points or angle suggestions for this article</h1>
-			<table id="tp-table">
-				<tbody><tr>
-					<td style="width:35%; vertical-align: top;">
-						<div id="tpdiv">
-							<div><button id="btn-get-tp">Get talking points</button> <button id="btn-get-angles">Suggest angles</button></div>
-						</div>
-					</td>
-					<td style="width:65%; max-height:180px;overflow-y:auto">
-						<div id="tp-cell"></div><div id="end-copy"></div>
-						<span id="tp-spinner-prompt">Retrieving . . . </span><img id="tp-spinner" height="45px" src="../search/loading_spinner.gif"/>
-					</td>
-				</tr>
-				<tr>
-					<td></td>
-					<td><button style="float:right" id="btn-copy-ai">Copy</button></td>
-				</tr></tbody>
-			</table>
 			<h1>Create a draft LTE Google document</h1>
 			<div id="inner">
 				<h2>
@@ -185,6 +168,24 @@
 					You will be asked to make a copy of a document. <br>Click the 'Make a copy' button when it appears.<br>
 				</div>
 			</div>
+			<table id="tp-table">
+				<tbody><tr>
+					<td style="width:35%; vertical-align: top;">
+						<div id="tpdiv">
+							<div><button id="btn-get-angles">Suggest angles</button></div>
+						</div>
+					</td>
+					<td style="width:65%; max-height:180px;overflow-y:auto; vertical-align: top;">
+						<div id="tp-cell"></div><div id="end-copy"></div>
+						<sup><span id="tp-spinner-prompt">Retrieving . . . </span></sup>
+							<img id="tp-spinner" height="35px" src="../search/loading_spinner.gif"/>
+					</td>
+				</tr>
+					<tr>
+						<td></td>
+						<td><button style="float:right" id="btn-copy-ai">Copy</button></td>
+					</tr></tbody>
+			</table>
 		</div>
 	</body>
 </html>

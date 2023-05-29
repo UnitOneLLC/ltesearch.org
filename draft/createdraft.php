@@ -11,6 +11,7 @@
 		curl_setopt($ch, CURLOPT_AUTOREFERER, true);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
 		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: text/plain']);
 		$result = curl_exec($ch);
 		return $result;
 	}
@@ -28,7 +29,10 @@
 	}
 	catch (PDOException $e) {
 		$conn = null;
+		echo("exception "); var_dump($e);
 	}
-	
-	echo fetch($url . "?" . $_SERVER['QUERY_STRING']);
+	$uri = $url . "?" . $_SERVER['QUERY_STRING'];
+//	echo $uri;
+	error_log("the url is " .$uri);
+	echo fetch($url . "?" . $_SERVER['QUERY_STRING']);// . "|" . $url;
 ?>

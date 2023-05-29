@@ -4,7 +4,7 @@
 	include_once "../common/lte_db.php";
 	include_once "../common/aiutility.php";
 	
-	define(INPUT_SIZE, 500);
+	define("INPUT_SIZE", 500);
 	
 	function sanitizeString($input) {
         // Define the allowed characters as a regular expression
@@ -64,7 +64,7 @@
 		if (is_null($key_phrase))
 			$key_phrase = 'climate change';
 		
-		$instru = "Suggest an angle for a letter to the editor from someone concerned with #key_phrase about this article : " . $head;
+		$instru = "Suggest a clever angle for a letter to the editor from someone concerned with #key_phrase about this article : " . $head;
 		
 		$instru = str_replace("#key_phrase", $key_phrase, $instru);
 	
