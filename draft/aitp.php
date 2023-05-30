@@ -4,7 +4,7 @@
 	include_once "../common/lte_db.php";
 	include_once "../common/aiutility.php";
 	
-	define("INPUT_SIZE", 500);
+	define("INPUT_SIZE", 1000);
 	
 	function sanitizeString($input) {
         // Define the allowed characters as a regular expression
@@ -16,7 +16,7 @@
         return $sanitizedString;
     }
 
-	function get_talking_points($topic, $url, $pro, $text, $count = 5, $max_tokens = 500, $temperature = 1.0) {
+	function get_talking_points($topic, $url, $pro, $text, $count = 5, $max_tokens = 800, $temperature = 1.0) {
 		$head = substr(sanitizeString($text), 0, INPUT_SIZE);
 	
 		$conn = new LTE_DB();
@@ -54,7 +54,7 @@
 		}
 	}
 	
-	function suggest_angles($topic, $url, $pro, $text, $max_tokens = 500, $temperature = 1.0) {
+	function suggest_angles($topic, $url, $pro, $text, $max_tokens = 800, $temperature = 1.0) {
 		$head = substr(sanitizeString($text), 0, INPUT_SIZE);
 	
 
