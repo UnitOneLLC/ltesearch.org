@@ -4,7 +4,7 @@
 	include_once "../common/lte_db.php";
 	include_once "../common/aiutility.php";
 	
-	define("INPUT_SIZE", 1000);
+	define("INPUT_SIZE", 1500);
 	
 	function sanitizeString($input) {
         // Define the allowed characters as a regular expression
@@ -64,7 +64,11 @@
 		if (is_null($key_phrase))
 			$key_phrase = 'climate change';
 		
-		$instru = "Suggest a clever angle for a letter to the editor from someone concerned with #key_phrase about this article : " . $head;
+		$instru = "Suggest a clever and original angle for a letter to the editor from someone concerned with #key_phrase about this article : " . $head;
+		
+		$instru = "Imagine you are tasked with writing a 250-word letter-to-the-editor that offers a fresh viewpoint on a given newspaper article. You are very concerned about #key_phrase. Your objective is to explore uncharted territory, uncover hidden narratives, or challenge conventional wisdom.  Delve into unexplored angles, unconventional interpretations, or lesser-known implications. Here is the article: " . $head;
+		
+		
 		
 		$instru = str_replace("#key_phrase", $key_phrase, $instru);
 	

@@ -170,7 +170,7 @@
 			</div>
 			<table id="tp-table">
 				<tbody><tr>
-					<td style="width:35%; vertical-align: top;">
+					<td style="width:15%; vertical-align: top;">
 						<div id="tpdiv">
 							<div><button id="btn-get-angles">Suggest angles</button></div>
 						</div>
