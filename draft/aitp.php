@@ -64,7 +64,7 @@
 		if (is_null($key_phrase))
 			$key_phrase = 'climate change';
 		
-		$instru = "Act as if you are somebody deeply concerned about #key_phrase, your absolute priority. You must write a letter-to-the-editor about a newspaper article. Your letter must be original, insightful, concise, forceful, persuasive. It must not be ponderous or repetitive. it may take a strongly opposing view from the author if the author does not share my concern about #key_phrase. Here is the article: " . $head;		
+		$instru = "Act as if you are somebody deeply concerned about #key_phrase, your absolute priority. You must write a letter-to-the-editor about a newspaper article. Your letter must be original, insightful, concise, forceful, persuasive. It must not be ponderous or repetitive. it may take a strongly opposing view from the author if the author does not share your concern about #key_phrase. Here is the article: " . $head;		
 		$instru = str_replace("#key_phrase", $key_phrase, $instru);
 	
 		$postData = array(

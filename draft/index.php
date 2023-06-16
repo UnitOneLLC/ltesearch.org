@@ -172,7 +172,7 @@
 				<tbody><tr>
 					<td style="width:15%; vertical-align: top;">
 						<div id="tpdiv">
-							<div><button id="btn-get-angles">Suggest angles</button></div>
+							<div><button id="btn-get-angles">Get suggestions</button></div>
 						</div>
 					</td>
 					<td style="width:65%; max-height:180px;overflow-y:auto; vertical-align: top;">
