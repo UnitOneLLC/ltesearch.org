@@ -118,7 +118,8 @@
 	}
 	
 	$u = "https://ltesearch.org/read?u=" . $u;
-	$content = read_html_from_url($u,"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)");
+//	$content = read_html_from_url($u,"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)");
+	$content = file_get_contents($u);
 	$dom = new DOMDocument();
 
 	@$dom->loadHTML($content);

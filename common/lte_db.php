@@ -183,6 +183,16 @@ class LTE_DB {
 		return $result;		
 	}
 	/*
+	* Get the URL of the webapp used to create draft docs
+	*/
+	function get_proxy_webapp_url() {
+		$stmt = $this->_conn->query("select url from proxy_webapp where is_current=true");
+		$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'url');
+		$stmt = null;
+		return $result;		
+	}
+	
+	/*
 	* Get the api key for openai
 	*/
 	function get_openai_api_key() {

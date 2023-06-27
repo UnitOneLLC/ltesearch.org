@@ -1,7 +1,7 @@
 <?php
-include "../common/version.php";
-include "../common/urlcode.php";
-include "../common/lte_db.php";
+include_once("../common/version.php");
+include_once("../common/urlcode.php");
+include_once("../common/lte_db.php");
   
 ?>
 <!DOCTYPE html>

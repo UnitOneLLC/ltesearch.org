@@ -61,7 +61,21 @@
 	function read_with_proxy($url, $agent) {
 		$encoded_url = urlencode($url);
 		$encoded_agent = urlencode($agent);
-		$proxy_url = "https://script.google.com/macros/s/AKfycbxs0_N5uDOmRRFnPnHqaUIXl-WxqDiq06itlu0jKy3Vla3vbIaEn7FwO5oOZVLG4KSRxg/exec";
+		try {
+			$conn = new LTE_DB();
+			$urls = $conn->get_proxy_webapp_url();
+			$conn = null;
+			
+			foreach($urls as $u) {
+				$proxy_url = $u;
+				break;
+			}
+		}
+		catch (PDOException $e) {
+			$conn = null;
+			echo("exception "); var_dump($e);
+			return;
+		}
 		
 		$final_url = "$proxy_url?url=$encoded_url&user_agent=$encoded_agent";
 		return file_get_contents($final_url);

@@ -2,9 +2,9 @@
 	define('ACTION', 'action');
 	define('URL', 'url');
 	
-	include "../common/version.php";
-	include "../common/lte_db.php";
-	include "../common/urlcode.php";
+	include_once("../common/version.php");
+	include_once("../common/lte_db.php");
+	include_once("../common/urlcode.php");
 
 	error_reporting(E_ERROR | E_PARSE);
 	

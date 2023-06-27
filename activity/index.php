@@ -1,6 +1,6 @@
 <?php
-include "../common/lte_db.php";
-include "../common/version.php"
+include_once("../common/lte_db.php");
+include_once("../common/version.php");
 ?>
 <!DOCTYPE html>
 <head>

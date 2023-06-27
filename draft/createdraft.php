@@ -1,5 +1,5 @@
 <?php
-	include "../common/lte_db.php";
+	include_once("../common/lte_db.php");
 
 
 	function fetch($url) {
