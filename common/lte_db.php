@@ -1,4 +1,5 @@
 <?php
+define ("MAX_ARTICLE_CACHE_ROW_COUNT", 50);
 
 class LTE_DB {
 
@@ -7,8 +8,13 @@ class LTE_DB {
 	/*
 	 * Get a connection to the lte search database. Throws on failure.
 	 */
-	function __construct() {
-		$dbjson = file_get_contents("../../etc/ltesearch.org/db.json");
+	function __construct($bWrite=false) {
+		if ($bWrite) {
+			$dbjson = file_get_contents("../../etc/ltesearch.org/db-write.json");
+		}
+		else {
+			$dbjson = file_get_contents("../../etc/ltesearch.org/db.json");
+		}
 		$dbarr = json_decode($dbjson, TRUE);
   
 		$hostname = $dbarr['hostname'];
@@ -208,6 +214,61 @@ class LTE_DB {
 		return $result[0];
 	}
 	
+	/*
+	 * store text in article cache for URL
+	 */
+	function update_cache_entry($url, $text) {
+		$timestamp = gmdate("Y-m-d H:i:s");
+		$stmt = $this->_conn->prepare("INSERT INTO article_cache (url, timestamp, contents) VALUES (?, ?, ?)");		
+		$stmt->execute([$url, $timestamp, $text]);
+	}
 	
+	/*
+	 * retrieve an article from the cache
+	 */
+	function get_article_from_cache($url) {
+		$query = "SELECT contents FROM article_cache WHERE url = ?";
+		$stmt = $this->_conn->prepare($query);
+		$stmt->execute([$url]);
+		
+		// Check if the query executed successfully
+		if ($stmt !== false) {
+			// Check if the query returned any rows
+			if ($stmt->rowCount() > 0) {
+				// Rows exist, process the results
+				while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+					return trim($row['contents']);
+				}
+			} else {
+				return "";
+			}
+		} else {
+			return "";
+		}
+	}
+	
+	function trim_cache()
+	{
+		$safety = 100;
+		do {
+			$rowCountStmt = $this->_conn->prepare("SELECT COUNT(*) FROM article_cache");
+			$rowCountStmt->execute();
+			$rowCount = $rowCountStmt->fetchColumn();
+
+			if ($rowCount > MAX_ARTICLE_CACHE_ROW_COUNT) {
+				$findMinTimeStmt = $this->_conn->prepare("SELECT MIN(timestamp) FROM article_cache");
+				$findMinTimeStmt->execute();
+				$row = $findMinTimeStmt->fetch(PDO::FETCH_ASSOC);
+				$minTimestamp = $row['MIN(timestamp)'];
+
+				$deleteStmt = $this->_conn->prepare("DELETE FROM article_cache WHERE timestamp = ?");
+
+				$deleteStmt->execute([$minTimestamp]);
+			}
+		} while ($rowCount > MAX_ARTICLE_CACHE_ROW_COUNT && --$safety);
+		
+		return $rowCount;
+	}
+
 }
 ?>
