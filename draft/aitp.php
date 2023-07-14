@@ -29,7 +29,7 @@
 		$instru = str_replace("#key_phrase", $key_phrase, $instru);
 		
 		$postData = array(
-			"model" => "text-davinci-003",
+			"model" => "gpt-3.5-turbo",
 			"prompt" => $instru,
 			"max_tokens" => $max_tokens,
 			"temperature" => $temperature
