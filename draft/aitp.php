@@ -64,7 +64,7 @@
 		if (is_null($key_phrase))
 			$key_phrase = 'climate change';
 		
-		$instru = "Act as if you are somebody deeply concerned about #key_phrase, your absolute priority. You must write a letter-to-the-editor about a newspaper article. Your letter must be original, insightful, concise, forceful, persuasive, and not preachy. It must not be ponderous or repetitive. it may take a strongly opposing view from the author if the author does not share your concern about #key_phrase. Here is the article: " . $head;		
+		$instru = "Act as if you are somebody deeply concerned about #key_phrase, your absolute priority. You must write a letter-to-the-editor about a newspaper article. Your letter must be original, insightful, concise, forceful, and persuasive. It must not be alarmist, preachy, ponderous, overdramatic, or repetitive. It must take a strongly opposing view from the article's author if the author does not share your concern about #key_phrase. Begin the letter with the words 'To the Editor'. Do not sign the letter. Here is the article: " . $head;		
 		$instru = str_replace("#key_phrase", $key_phrase, $instru);
 	
 		$postData = array(
@@ -79,7 +79,7 @@
 		
 		if ($decoded && is_array($decoded->choices) && $decoded->choices[0]->text) {
 			$decoded->choices[0]->fullResponse = $returnString;
-			$decoded->choices[0]->text = getSubstringStartingWithFirstUppercase($decoded->choices[0]->text);
+			$decoded->choices[0]->text = extractToTheEditorSubstring($decoded->choices[0]->text);
 			return json_encode($decoded->choices[0]);
 		}
 		else {
@@ -100,8 +100,23 @@
 			}
 		}
 		return $substring;
-	}	
-
+	}
+	
+	function extractToTheEditorSubstring($s) {
+		$phrase = "To the Editor";
+		$position = stripos($s, $phrase);
+		
+		if ($position !== false) {
+			// If the phrase is found, extract the substring from the position where the phrase starts.
+			$result = substr($s, $position);
+		} else {
+			// If the phrase is not found, return the entire string $s.
+			$result = $s;
+		}
+		
+		return $result;
+	}
+	
 # begin script
 	
 	$u = $_GET['u'];

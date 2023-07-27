@@ -19,20 +19,12 @@
 	$url = "";
 	try {
 		$conn = new LTE_DB();
-		$urls = $conn->get_draft_webapp_url();
-		$conn = null;
-		
-		foreach($urls as $u) {
-			$url = $u;
-			break;
-		}
+		$url = $conn->get_parameter("draft_webapp");
 	}
 	catch (PDOException $e) {
 		$conn = null;
-		echo("exception "); var_dump($e);
+		error_log("PDOException in create draft: " . $e->getMessage());
 	}
 	$uri = $url . "?" . $_SERVER['QUERY_STRING'];
-//	echo $uri;
-	error_log("the url is " .$uri);
-	echo fetch($url . "?" . $_SERVER['QUERY_STRING']);// . "|" . $url;
+	echo fetch($uri);
 ?>

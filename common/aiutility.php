@@ -4,27 +4,22 @@
 	
 	define("OPEN_AI_COMPLETION", "https://api.openai.com/v1/completions");
 	
-	function get_api_key() {
+	function get_openai_api_key() {
 		try {
 			$conn = new LTE_DB();
-			$keys = $conn->get_openai_api_key();
-			$conn = null;
-			
-			foreach($keys as $k) {
-				$key = $k;
-				break;
-			}
+			$key = $conn->get_parameter("openai_key");
 		}
 		catch (PDOException $e) {
 			$conn = null;
-			$key = "PDO EXCEPTION";
+			error_log("PDOException in get_api_key");
+			$key = null;
 		}
 		
 		return $key;
 	}
 	
 	function fetch_from_openai($payload) {
-		$key = get_api_key();
+		$key = get_openai_api_key();
 		$auth_header = 'Authorization: Bearer ' . $key;
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:97.0) Gecko/20100101 Firefox/97.0");

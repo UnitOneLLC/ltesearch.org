@@ -1,5 +1,5 @@
 <?php
-define ("MAX_ARTICLE_CACHE_ROW_COUNT", 50);
+define ("MAX_ARTICLE_CACHE_ROW_COUNT", 100);
 
 class LTE_DB {
 
@@ -28,16 +28,6 @@ class LTE_DB {
 		$this->_conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	}
 
-	/*
-	 * Fetch the api key for the named api, using the provided db connection.
-	 */
-	function fetch_api_key($apiname) {
-	    $stmt = $this->_conn->query("select apikey from api where name = '$apiname'");
-	    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-	    $stmt = null;
-	    return $result['apikey'];
-	}
-	
 	/*
 	 * checks that the given name is a known region and returns the region id. Returns
 	 * null if not found.
@@ -173,34 +163,7 @@ class LTE_DB {
 		$stmt = null;
 		return $result;
 	}
-	/*
-	 * Get the URL of the webapp used to create draft docs
-	 */
-	function get_draft_webapp_url() {
-		$stmt = $this->_conn->query("select url from draft_webapp where is_current=true");
-		$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'url');
-		$stmt = null;
-		return $result;		
-	}
-	/*
-	* Get the URL of the webapp used to create draft docs
-	*/
-	function get_proxy_webapp_url() {
-		$stmt = $this->_conn->query("select url from proxy_webapp where is_current=true");
-		$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'url');
-		$stmt = null;
-		return $result;		
-	}
 	
-	/*
-	* Get the api key for openai
-	*/
-	function get_openai_api_key() {
-		$stmt = $this->_conn->query("select apikey from openai_key where is_current=true");
-		$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'apikey');
-		$stmt = null;
-		return $result;		
-	}
 	/*
 	* Fetch the set of subjects for the ai screen as an array for the specified topic 
 	*/
@@ -210,7 +173,6 @@ class LTE_DB {
 		$stmt = null;
 		return $result;
 	}
-
 	/*
 	 * fetch the phrase for a subject that is used for talking points and angles
 	 */
@@ -280,5 +242,37 @@ class LTE_DB {
 		return $rowCount;
 	}
 
+	
+	function get_parameter($p)
+	{
+		try {
+			$pdo = $this->_conn;
+			
+			// Prepare the SQL statement to fetch the value corresponding to the given parameter
+			$sql = "SELECT value FROM parameters WHERE param = :param LIMIT 1";
+			$stmt = $pdo->prepare($sql);
+			
+			// Bind the parameter value to the prepared statement
+			$stmt->bindParam(':param', $p, PDO::PARAM_STR);
+			
+			// Execute the statement
+			$stmt->execute();
+			
+			// Fetch the result as an associative array
+			$result = $stmt->fetch(PDO::FETCH_ASSOC);
+			
+			// Check if a value was found or not
+			if ($result) {
+				return $result['value'];
+			} else {
+				return null;
+			}
+		} catch (PDOException $e) {
+			// Handle any database connection or query errors here
+			// For example, you can log the error or display a user-friendly message
+			error_log("Error: " . $e->getMessage());
+			return null;
+		}
+	}
 }
 ?>

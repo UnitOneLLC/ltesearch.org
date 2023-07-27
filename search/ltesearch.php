@@ -246,7 +246,7 @@ include_once "../common/aiutility.php";
 			shuffle($randomized);
 			$terms_string = implode(" ", $randomized);
 	
-			$apikey = $conn->fetch_api_key('custom_search');
+			$apikey = $conn->get_parameter("custom_search_api_key");
 			$engines = $conn->fetch_engine_keys($region_id);
 			$url_filters = $conn->fetch_url_filters($topic, $region_id);
 			$url_suffixes_to_strip = $conn->fetch_url_removal_suffixes($topic, $region_id);

@@ -63,13 +63,7 @@
 		$encoded_agent = urlencode($agent);
 		try {
 			$conn = new LTE_DB();
-			$urls = $conn->get_proxy_webapp_url();
-			$conn = null;
-			
-			foreach($urls as $u) {
-				$proxy_url = $u;
-				break;
-			}
+			$proxy_url = $conn->get_parameter("proxy_webapp");
 		}
 		catch (PDOException $e) {
 			$conn = null;
