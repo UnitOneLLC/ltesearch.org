@@ -78,14 +78,16 @@ include_once("../common/lte_db.php");
           $title = substr($html, $titleOffset, $titleEnd-$titleOffset);
         }
       }
-      
-      $host = parse_url($u, PHP_URL_HOST);
+      error_log("The URL is $url");
+      $host = parse_url($url, PHP_URL_HOST);
       if (strncmp($host, "www.", 4) === 0) {
         $host = substr($host, 4);
       }
       
       $conn = new LTE_DB();
+      error_log("fetch paper by host: ") . $host;
       $paper = $conn->fetch_paper_by_domain($host);
+      error_log("found paper: $paper");
       $conn = null;
       if (empty($paper)) {
         $paper = "-unknown-";
