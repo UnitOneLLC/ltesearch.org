@@ -44,6 +44,7 @@ $(document).ready(function() {
     $("#clear-selection").click(onClearSelection);
     $("#incl-text-only").prop("checked", true);
     $("#incl-create-draft").prop("checked", true);
+    $("#incl-social").prop("checked", true);
     $("#radio_all").prop("checked", true);
     $("input[name=disp_sel]").on("change", onDisplaySelectChange);
     $("#param-summary").text(getParamsSummary());
