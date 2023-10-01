@@ -116,9 +116,14 @@ Access denied.
         $ai_prompt = $_POST["payload"];
         
         $postData = array(
-          "model" => "gpt-3.5-turbo",
-          "prompt" => $ai_prompt,
-          "max_tokens" => 1024,
+//          "model" => "text-davinci-003",
+          "model" => "gpt-4",
+          "messages" => array(
+            ["role" => "system", "content" => "You are a helpful assistant."],
+            ["role" => "user", "content" => "$ai_prompt"]
+          ),
+
+          "max_tokens" => 512,
           "temperature" => 1.0
         );
         

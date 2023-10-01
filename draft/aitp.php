@@ -17,6 +17,7 @@
     }
 
 	function get_talking_points($topic, $url, $pro, $text, $count = 5, $max_tokens = 800, $temperature = 1.0) {
+/*
 		$head = substr(sanitizeString($text), 0, INPUT_SIZE);
 	
 		$conn = new LTE_DB();
@@ -29,7 +30,8 @@
 		$instru = str_replace("#key_phrase", $key_phrase, $instru);
 		
 		$postData = array(
-			"model" => "gpt-3.5-turbo",
+//			"model" => "gpt-3.5-turbo",
+			"model" => "gpt-4",			
 			"prompt" => $instru,
 			"max_tokens" => $max_tokens,
 			"temperature" => $temperature
@@ -52,6 +54,7 @@
 		else {
 			return '{input_len: ' . strval(strlen($text)) . ', error: ' . '"' . $returnString . '"}';
 		}
+*/
 	}
 	
 	function suggest_angles($topic, $url, $pro, $text, $max_tokens = 800, $temperature = 1.0) {
@@ -64,7 +67,7 @@
 		if (is_null($key_phrase))
 			$key_phrase = 'climate change';
 		
-		$instru = "Act as if you are somebody deeply concerned about #key_phrase, your absolute priority. You must write a letter-to-the-editor about a newspaper article. Your letter must be original, insightful, concise, forceful, and persuasive. It must not be alarmist, preachy, ponderous, overdramatic, or repetitive. It must take a strongly opposing view from the article's author if the author does not share your concern about #key_phrase or if the author advocates policies in potential conflict with your priorities. You must disagree with the stated opinion, regardless of its persuasiveness, if it does not align with your stance. Do not offer support for opinions that do not directly support your stance. Begin the letter with the words 'To the Editor'. Do not sign the letter. Here is the article: " . $head;		
+		$instru = "Act as if you are somebody deeply concerned about #key_phrase, your absolute priority. You must write a letter-to-the-editor about a newspaper article. Your letter must be original, insightful, concise, forceful, calm, tolerant, and persuasive. It must take a strongly opposing view from the article's author if the author does not share your concern about #key_phrase or if the author advocates policies in potential conflict with your priorities. You must disagree with the stated opinion, regardless of its persuasiveness, if it does not align with your stance. Support author's opinions only if they directly support your stance. Begin the letter with the words 'To the Editor'. Do not sign the letter. Here is the article: " . $head;		
 		$instru = str_replace("#key_phrase", $key_phrase, $instru);
 	
 		$postData = array(

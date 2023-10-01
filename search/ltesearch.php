@@ -10,6 +10,7 @@ define('REGION', 'region');
 define('SEARCH', 'search');
 define('MODE', 'mode');
 define('RAW', 'raw');
+define('LTEDEBUG','debug');
 define('KWSEARCH', 's');
 define('GETPAPERDB', 'getpaperdb');
 define('DATABASE_FAILURE', 'Database failure');
@@ -220,6 +221,8 @@ include_once "../common/aiutility.php";
 			return;
 		}
 		
+		$debug = $qstr_aa[LTEDEBUG];
+		
 		try {
 			$conn = new LTE_DB();
 			$region_id = $conn->validate_region($region);
@@ -259,7 +262,7 @@ include_once "../common/aiutility.php";
 			
 			$all_results = array();
 			foreach ($engines as $engine) {
-				$cse = new CustomSearch($apikey, $engine, $terms_string, $url_filters, $content_filters, $title_filters, $url_suffixes_to_strip);
+				$cse = new CustomSearch($apikey, $engine, $terms_string, $url_filters, $content_filters, $title_filters, $url_suffixes_to_strip, $debug);
 				$items = $cse->execute_search(MAX_RESULTS, $filter_strength, $is_raw_mode);
 				$all_results = array_merge($all_results, $items);
 			}
@@ -298,7 +301,7 @@ include_once "../common/aiutility.php";
 
 			$screen = build_ai_screen_prompt_template($topic);
 			if ($screen != null) {
-				$all_results = do_ai_screen($min_rank, $screen, $all_results);
+				$all_results = do_ai_screen($min_rank, $screen, $all_results, $debug);
 			}
 			
 			foreach($all_results as &$result) {
@@ -342,7 +345,7 @@ include_once "../common/aiutility.php";
 		}
 	}
 	
-	function do_ai_screen($min_rank, $screen, $results) {
+	function do_ai_screen($min_rank, $screen, $results, $debug) {
 		
 		$ret_array = array();
 		foreach ($results as $key => $value) {
@@ -354,12 +357,13 @@ include_once "../common/aiutility.php";
 			$title = $value["title"];
 			$instru = str_replace("#title", $title, $screen);
 			$postData = array(
-				"model" => "text-davinci-003",
+//				"model" => "gpt-4",
+				"model" => "text-davinci-003",				
+//				"model" => "gpt-3.5-turbo",
 				"prompt" => $instru,
 				"max_tokens" => 128,
 				"temperature" => 1.0
 			);
-			
 			if (stripos($title, "letter") !== false) {
 				$answer = 50;
 			}
@@ -385,6 +389,9 @@ include_once "../common/aiutility.php";
 				$value["rank"] -= $answer;
 				$value["description"] .= " /s" . $answer;
 				array_push($ret_array, $value);
+			}
+			else if ($debug != 0) {
+				error_log("[FILTER][AI $answer] $title");
 			}
 		}
 	

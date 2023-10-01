@@ -669,7 +669,12 @@ function getDigest() {
     if (filterStrength) {
     	url += "&filter=" + filterStrength;
     }
-
+    
+    var doDebug = getQueryVariable("debug");
+    if (doDebug) {
+        url += "&debug=" + doDebug;
+    }
+    
     $.ajax({
         url: url,
         type: 'POST',

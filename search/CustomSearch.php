@@ -45,7 +45,7 @@ class CustomSearch {
 		return explode($DELIM, $strx);
 	}
 
-	function __construct($apikey, $engine, $search_terms, $url_filters, $content_filters, $title_filters, $url_suffixes_to_strip) {
+	function __construct($apikey, $engine, $search_terms, $url_filters, $content_filters, $title_filters, $url_suffixes_to_strip, $debug) {
 		$this->_engine_id = $engine;
 		$this->_search_terms  = $search_terms;
 		$this->_terms_array = self::explode_term_list($search_terms);
@@ -55,6 +55,7 @@ class CustomSearch {
 		$this->_title_filters = $title_filters;
 		$this->_apikey = $apikey;
 		$this->suffixes = $url_suffixes_to_strip;
+		$this->debug = $debug;
 	}
 
 	function build_query($number, $start_index, $orterms) {
@@ -160,6 +161,9 @@ class CustomSearch {
 				$now = time();
 				date_default_timezone_set('America/New_York');
 				$counter = -1;
+				if ($this->debug > 1) {
+					self::dump_raw_items($items);
+				}
 				foreach($items as $item) {
 					$counter += 1;
 					$date_aa = self::estimate_item_date($item);
@@ -182,15 +186,15 @@ class CustomSearch {
 						}
 					}
 					
-					if (($filter_strength != self::FILTER_OFF) and !$this->filter_url($item["link"])) {
+					if (($filter_strength != self::FILTER_OFF) and !$this->filter_url($item["link"], $this->debug)) {
 						continue;
 					}
 					
-					if (($filter_strength != self::FILTER_OFF) and !$this->filter_contents($item["snippet"] . " " . $item['title'], $item["htmlSnippet"], $filter_strength)) {
+					if (($filter_strength != self::FILTER_OFF) and !$this->filter_contents($item["snippet"] . " " . $item['title'], $item["htmlSnippet"], $filter_strength, $this->debug)) {
 						continue;
 					}
 
-					if (($filter_strength != self::FILTER_OFF) and !$this->filter_titles($item['title'])) {
+					if (($filter_strength != self::FILTER_OFF) and !$this->filter_titles($item['title'], $this->debug)) {
 						continue;
 					}
 					
@@ -219,12 +223,15 @@ class CustomSearch {
 		return $ret_arr;
 	}
 
-	function filter_url($url) {
+	function filter_url($url, $debug) {
 		$passes = true;
 		$lurl = strtolower($url);
 		foreach ($this->_url_filters as &$filter) {
 			if (strpos($lurl, $filter) !== false) {
 				$passes = false;
+				if ($debug != 0) {
+					error_log("[FILTER][URL] $url");
+				}
 				break;
 			}
 		}
@@ -249,7 +256,7 @@ class CustomSearch {
 		return $is_bait;
 	}
 	
-	function filter_contents($str, $htmlStr, $filter_strength) {
+	function filter_contents($str, $htmlStr, $filter_strength, $debug) {
 		$passes = true;
 		$lstr = strtolower($str);
 		
@@ -266,6 +273,9 @@ class CustomSearch {
 				}
 				
 				if (!$keyword_found) {
+					if ($debug != 0) {
+						error_log("[FILTER][CONTENTS-1] $str");
+					}
 					return false;
 				}
 			}
@@ -273,6 +283,9 @@ class CustomSearch {
 		
 		foreach ($this->_content_filters as &$filter) {
 			if (strpos($lstr, $filter) !== false) {
+				if ($debug != 0) {
+					error_log("[FILTER][CONTENTS-2] $str");
+				}
 				$passes = false;
 				break;
 			}
@@ -295,14 +308,21 @@ class CustomSearch {
 		}
 	}
 	
-	function filter_titles($title) {
-		if ($this->looks_like_rollup($title))
+	function filter_titles($title, $debug) {
+		if ($this->looks_like_rollup($title)) {
+			if ($debug != 0) {
+				error_log("[FILTER][ROLLUP] $title");
+			}
 			return false;
+		}
 		
 		$passes = true;
 		
 		foreach ($this->_title_filters as &$t) {
 			if (strpos($title, $t) !== false) {
+				if ($debug != 0) {
+					error_log("[FILTER][TITLE] $title");
+				}
 				$passes = false;
 				break;
 			}
@@ -333,6 +353,12 @@ class CustomSearch {
 		}
 		else {
 			return false;
+		}
+	}
+	
+	function dump_raw_items($items) {
+		foreach ($items as $item) {
+			error_log("[RAW] "  . $item["link"] . " " . $item["title"]);
 		}
 	}
 		
