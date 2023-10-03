@@ -188,7 +188,7 @@ Access denied.
         
         $url = 'https://api.openai.com/v1/chat/completions';
         
-        $api_key = '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';
+
         
         $query = 'What is the capital city of England?';
         
