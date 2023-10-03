@@ -474,6 +474,7 @@
 		function setupFontControl() {
 			document.getElementById("btn-font-up").addEventListener("click", ()=>incrFont());
 			document.getElementById("btn-font-down").addEventListener("click", ()=>decrFont());
+			document.getElementById("btn-copy").addEventListener("click", ()=>copyTextToClipboard());
 			var fontSize = $.cookie(FONT_COOKIE_NAME);
 			if (fontSize) {
 				document.getElementById("main").style.fontSize = fontSize.toString() + "em";				
@@ -496,13 +497,32 @@
 			
 			$.cookie(FONT_COOKIE_NAME, fs.toString());			
 		}
+		
+		function copyTextToClipboard() {
+			// Get the text content of the element with id "main"
+			var textToCopy = document.getElementById("main").innerText;
+			
+			// Create a new ClipboardItem with the text data
+			var clipboardItem = new ClipboardItem({ "text/plain": new Blob([textToCopy], { type: "text/plain" }) });
+			
+			// Access the clipboard and write the ClipboardItem
+			navigator.clipboard.write([clipboardItem]).then(
+				function () {
+					console.log("Text copied to clipboard: " + textToCopy);
+				},
+				function (err) {
+					console.error("Unable to copy text to clipboard", err);
+				}
+			);
+		}
+		
 	</script>
 
 </head>
 <body onload=setupFontControl() style="background-color: #eee;">
 <div id="font-control" style="position:fixed; left:5px; top:15px">
 	<table><tr>
-		<td>
+		<td style="text-align: center;">
 			<div>
 			<span id="btn-font-up" style="cursor:pointer;padding:0 3px">&#9650;</span>
 			</div>
@@ -517,7 +537,12 @@
 				<span style="font-size:0.7em">A</span>
 			</div>
 		</td>
-	</tr></table>
+	</tr><tr>
+		<td  colspan="2">
+			<button id="btn-copy">Copy to clipboard</button>
+		</td>
+	</tr>
+	</table>
 </div>
 <div style="max-width:700px; margin: 0 auto; font-family:arial; background-color: white; padding: 20px; filter: drop-shadow(0 0 4px #bbb);">
 	<h2>
@@ -575,10 +600,13 @@
 		}
 			
 		
-		insertDraftButton();
+
 			
 		?>
 	</div>	
+	<div>
+		<?php insertDraftButton(); ?>
+	</div>
 </div>
 </body>
 </html>

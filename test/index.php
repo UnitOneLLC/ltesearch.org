@@ -1,7 +1,55 @@
 <?php
+  define("OPENAI_MODEL", "gpt-4");
+  define("OPEN_AI_COMPLETION", "https://api.openai.com/v1/completions");
+  define("OPEN_AI_CHAT_COMPLETION", "https://api.openai.com/v1/chat/completions");
+
   include_once "../common/version.php";
   include_once "../common/urlcode.php";
-  include_once "../common/aiutility.php"
+  include_once "../common/aiutility.php";
+  include_once "../common/lte_db.php";
+  
+  function query_ai($query) {
+    $ch = curl_init();
+    
+    $url = OPEN_AI_CHAT_COMPLETION;
+    
+    $api_key = get_openai_api_key();
+
+    $post_fields = array(
+      "model" => OPENAI_MODEL,
+      "messages" => array(
+        array(
+          "role" => "user",
+          "content" => $query
+        )
+      ),
+      "max_tokens" => 12,
+      "temperature" => 0
+    );
+    
+    $header  = [
+      'Content-Type: application/json',
+      'Authorization: Bearer ' . $api_key
+    ];
+    
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_fields));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+    
+    $result = curl_exec($ch);
+    if (curl_errno($ch)) {
+      echo 'Error: ' . curl_error($ch);
+    }
+    curl_close($ch);
+    
+    $response = json_decode($result);
+    return $response->choices[0]->message->content;  
+  }
+  
+  
+  
 ?>
 <!DOCTYPE html>
 <head>
@@ -112,18 +160,18 @@ Access denied.
     
     if ($_POST["action"]=="openai") {
       $valid_url = true;
-      try {    
-        $ai_prompt = $_POST["payload"];
+      try { 
+/*        $ai_prompt = $_POST["payload"];
         
         $postData = array(
-//          "model" => "text-davinci-003",
-          "model" => "gpt-4",
+          "model" => "gpt-3.5-turbo",
           "messages" => array(
-            ["role" => "system", "content" => "You are a helpful assistant."],
-            ["role" => "user", "content" => "$ai_prompt"]
+            array(
+              "role" => "user",
+              "content" => $ai_prompt
+            )
           ),
-
-          "max_tokens" => 512,
+          "max_tokens" => 127,
           "temperature" => 1.0
         );
         
@@ -134,8 +182,53 @@ Access denied.
         if ($decoded && is_array($decoded->choices) && $decoded->choices[0]->text) {
           $answer = $decoded->choices[0]->text;
         }
-        else $answer = "Nothing available. " . $ai_returned_string;
-
+        else $answer = "|$encoded_postData| "."Nothing available. " . $ai_returned_string;
+*/
+        $ch = curl_init();
+        
+        $url = 'https://api.openai.com/v1/chat/completions';
+        
+        $api_key = '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';
+        
+        $query = 'What is the capital city of England?';
+        
+        $post_fields = array(
+          "model" => "gpt-3.5-turbo",
+          "messages" => array(
+            array(
+              "role" => "user",
+              "content" => $query
+            )
+          ),
+          "max_tokens" => 12,
+          "temperature" => 0
+        );
+        
+        $header  = [
+          'Content-Type: application/json',
+          'Authorization: Bearer ' . $api_key
+        ];
+        
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_fields));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        
+        $result = curl_exec($ch);
+        if (curl_errno($ch)) {
+          echo 'Error: ' . curl_error($ch);
+        }
+        curl_close($ch);
+        
+        $response = json_decode($result);
+        var_dump($response->choices[0]->message->content);  
+        
+        
+        
+        
+        
+        
       }
       catch (Exception $e) {
         $answer = "An exception occurred: " . $e.message();

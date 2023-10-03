@@ -23,9 +23,9 @@ define('HIGHLIGHT_THRESHOLD',4);
 define('AUTH_ERROR', 'Authentication error');
 //define('AI_SCREEN_TEMPLATE', 'Would you guess that the subject matter of a news article entitled "#title" is related to any of the following: #subjects? Answer one of the following: Very likely, Maybe, Very unlikely.');
 
-define('AI_SCREEN_TEMPLATE', 'On a scale of 1 to 100, 100 meaning most likely, how likely is a news article with entitled "#title" to be related to any one of the following subjects: #subjects ? Just reply with a number and no additional text.');
+define('AI_SCREEN_TEMPLATE', 'On a scale of 1 to 100, where 1 means not very likely, how likely is a news article with entitled "#title" to be related to one of the following subjects: #subjects ? Do not give your reasoning. Your answer must always be a single number, the maximum score over all the given subjects.');
 define('MIN_RANK', 40);
-define('AI_CUTOFF', 20);
+define('AI_CUTOFF', 25);
 
 include "CustomSearch.php";
 include_once "../common/lte_db.php";
@@ -278,7 +278,7 @@ include_once "../common/aiutility.php";
 				$result["highlight"] = false; // is_highlight($result);
 				$result["zlink"] = encode_url($result["url"]);
 				$result["title"] = get_trimmed_title($result["title"]);
-				
+/*				
 				if ($result["rank"] < $min_rank) {
 					$ft = $result["title"];
 					if (endsWith($ft, "...")) {
@@ -288,7 +288,7 @@ include_once "../common/aiutility.php";
 						}
 					}
 				}
-				
+*/				
 				$title_word_count = word_count($result["title"]); 
 				if ($title_word_count == 1){
 					$result["rank"] += 100;					
@@ -355,26 +355,18 @@ include_once "../common/aiutility.php";
 			}
 			
 			$title = $value["title"];
-			$instru = str_replace("#title", $title, $screen);
-			$postData = array(
-//				"model" => "gpt-4",
-				"model" => "text-davinci-003",				
-//				"model" => "gpt-3.5-turbo",
-				"prompt" => $instru,
-				"max_tokens" => 128,
-				"temperature" => 1.0
-			);
 			if (stripos($title, "letter") !== false) {
 				$answer = 50;
 			}
 			else {
+				$instru = str_replace("#title", $title, $screen);
+				$ai_returned_string = trim(fetch_from_openai_completion($instru));
+//				error_log("ai returned string is $ai_returned_string");
 				
-				$encoded_postData = json_encode($postData);
-				$ai_returned_string = fetch_from_openai($encoded_postData);
-				
-				$decoded = json_decode($ai_returned_string);
-				if ($decoded && is_array($decoded->choices) && $decoded->choices[0]->text) {
-					$answerText = trim($decoded->choices[0]->text);
+				$answer = intval($ai_returned_string);
+/*				
+				if ($decoded && is_array($decoded)) {
+					$answerText = trim($decoded["text"]);
 					$answer = intval($answerText);
 					if ($answer == 0) {
 						$answer = 50;
@@ -383,6 +375,7 @@ include_once "../common/aiutility.php";
 				else {
 					$answer = 50;
 				}
+*/				
 			}
 			
 			if ($answer >= AI_CUTOFF) {
@@ -403,7 +396,7 @@ include_once "../common/aiutility.php";
 		if ($endingLength > strlen($string)) {
 			return false;
 		}
-		$substring = substr($string, -$endingLength);
+/*		$substring = substr($string, -$endingLength);
 		return $substring === $ending;
 	}
 	
@@ -413,7 +406,7 @@ include_once "../common/aiutility.php";
 		$title_regex = '/<title.*>(.*)<\/title>/';
 		
 		preg_match($title_regex, $html, $title_matches);
-		
+*/		
 		if (is_array($title_matches) && (count($title_matches) > 1)) {
 			$title = $title_matches[1];
 		}
