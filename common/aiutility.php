@@ -3,6 +3,7 @@
 	include_once "../common/lte_db.php";
 	
 	define("OPENAI_MODEL", "gpt-4");
+	define("OPENAI_INSTRUCT_MODEL", "gpt-3.5-turbo-instruct");
 	define("OPEN_AI_COMPLETION", "https://api.openai.com/v1/completions");
 	define("OPEN_AI_CHAT_COMPLETION", "https://api.openai.com/v1/chat/completions");
 	
@@ -64,7 +65,7 @@
 	function fetch_from_openai_completion($instru) {
 		$key = get_openai_api_key();
 		$payload = array(
-			"model" => "text-davinci-003",
+			"model" => OPENAI_INSTRUCT_MODEL,
 			"prompt" => $instru,
 			"max_tokens" => 512,
 			"temperature" => 1.0
