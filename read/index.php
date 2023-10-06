@@ -468,13 +468,15 @@
 	<meta charset="UTF-8"/>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script type="text/javascript">
 		const FONT_COOKIE_NAME = "reader-font-size";
 		function setupFontControl() {
+			$("#spinner").hide();
 			document.getElementById("btn-font-up").addEventListener("click", ()=>incrFont());
 			document.getElementById("btn-font-down").addEventListener("click", ()=>decrFont());
 			document.getElementById("btn-copy").addEventListener("click", ()=>copyTextToClipboard());
+			document.getElementById("btn-summary").addEventListener("click", ()=>getSummary());
 			var fontSize = $.cookie(FONT_COOKIE_NAME);
 			if (fontSize) {
 				document.getElementById("main").style.fontSize = fontSize.toString() + "em";				
@@ -516,6 +518,21 @@
 			);
 		}
 		
+		function getSummary() {
+			$("#spinner").show();
+			$("#btn-summary").prop("disabled", true);
+			var text = $("#main").text();
+			$.ajax({
+				url: "https://ltesearch.org/read/summary.php",
+				method: 'POST',
+				data: {"text": text},
+				success: function(markup) {$("#main").html(markup); $("#spinner").hide();},
+				cache: false,
+				contentType: false,
+				processData: true
+			});
+		}
+
 	</script>
 
 </head>
@@ -540,6 +557,11 @@
 	</tr><tr>
 		<td  colspan="2">
 			<button id="btn-copy">Copy to clipboard</button>
+		</td>
+	</tr><tr>
+		<td  colspan="2">
+			<button id="btn-summary">Summarize</button>
+			<img id="spinner" style="display:none;padding-left:3px;height:25px;vertical-align:sub" src="loading_spinner.gif">
 		</td>
 	</tr>
 	</table>
