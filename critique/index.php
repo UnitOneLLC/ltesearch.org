@@ -9,33 +9,43 @@
   <title>Critique My LTE</title>
   
   <style type="text/css">
-    body {
+    body, #top-box {
       background-color: rgba(30,30,120,1);
       color:white;
+      font-family: sans-serif;
     }
-    #container {
+    #container, #top-box {
       margin: auto;
       background-color: #e8e8f0;
       color: #111;
       padding: 10px;
       overflow-wrap: break-word;
     }
-    #input_url {
-      width: 60%;
+    #top-box {
+      color: black;
+    }
+    header {
+      font-size: 24px;
+    }
+    #instructions {
+      padding: 10px 0;
     }
     
     @media  (min-width: 600px) {
-      #container {
-        max-width: 900px;
+      #container, #top-box {
+        max-width: 500px;
         width: 66%;
       }
     }
     @media  (min-width: 1000px) {
-      #container {
-        max-width: 1100px;
+      #container, #top-box {
+        max-width: 800px;
         width: 75%;
       }
     }
+    textarea {
+        width: 90%;
+    } 
   </style>
   <script type="text/javascript">
     function showSpinner() {
@@ -48,6 +58,15 @@
   if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 ?>
 <body>
+  <div id="top-box">
+    <header>AI Letter Critique</header>
+    <div id="instructions">
+        After you have a draft of your letter, you can copy it to the clipboard and
+        paste it into the form below. Click <b>Submit</b>, and the AI will assess the
+        strengths and weaknesses of your letter, as well as checking for grammatical
+        errors.
+    </div>
+  </div>
   <div id="container">
     <form method="POST">
       <label for="input_url">Paste your letter here:</label><br>
