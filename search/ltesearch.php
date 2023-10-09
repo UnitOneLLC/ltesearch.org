@@ -23,9 +23,9 @@ define('HIGHLIGHT_THRESHOLD',4);
 define('AUTH_ERROR', 'Authentication error');
 //define('AI_SCREEN_TEMPLATE', 'Would you guess that the subject matter of a news article entitled "#title" is related to any of the following: #subjects? Answer one of the following: Very likely, Maybe, Very unlikely.');
 
-define('AI_SCREEN_TEMPLATE', 'On a scale of 1 to 100, where 1 means not very likely, how likely is a news article with entitled "#title" to be related to one of the following subjects: #subjects ? Do not give your reasoning. Your answer must always be a single number, the maximum score over all the given subjects.');
+define('AI_SCREEN_TEMPLATE', 'On a scale of 1 to 100, where 1 means not very likely, how likely is a news article entitled "#title" to be related to one of the following subjects: #subjects ? Do not give your reasoning. Your answer must always be a single number, the maximum score over all the given subjects.');
 define('MIN_RANK', 40);
-define('AI_CUTOFF', 25);
+define('AI_CUTOFF', 20);
 
 include "CustomSearch.php";
 include_once "../common/lte_db.php";
@@ -278,7 +278,7 @@ include_once "../common/aiutility.php";
 				$result["highlight"] = false; // is_highlight($result);
 				$result["zlink"] = encode_url($result["url"]);
 				$result["title"] = get_trimmed_title($result["title"]);
-/*				
+				
 				if ($result["rank"] < $min_rank) {
 					$ft = $result["title"];
 					if (endsWith($ft, "...")) {
@@ -288,7 +288,7 @@ include_once "../common/aiutility.php";
 						}
 					}
 				}
-*/				
+				
 				$title_word_count = word_count($result["title"]); 
 				if ($title_word_count == 1){
 					$result["rank"] += 100;					
@@ -396,24 +396,49 @@ include_once "../common/aiutility.php";
 		if ($endingLength > strlen($string)) {
 			return false;
 		}
-/*		$substring = substr($string, -$endingLength);
+		$substring = substr($string, -$endingLength);
 		return $substring === $ending;
 	}
+
+	function get_title_from_url($url) { // ChatGPT
+		if (!endsWith($url, "/")) {
+			$url = $url . "/";
+		}
+		
+		// Define the regular expression pattern
+		$pattern = '#\/([a-zA-Z0-9]+(?:-[a-zA-Z0-9]+){2,})\/#';
+		
+		// Use preg_match to find the first match
+		if (preg_match($pattern, $url, $matches)) {
+			// Extract the matched sequence
+			$result = $matches[1];
+			
+			// Replace hyphens with spaces
+			$result = str_replace('-', ' ', $result);
+			
+			// Remove forward slashes
+			$result = str_replace('/', '', $result);
+			
+			// Remove trailing numeric characters
+			$result = rtrim($result, '0..9');
+			
+			// Ensure the result string ends with an alphabetic character
+			$result = rtrim($result, 'a..zA..Z');
+			
+			return $result;
+		} else {
+			// Return an empty string if no match is found
+			return '';
+		}
+	}	
 	
 	function get_full_title($url) {
-		$html = file_get_contents($url);
+		$title = get_title_from_url($url);
 		
-		$title_regex = '/<title.*>(.*)<\/title>/';
-		
-		preg_match($title_regex, $html, $title_matches);
-*/		
-		if (is_array($title_matches) && (count($title_matches) > 1)) {
-			$title = $title_matches[1];
+		if (empty($title)) {
+			return null;
 		}
-		else {
-			$title = null;
-		}
-		return $title;
+		return ucwords($title);
 	}
 	
 	function get_ip_address() {
