@@ -73,6 +73,7 @@ define("LOGOCLASS","logo-350");
           <li><a href="#blast">Alerts (aka “the Morning Blast”)</a></li>
           <li><a href="#draft-page">Creating a draft of your letter</a></li>
           <li><a href="#draft-doc">The Draft Doc</a></li>
+          <li><a href="#critique">Let the AI critique your draft</a></li>
           <li><a href="#collab">Sharing Your Draft with the Team</a></li>
           <li><a href="#reviewing">Reviewing and Commenting on Others' Draft Documents</a></li>
           <li><a href="#resolving">Accepting and Rejecting Comments</a></li>
@@ -140,6 +141,17 @@ define("LOGOCLASS","logo-350");
         </p>
       </div>
       
+      <div class="w3-container " id="critique">
+        <h3 class="w3-border-bottom w3-border-light-grey tam-padding-header">Let the AI critique your draft</h3>
+        <p>When you think your draft is ready, you can <i>optionally</i> ask the AI to identify the strengths and weaknesses,
+           as well as point out errors in grammar, syntax, or spelling.
+          <ul>
+            <li>Copy the body of your letter (beginning with "To the editor") to the clipboard</li>
+            <li>Paste the text into the form at <a target="_other" href="https://ltesearch.org/critique">this page</a>.</li>
+          </ul>
+        </p>
+      </div>
+
       <div class="w3-container " id="collab">
         <h3 class="w3-border-bottom w3-border-light-grey tam-padding-header">Sharing Your Draft with the Team</h3>
         <p>Google Docs has features that make it easy to allow other team members to review your draft and
