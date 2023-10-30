@@ -190,9 +190,11 @@ class LTE_DB {
 	 * store text in article cache for URL
 	 */
 	function update_cache_entry($url, $text) {
+		// Convert the HTML content to UTF-8
+		$htmlContent = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
 		$timestamp = gmdate("Y-m-d H:i:s");
 		$stmt = $this->_conn->prepare("INSERT INTO article_cache (url, timestamp, contents) VALUES (?, ?, ?)");		
-		$stmt->execute([$url, $timestamp, $text]);
+		$stmt->execute([$url, $timestamp, $escapedContent]);
 	}
 	
 	/*
