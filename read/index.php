@@ -387,7 +387,7 @@
 			$u = decode_url($z);
 			
 			if ($u == null) {
-				echo "no URL\n";
+				echo "Error: (403) invalid/forbidden\n";
 				exit(0);
 			}
 		}

@@ -170,16 +170,21 @@
 			</div>
 			<table id="tp-table">
 				<tbody><tr>
-					<td style="width:15%; vertical-align: top;">
+					<td style="width:15%; vertical-align: top;" colspan="2">
 						<div id="tpdiv">
-							<div><button id="btn-get-angles">Get suggestions</button></div>
+							<div>
+								<button id="btn-get-angles">Get suggestions</button>
+								<span style="font-style: italic">&nbsp;(uses AI to generate a first draft of your letter)</span>
+							</div>
 						</div>
 					</td>
-					<td style="width:65%; max-height:180px;overflow-y:auto; vertical-align: top;">
-						<div id="tp-cell"></div><div id="end-copy"></div>
-						<sup><span id="tp-spinner-prompt">Retrieving . . . </span></sup>
+					<tr>
+						<td style="max-height:180px;overflow-y:auto; vertical-align: top;">
+							<div id="tp-cell"></div><div id="end-copy"></div>
+							<sup><span id="tp-spinner-prompt">Retrieving . . . </span></sup>
 							<img id="tp-spinner" height="35px" src="../search/loading_spinner.gif"/>
-					</td>
+						</td>
+					</tr>
 				</tr>
 					<tr>
 						<td></td>

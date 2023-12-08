@@ -4,7 +4,7 @@
 	include_once "../common/lte_db.php";
 	include_once "../common/aiutility.php";
 	
-	define("INPUT_SIZE", 2500);
+	define("INPUT_SIZE", 3500);
 	
 	function sanitizeString($input) {
         // Define the allowed characters as a regular expression
@@ -16,45 +16,23 @@
         return $sanitizedString;
     }
 
+	function get_ai_draft_prompt() {
+		try {
+			$conn = new LTE_DB();
+			$prompt = $conn->get_parameter("ai_draft_prompt");
+			$conn = null;
+		}
+		catch (PDOException $e) {
+			$conn = null;
+			error_log("PDOException in get_ai_draft_prompt");
+			$prompt = null;
+		}
+		
+		return $prompt;
+	}
+
 	function get_talking_points($topic, $url, $pro, $text, $count = 5, $max_tokens = 800, $temperature = 1.0) {
-/*
-		$head = substr(sanitizeString($text), 0, INPUT_SIZE);
-	
-		$conn = new LTE_DB();
-		$key_phrase = $conn->fetch_key_ai_screen_phrase_for_topic($topic);
-		$conn = null;
-		if (is_null($key_phrase))
-			$key_phrase = 'climate change';
-	
-		$instru = "Create a list of " . $count . " points about this article from the perspective of a person concerned about #key_phrase:" . $head;
-		$instru = str_replace("#key_phrase", $key_phrase, $instru);
-		
-		$postData = array(
-//			"model" => "gpt-3.5-turbo",
-			"model" => "gpt-4",			
-			"prompt" => $instru,
-			"max_tokens" => $max_tokens,
-			"temperature" => $temperature
-		);
-		
-		$returnString = fetch_from_openai(json_encode($postData));
-		$decoded = json_decode($returnString);
-		
-		if ($decoded && is_array($decoded->choices) && $decoded->choices[0]->text) {
-			$output = $decoded->choices[0]->text;
-			$splat = preg_split("/\s\d\./", $output); // split on space number period
-			
-			if (count($splat) > 5) {
-				unset($splat[0]);
-			}
-			
-			$json = json_encode($splat);
-			return $json;
-		}
-		else {
-			return '{input_len: ' . strval(strlen($text)) . ', error: ' . '"' . $returnString . '"}';
-		}
-*/
+		return "error obsolete"; 
 	}
 	
 	function suggest_angles($topic, $url, $pro, $text, $max_tokens = 800, $temperature = 1.0) {
@@ -66,7 +44,7 @@
 		if (is_null($key_phrase))
 			$key_phrase = 'climate change';
 		
-		$instru = "Act as if you are somebody deeply concerned about #key_phrase, your absolute priority. You must write a letter-to-the-editor about a newspaper article. Your letter must be original, insightful, concise, punchy, informal, forceful, lively, tolerant, and persuasive. It must take a strongly opposing view from the article's author if the author does not share your concern about #key_phrase or if the author advocates policies in potential conflict with your priorities. You must disagree with the stated opinion, regardless of its persuasiveness, if it does not align with your stance. Support author's opinions only if they directly support your stance. Begin the letter with the words 'To the Editor'. Do not sign the letter. Your answer must not exceed 200 words in length. Here is the article: " . $head;		
+		$instru = get_ai_draft_prompt() . $head;		
 		$instru = str_replace("#key_phrase", $key_phrase, $instru);
 
 		$response = query_ai($instru);
