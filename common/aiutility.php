@@ -27,7 +27,7 @@
 		
 		$url = OPEN_AI_CHAT_COMPLETION;
 		
-		$api_key = get_openai_api_key();
+		$api_key = get_openai_api_key();
 		
 		$post_fields = array(
 			"model" => OPENAI_MODEL,

@@ -17,12 +17,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         // Read the contents of the file
         $fileContents = file_get_contents($fileName);
 
-        // Set the appropriate headers
-        header('Content-Type: text/plain');
-        header('Content-Disposition: inline; filename=' . $fileName);
+        // Set the appropriate headers for HTML
+        header('Content-Type: text/html');
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Cache-Control: post-check=0, pre-check=0', false);
+        header('Pragma: no-cache');
 
-        // Output the file contents
-        echo $fileContents;
+        // Output the HTML content with file contents inside <pre> tag
+        echo '<!DOCTYPE html>
+              <html lang="en">
+              <head>
+                  <meta charset="UTF-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                  <title>Error Log Contents</title>
+              </head>
+              <body>
+                  <pre>' . htmlspecialchars($fileContents) . '</pre>
+              </body>
+              </html>';
     } else {
         // If the file does not exist, return a 404 response
         header('HTTP/1.1 404 Not Found');
