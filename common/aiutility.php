@@ -15,8 +15,8 @@
 		}
 		catch (PDOException $e) {
 			$conn = null;
-			error_log("PDOException in get_api_key");
 			$key = null;
+			error_log("PDOException in get_api_key");
 		}
 		
 		return $key;
