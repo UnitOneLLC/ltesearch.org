@@ -29,15 +29,19 @@ include "../common/version.php";
             background-color: #e8e8f0;
             padding: 10px;
         }
+        #adder {
+            margin: auto;
+            padding: 10px;
+        }
         
         @media  (min-width: 600px) {
-        	#container {
+        	#container, #adder {
 				max-width: 900px;
 				width: 66%;
         	}
         }
         @media  (min-width: 1000px) {
-        	#container {
+        	#container, #adder {
 				max-width: 1100px;
 				width: 75%;
         	}
@@ -59,7 +63,7 @@ include "../common/version.php";
         #url-to-add-input {
             width: 300px;
         }
-        #controls {
+        #controls, #adder {
             background-color: #777;
             color: white;
             padding: 10px;
@@ -86,6 +90,11 @@ include "../common/version.php";
 </head>
 
 <body>
+    <div id="adder">
+        <span>Add another link:</span>&nbsp;<input id="url-to-add-input" type="text"><button id="add-url-btn">Add</button>
+        <button id="toggle-help" style="display:inline-div;float:right">?</button>
+    </div>
+
     <div contenteditable id="container">
         <div id="head" contenteditable style="min-height:20px;">
             Good Morning,<br>
@@ -108,10 +117,6 @@ include "../common/version.php";
         <div id="_end_"></div>
         <div id="buffer-for-chrome">&nbsp</div>
         <div id="controls">
-            <div>
-                <span>Add another link:</span>&nbsp;<input id="url-to-add-input" type="text"><button id="add-url-btn">Add</button>
-                <button id="toggle-help" style="display:inline-div;float:right">?</button>
-            </div>
             <div>
                 <button id="copy-btn" title="Copy the letter to the clipboard">Copy email to clipboard</button>&nbsp;<span id="copy-feedback"></span>
             </div>

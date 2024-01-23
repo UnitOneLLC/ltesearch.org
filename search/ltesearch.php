@@ -24,8 +24,8 @@ define('AUTH_ERROR', 'Authentication error');
 //define('AI_SCREEN_TEMPLATE', 'Would you guess that the subject matter of a news article entitled "#title" is related to any of the following: #subjects? Answer one of the following: Very likely, Maybe, Very unlikely.');
 
 define('AI_SCREEN_TEMPLATE', 'On a scale of 1 to 100, where 1 means not very likely, how likely is a news article entitled "#title" to be related to one of the following subjects: #subjects ? Do not give your reasoning. Your answer must always be a single number, the maximum score over all the given subjects.');
-define('MIN_RANK', 40);
-define('AI_CUTOFF', 20);
+define('MIN_RANK', 10);
+define('AI_CUTOFF', 25);
 
 include "CustomSearch.php";
 include_once "../common/lte_db.php";
@@ -270,7 +270,6 @@ include_once "../common/aiutility.php";
 			$all_results = remove_duplicate_urls($all_results);
 			
 			$papers = $conn->fetch_papers();
-			$min_rank = MIN_RANK;
 			foreach($all_results as &$result) {
 				$n_bold = get_bold_word_count($item["description"]);
 				$result["rank"] -= $n_bold*3;
@@ -279,9 +278,9 @@ include_once "../common/aiutility.php";
 				$result["zlink"] = encode_url($result["url"]);
 				$result["title"] = get_trimmed_title($result["title"]);
 				
-				if ($result["rank"] < $min_rank) {
+				if ($result["rank"] > MIN_RANK) {
 					$ft = $result["title"];
-					if (endsWith($ft, "...")) {
+					if (endsWith($ft, "...") and strlen($ft) < 30) {
 						$ft = get_full_title($result["url"]);
 						if ($ft != null) {
 							$result["title"] = $ft;
@@ -294,14 +293,14 @@ include_once "../common/aiutility.php";
 					$result["rank"] += 100;					
 				}
 				else if ($title_word_count == 2) {
-					$result["rank"] += 40;
+					$result["rank"] += 70;
 				}
 				$result["rank"] -= $title_word_count*2;
 			}
 
 			$screen = build_ai_screen_prompt_template($topic);
 			if ($screen != null) {
-				$all_results = do_ai_screen($min_rank, $screen, $all_results, $debug);
+				$all_results = do_ai_screen(MIN_RANK, $screen, $all_results, $debug);
 			}
 			
 			foreach($all_results as &$result) {
@@ -349,10 +348,10 @@ include_once "../common/aiutility.php";
 		
 		$ret_array = array();
 		foreach ($results as $key => $value) {
-			if ($value["rank"] > $min_rank) {
-// do not return unlikely resutls				array_push($ret_array, $value);
-				continue;
-			}
+//			if ($value["rank"] < $min_rank) {
+//				array_push($ret_array, $value);
+//				continue;
+//			}
 			
 			$title = $value["title"];
 			if (stripos($title, "letter") !== false) {
@@ -381,10 +380,14 @@ include_once "../common/aiutility.php";
 			if ($answer >= AI_CUTOFF) {
 				$value["rank"] -= $answer;
 				$value["description"] .= " /s" . $answer;
-				array_push($ret_array, $value);
+				if ($value["rank"] < $min_rank)
+					array_push($ret_array, $value);
+				else {
+					error_log("[FILTER][AI-1] $answer] $title");
+				}
 			}
 			else if ($debug != 0) {
-				error_log("[FILTER][AI $answer] $title");
+				error_log("[FILTER][AI-2 $answer] $title");
 			}
 		}
 	

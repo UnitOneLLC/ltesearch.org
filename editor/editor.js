@@ -279,6 +279,7 @@ function doCopy() {
 function doAddUrl() {
 
     var url = $("#url-to-add-input").val();
+    $("#url-to-add-input").val("");
     if (url.length == 0)
         return;
 
@@ -299,8 +300,8 @@ function doAddUrl() {
             var facebookUrl = rowData.url ? makeFacebookUrl(rowData.url, rowData.title) : "#";
             var nRows = $('#result_table tr').length;
 
-            var newRow = createRow(nRows, rowData.paper, rowData.title, url, readerUrl, draftUrl, twitterUrl, facebookUrl);
 
+            var newRow = createRow(nRows, rowData.paper, rowData.title, url, readerUrl, draftUrl, twitterUrl, facebookUrl);
             gDataTable.row.add([
                 nRows-1,
                 newRow.childNodes[1].innerHTML,

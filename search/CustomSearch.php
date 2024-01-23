@@ -297,7 +297,7 @@ class CustomSearch {
 		return $passes;
 	}
 	
-	function looks_like_rollup($s) {
+	function looks_like_rollup($s) { // not used 01/13/2024
 		$pattern = "/^([a-zA-Z]+)\s+\|\s+[A-Za-z]+/";
 		if (preg_match($pattern, $s) == 1) {
 			return true;
@@ -309,13 +309,14 @@ class CustomSearch {
 	}
 	
 	function filter_titles($title, $debug) {
+/************************** DISABLE (nytimes)		
 		if ($this->looks_like_rollup($title)) {
 			if ($debug != 0) {
 				error_log("[FILTER][ROLLUP] $title");
 			}
 			return false;
 		}
-		
+***************************/		
 		$passes = true;
 		
 		foreach ($this->_title_filters as &$t) {

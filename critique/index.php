@@ -1,7 +1,7 @@
 <?php
   include_once "../common/version.php";
   include_once "../common/aiutility.php";
-  define("PREAMBLE", "Critique this letter-to-the-editor. Do not rewrite it. First, report the count of words in the letter. If the word count is more than 200, include a warning that the guidelines usually suggest a maximum of 200 words. Then, give a list of its strengths and weaknesses. Also, very important, point out grammatical, syntax, and spelling errors. Format the response using HTML. Headings and Listed items must start on a new line. Here is the letter: ");
+  define("PREAMBLE", "Critique this letter-to-the-editor. Do not rewrite it. First, report the count of words in the letter. If the word count is more than 200, include a warning that the guidelines usually suggest a maximum of 200 words. Then, give a list of its strengths and weaknesses. Also, very important, point out grammatical, syntax, and spelling errors. You may also suggest minor wording changes if they would improve clarity. Format the response using HTML. Headings and Listed items must start on a new line. Here is the letter: ");
 ?>
 <!DOCTYPE html>
 <head>
