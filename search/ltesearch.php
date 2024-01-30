@@ -245,9 +245,9 @@ include_once "../common/aiutility.php";
 				$keywords[0] = '"' . $kw_search . '"';
 			}
 	
-			$randomized = $keywords;
-			shuffle($randomized);
-			$terms_string = implode(" ", $randomized);
+//			$randomized = $keywords;
+//			shuffle($randomized);
+			$terms_string = implode(" ", $keywords);
 	
 			$apikey = $conn->get_parameter("custom_search_api_key");
 			$engines = $conn->fetch_engine_keys($region_id);
@@ -300,7 +300,7 @@ include_once "../common/aiutility.php";
 
 			$screen = build_ai_screen_prompt_template($topic);
 			if ($screen != null) {
-				$all_results = do_ai_screen(MIN_RANK, $screen, $all_results, $debug);
+				$all_results = do_ai_screen($keywords, MIN_RANK, $screen, $all_results, $debug);
 			}
 			
 			foreach($all_results as &$result) {
@@ -344,7 +344,17 @@ include_once "../common/aiutility.php";
 		}
 	}
 	
-	function do_ai_screen($min_rank, $screen, $results, $debug) {
+	function containsKeyword($title, $keywords) {
+		foreach ($keywords as $keyword) {
+			if (stripos($title, $keyword) !== false) {
+				// Case-insensitive check for keyword in title
+				return true;
+			}
+		}
+		return false;
+	}
+
+	function do_ai_screen($keywords, $min_rank, $screen, $results, $debug) {
 		
 		$ret_array = array();
 		foreach ($results as $key => $value) {
@@ -356,6 +366,9 @@ include_once "../common/aiutility.php";
 			$title = $value["title"];
 			if (stripos($title, "letter") !== false) {
 				$answer = 50;
+			}
+			else if (containsKeyword($title, $keywords)) {
+				$answer = 90;
 			}
 			else {
 				$instru = str_replace("#title", $title, $screen);
