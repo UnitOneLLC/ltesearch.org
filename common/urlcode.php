@@ -42,9 +42,26 @@
 		}
 		return $article;
 	}
+
+	function paper_uses_proxy_reader($u) {
+		$host = parse_url($u, PHP_URL_HOST);
+		if (strncmp($host, "www.", 4) === 0) {
+			$host = substr($host, 4);
+		}
+		
+		$conn = new LTE_DB();
+		$is_proxied = $conn->fetch_paper_uses_proxy($host);
+		$conn = null;
+
+		return $is_proxied;
+	}
 	
 	function cache_article($url, $text) {
+		if (strlen($text) < 1000) // likely an error page
+			return;
+		
 		try {
+			error_log("[CACHE URL] $url");
 			$conn = new LTE_DB();
 			$article = $conn->update_cache_entry($url, $text);
 			$conn->trim_cache();
@@ -76,6 +93,7 @@
 	}
 	
 	function read_html_from_url($url, $ua="") {
+		
 		$data = read_from_cache($url);
 
 		if (strlen($data) > 0) {
@@ -86,13 +104,12 @@
 			$ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36";
 		}
 		
-		if (strpos($url, "bostonglobe.com") !== false || strpos($url, "brookline.news") !== false) {
+		$is_proxied = paper_uses_proxy_reader($url);
+		if ($is_proxied) {
 			$data = read_with_proxy($url, $ua);
-
 			cache_article($url, $data);
 			return $data;
 		}
-		
 		
 		$ch = curl_init();
 		$timeout = 5;

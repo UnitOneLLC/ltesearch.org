@@ -16,7 +16,7 @@ define('GETPAPERDB', 'getpaperdb');
 define('DATABASE_FAILURE', 'Database failure');
 define('MISSING_PARAM', "A required parameter is missing");
 define('REGION_INVALID', "Specified region not configured");
-define('MAX_RESULTS', 75);
+define('MAX_RESULTS', 40);
 define('UNKNOWN_TOPIC', 'Unknown topic specified');
 define('BAD_FILTER_VALUE', 'Invalid filter argument');
 define('HIGHLIGHT_THRESHOLD',4);

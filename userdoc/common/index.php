@@ -56,7 +56,7 @@ define("LOGOCLASS","logo-350");
         <p>Here's how it works in a nutshell:
           <ol>
             <li>Each day you get an email with links to climate-related stories.</li>
-            <li>If any of the stories compel you to write a letter, use the provided tools to cwrite the letter and share it with the team (in "comment" mode).</li>
+            <li>If any of the stories compel you to write a letter, use the provided tools to write the letter and share it with the team (in "comment" mode).</li>
             <li>You accept or reject the comments from the team as you see fit. </li>
             <li>You email the text to the paper or submit the letter on the paper’s website.</li>
           </ol>

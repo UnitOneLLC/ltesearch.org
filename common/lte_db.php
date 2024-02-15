@@ -142,6 +142,39 @@ class LTE_DB {
 		$stmt = null;
 		return $result;
 	}
+	
+	function fetch_paper_uses_proxy($domain) {
+		try {
+			$pdo = $this->_conn;
+			$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			
+			// Prepare the SQL query with a placeholder for the domain
+			$stmt = $pdo->prepare('SELECT uses_proxy_reader FROM papers WHERE domain = :domain');
+			
+			// Bind the parameter to the placeholder
+			$stmt->bindParam(':domain', $domain, PDO::PARAM_STR);
+			
+			// Execute the query
+			$stmt->execute();
+			
+			// Fetch the result
+			$result = $stmt->fetch(PDO::FETCH_ASSOC);
+			
+			// If a result is found, return the value of "uses_proxy_reader"
+			if ($result !== false) {
+				return $result['uses_proxy_reader'];
+			} else {
+				// If no result is found, you may choose to return a default value or handle it as needed
+				return null;
+			}
+			
+		} catch (PDOException $e) {
+			// Handle database connection or query errors here
+			error_log('Error: ' . $e->getMessage());
+			return 0;
+		}		
+	}
+	
 	/*
 	 * add a row to the queries table
 	 */
@@ -190,11 +223,22 @@ class LTE_DB {
 	 * store text in article cache for URL
 	 */
 	function update_cache_entry($url, $text) {
+		error_log("[ENTER update_cache_entry] $url");
 		// Convert the HTML content to UTF-8
-		$htmlContent = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
-		$timestamp = gmdate("Y-m-d H:i:s");
-		$stmt = $this->_conn->prepare("INSERT INTO article_cache (url, timestamp, contents) VALUES (?, ?, ?)");		
-		$stmt->execute([$url, $timestamp, $escapedContent]);
+		try {
+			$htmlContent = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
+			$timestamp = gmdate("Y-m-d H:i:s");
+			$stmt = $this->_conn->prepare("INSERT INTO article_cache (url, timestamp, contents) VALUES (?, ?, ?)");		
+			$stmt->execute([$url, $timestamp, $htmlContent]);
+			error_log("[update_cache_entry] $url $timestamp");
+		} catch (PDOException $e) {
+			$errorMessage = $e->getMessage();
+			error_log("PDOException: " . $errorMessage);
+		}
+		catch (Exception $e2) {
+			$errorMessage = $e->getMessage();
+			error_log("Generic Exception: " . $errorMessage);
+		}
 	}
 	
 	/*
@@ -211,9 +255,11 @@ class LTE_DB {
 			if ($stmt->rowCount() > 0) {
 				// Rows exist, process the results
 				while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+					error_log("[CACHE HIT] $url");
 					return trim($row['contents']);
 				}
 			} else {
+				error_log("[CACHE MISS] $url");
 				return "";
 			}
 		} else {
@@ -228,7 +274,7 @@ class LTE_DB {
 			$rowCountStmt = $this->_conn->prepare("SELECT COUNT(*) FROM article_cache");
 			$rowCountStmt->execute();
 			$rowCount = $rowCountStmt->fetchColumn();
-
+error_log("[TRIM_CACHE] current count=$rowCount");
 			if ($rowCount > MAX_ARTICLE_CACHE_ROW_COUNT) {
 				$findMinTimeStmt = $this->_conn->prepare("SELECT MIN(timestamp) FROM article_cache");
 				$findMinTimeStmt->execute();
