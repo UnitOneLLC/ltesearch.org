@@ -35,13 +35,13 @@ include "../common/version.php";
         
         @media  (min-width: 600px) {
         	#container, #adder {
-				max-width: 900px;
+			/*	max-width: 900px; */
 				width: 66%;
         	}
         }
         @media  (min-width: 1000px) {
         	#container, #adder {
-				max-width: 1100px;
+			/*	max-width: 1100px;*/
 				width: 75%;
         	}
         }
@@ -90,7 +90,7 @@ include "../common/version.php";
 
     <div contenteditable id="container">
          <div id="table-parent">
-			<table id="result_table" class="hover stripe">
+			<table id="result_table" class="hover stripe" style="width:100%">
 				<tbody>
 				</tbody>
 			</table>
