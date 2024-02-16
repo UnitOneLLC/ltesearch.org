@@ -4,8 +4,7 @@ var USE_TEST_DATA = false;
 
 const READER_URL = "https://ltesearch.org/read";
 const DRAFT_URL = "https://ltesearch.org/draft";
-const TWITTER_URL = "https://twitter.com/intent/tweet";
-const FACEBOOK_URL = "https://www.facebook.com/share.php?u=";
+const HAMBURGER = "\u2630";
 
 var gDataTable = null;
 
@@ -14,129 +13,42 @@ var docTitle = window.docTitle;
 var DATA_TABLE_OPTIONS = {  
     "pageLength": 500,
     "rowReorder": true,
+    "paging": false,
+    "bFilter": false,
     "columns": [
-        {type: "num" },
-        {type: "html"},
-        {type: "text"},
-        {type: "html"},
-        {type: "html"},
-        {type: "html"},
-        {type: "html"}
-        ]
-}
-
-var helpString = "You can reorder the rows of the table by dragging lines up and down. Click and hold on " + 
-    "the sequence number in the leftmost column to drag. You can write comments in the blank " +
-    "areas and drag them to the appropriate position in the table.";
+        /* seq #   */ {type: "text", className: 'reorder'},
+        /* del btn */ {type: "html"},
+        /* paper   */ {type: "text"},
+        /* title   */ {type: "html"}
+    ]
+};
 
 $(document).ready(function() {
     $("#copy-btn").click(doCopy);
     $("#add-url-btn").click(doAddUrl);
-    $("#toggle-help").click(doToggleHelp);
-    $("#help-pane").hide();
-    $("#help-pane").text(helpString);
     gDataTable = buildResultTable(items);
 });
 
-function createRow(seq, paperName, text, url, readerUrl, draftUrl, twitterUrl, fbUrl) {
+function createRow(seq, paperName, text, data) {
     var row = document.createElement("tr");
-    var handle = document.createElement("td");
+    row.__lte = data;
+    var seqCell = document.createElement("td");
     var delBtnCell = document.createElement("td");
     var paperCell = document.createElement("td");
     var linkCell = document.createElement("td");
-    var textLinkCell = document.createElement("td");
-    var draftLinkCell = document.createElement("td");
-    var socialCell = document.createElement("td");
-    row.appendChild(handle);
+
+    row.appendChild(seqCell);
     row.appendChild(delBtnCell);
     row.appendChild(paperCell);
     row.appendChild(linkCell);
-    row.appendChild(textLinkCell);
-    row.appendChild(draftLinkCell);
-    row.appendChild(socialCell);
     
-    handle.appendChild(document.createTextNode(seq.toString()));
+    seqCell.appendChild(document.createTextNode(seq));
     delBtnCell.innerHTML = "<span onclick='deleteRow(this)' class=del-btn contenteditable=false>x</span>";
     $(delBtnCell).addClass("del-btn");
     paperCell.appendChild(document.createTextNode(paperName));
-    paperCell.setAttribute("style", "padding-left:30px");
-    if (bEnableSocial) {
-        socialCell.setAttribute("style", "width:40px");
-    }
-    else {
-        socialCell.setAttribute("style", "width:1px");
-    }
-        
-    var anch = document.createElement("a");
-    anch.setAttribute("noreferrer","");
-    linkCell.appendChild(anch);
-    anch.href = url;
-    var textNode = document.createTextNode(text);
-    anch.appendChild(textNode);
-//    linkCell.setAttribute("style","font-size:14.5px");
-    
-    if (readerUrl) {
-        var readerAnch = document.createElement("a");
-        readerAnch.setAttribute("title", "view text");
-        readerAnch.setAttribute("style", "background-color: #11a;color: #fff;font-family: sans-serif;font-variant: small-caps;padding: 0px 2px 0px 2px;cursor: pointer;text-decoration: none;font-size:0.85em;font-weight:600");;
-        textLinkCell.appendChild(document.createTextNode("  "));
-        textLinkCell.setAttribute("style", "width:40px");        
-        textLinkCell.appendChild(readerAnch);
-        readerAnch.href = readerUrl;
-        readerAnch.innerHTML = "&nbsp;text&nbsp;";        
-    }
-    
-    if (draftUrl) {
-        var draftAnch = document.createElement("a");
-        draftAnch.setAttribute("title", "create draft letter");
-        draftAnch.setAttribute("style", "background-color: #11a;color: #fff;font-family: sans-serif;font-variant: small-caps;padding: 0px 2px 0px 2px;cursor: pointer;text-decoration: none;font-size:0.85em;font-weight:600");
-        draftLinkCell.setAttribute("style", "width:50px");
-        draftLinkCell.appendChild(draftAnch);
-        draftAnch.href = draftUrl;
-        draftAnch.innerHTML = "&nbsp;draft&nbsp;"; 
-    }
-
-    if (bEnableSocial) {
-        if (twitterUrl) {
-            var twitterAnch = document.createElement("a");
-            twitterAnch.setAttribute("title", "tweet this article");
-            twitterAnch.setAttribute("style", "width:16px");
-            socialCell.appendChild(document.createTextNode("  "));
-            socialCell.appendChild(twitterAnch);
-            twitterAnch.href = twitterUrl;
-            twitterAnch.innerHTML = '<img style="height:16px; vertical-align: middle" src="https://www.gstatic.com/alerts/images/tw-24.png">';
-        }
-        
-        if (fbUrl) {
-            socialCell.appendChild(document.createTextNode("  "));
-            var fbAnch = document.createElement("a");
-            fbAnch.setAttribute("title", "share on Facebook");
-            fbAnch.setAttribute("style", "width:16px");
-            socialCell.appendChild(document.createTextNode("  "));
-            socialCell.appendChild(fbAnch);
-            fbAnch.href = fbUrl;
-            fbAnch.innerHTML = '<img style="height:16px; vertical-align: middle" src="https://www.gstatic.com/alerts/images/fb-24.png">';
-        }
-    }
+    linkCell.appendChild(document.createTextNode(text));
     
     return row;
-}
-
-
-function makeReaderUrl(z) {
-    return READER_URL + "?z=" + z;
-}
-
-function makeDraftUrl(z) {
-    return DRAFT_URL + "?z=" + z;
-}
-
-function makeTwitterUrl(u, title) {
-    return TWITTER_URL + "?url=" + encodeURIComponent(u) + "&text=" + encodeURIComponent(title);
-}
-
-function makeFacebookUrl(u, title) {
-    return FACEBOOK_URL + encodeURIComponent(u);
 }
 
 function buildResultTable(jsonArr) {
@@ -150,51 +62,11 @@ function buildResultTable(jsonArr) {
         
     for (i in jsonArr) {
         d = jsonArr[i];
-        var readerUrl = d.zlink ? makeReaderUrl(d.zlink) : "#";
-        var draftUrl = d.zlink ? makeDraftUrl(d.zlink) : "#";
-        var twitterUrl = d.url ? makeTwitterUrl(d.url, d.title) : "#";
-        var facebookUrl = d.url ? makeFacebookUrl(d.url, d.title) : "#";
-        var row = createRow(i, d.paper, d.title, d.url, readerUrl, draftUrl, twitterUrl, facebookUrl);
+        var row = createRow(i, d.paper, d.title, d);
         tbody[0].appendChild(row);
     }
     
-    var nRows = $('#result_table tr').length;
-    for (var k=0;  k < nRows; ++k) {
-        var commentRow = createCommentRow(k + nRows);
-        tbody[0].appendChild(commentRow);
-    }
-    
     return table.DataTable(DATA_TABLE_OPTIONS);
-}
-
-
-function getArticleCount() {
-    return $("#result_table tr").length - $(".comment-row").length;
-}
-
-function createCommentRow(seq) {
-    var xrow = document.createElement("tr");
-    xrow.classList.add("comment-row");
-    var seqCell = document.createElement("td");
-    seqCell.appendChild(document.createTextNode(seq.toString()))
-    xrow.appendChild(seqCell);
-    var delCell = document.createElement("td");
-    $(delCell).addClass("del-btn");
-    $(delCell).css("background-color", "#d0d0d0");
-    var bigcol = document.createElement("td");
-    bigcol.setAttribute("contenteditable", "true");
-    bigcol.setAttribute("colspan", 5);
-    xrow.appendChild(delCell);
-    xrow.appendChild(bigcol);
-    
-    for (var i=0; i < 4; ++i) {
-        var cell = document.createElement("td");
-        cell.style.display = "none";
-        xrow.appendChild(cell);
-    }
-    
-    $(xrow).css("font-weight", "bold");
-    return xrow;
 }
 
 function deleteRow(cell) {
@@ -204,76 +76,80 @@ function deleteRow(cell) {
     .draw();    
 }
 
-function doCopy() {
-    $("#result_table").css("width", "640px").css("margin", "0 10px");
+function getLteObjectsFromTable(tableNode) {
+    const lteObjects = [];
     
-    var btns = $(".del-btn");
-    
-    btns.each(
-        b=>{
-            if ($(btns[b]).text() == "x") {
-                $(btns[b]).text("");
-                $(btns[b]).css("user-select", "auto");
-                $(btns[b]).css("background-color", "transparent");
-            }
-        }
-    )
-    var rows = $("#result_table tbody tr");
-    for (var i=0; i < rows.length; ++i) {
-        var firstCell = rows[i].firstChild;
-        $(firstCell).text(" ");
-    }
-
-    for (i = rows.length-1; i >= 0; --i) {
-        $(rows[i].childNodes[0]).css("width", "1px");
-        $(rows[i].childNodes[0]).css("padding", "0 0 0 0"); 
-        $(rows[i].childNodes[1]).css("width", "1px");
-        $(rows[i].childNodes[1]).css("padding", "0 0 0 0");        
+    $(tableNode).find('tr').each(function() {
+        const lteObject = $(this).prop('__lte');
         
-        if ($(rows[i]).hasClass("comment-row")) {
-            if (rows[i].textContent.trim() == "") {
-                rows[i].remove();
-            }
-            else {
-                $(rows[i].childNodes[1]).css("background-color", "transparent");
-            }
+        if (lteObject) {
+            lteObjects.push(lteObject);
         }
-    }
+    });
     
-    $("#result_table thead tr")[0].remove();
+    return lteObjects;
+}
 
-    var tab = $("#head")[0];
-    var end = $("#_end_")[0];        
-
-    var range = document.createRange();
+function copyDivToClipboard() {
+    // Get the element by ID
+    var clipDiv = document.getElementById('clipDiv');
     
-    range.setStart(tab, 0);
-    range.setEnd(end, 0);
+    // Get the HTML content of the element
+    var contentToCopy = clipDiv.innerHTML;
     
-    var selObj = window.getSelection()
-    selObj.removeAllRanges();
-    selObj.addRange(range);
+    // Use the Clipboard API to copy the HTML content
+    navigator.clipboard.write([
+        new ClipboardItem({
+            "text/html": new Blob([contentToCopy], { type: "text/html" })
+        })
+    ]).then(() => {
+        $(clipDiv).remove();
+        $("#copy-feedback").text("" + gDataTable.rows().count() + " articles copied to clipboard")
+    }).catch((error) => {
+        console.error('Unable to copy HTML to clipboard', error);
+    });
+}
 
+function doCopy() {
+    const cssContainer = "";
+    const cssTable = "background-color: #eee; width: 80%; max-width: 640px; font-family: arial; margin-left: 28px";
+    const cssPaperCell = "width: 25%; font-style: italic; text-align: right; padding-right: 10px";
+    const cssLinkCell = "width: 67";
+    const cssBtnCell = " width: 50px;  text-align: center";
+    const cssBtnLink = "background-color: rgb(17,17,170); color: #FFF; font-weight: bold; text-decoration: none; font-variant: small-caps";
+    const textLinkStem = "https://ltesearch.org/read?z=";
+    const draftLinkStem = "https://ltesearch.org/draft?z=";    
 
-    var nItems = getArticleCount();
-    if (document.execCommand('copy')) {
-        if (nItems === 1) {
-            $("#copy-feedback").text("1 article copied");
-        } else {
-            $("#copy-feedback").text("" + nItems + " articles copied");
-        }
-    } else {
-        console.error('failed to get clipboard content');
+    var lteObjs = getLteObjectsFromTable($("#result_table")[0]);
+    var container = document.createElement("div");
+    $(container).prop("id", "clipDiv");
+    $(container).append("<br>");
+    
+    for (var i=0; i < lteObjs.length; ++i) {
+        
+        var textLink = textLinkStem + lteObjs[i].zlink;
+        var draftLink = draftLinkStem + lteObjs[i].zlink;
+        var markUp ="<table style='" + cssTable + "'>" +
+                        "<tr>" +
+                            "<td style='"+ cssPaperCell + "'>" + // paper
+                                lteObjs[i].paper +
+                            "</td>" +
+                            "<td style='" + cssLinkCell + "'>" + // link
+                                "<a href='" + lteObjs[i].url + "'>" + lteObjs[i].title + "</a>" +
+                            "</td>" +
+                            "<td style='" + cssBtnCell + "'>"+  // TEXT
+                                "<a style='" + cssBtnLink + "' + href='" + textLink + "'>&nbsp;&nbsp;text&nbsp;&nbsp;</a>" +
+                            "</td>" +
+                            "<td style='" + cssBtnCell + "'>"+  // DRAFT
+                                "<a style='" + cssBtnLink + "' + href='" + draftLink + "'>&nbsp;&nbsp;draft&nbsp;&nbsp;</a>" +
+                            "</td>" +
+                        "</tr>"+
+                    "</table>";
+        
+        $(container).append(markUp);
     }
-
-    for (i=0; i < rows.length; ++i) {
-        var firstCell = rows[i].firstChild;
-        $(firstCell).text(i.toString());
-    }
-    if (window.getSelection().empty)
-        window.getSelection().empty();
-
-    $("#result_table").css("width", "").css("margin", "");
+    $("body").append($(container));
+    copyDivToClipboard();
 }
 
 function doAddUrl() {
@@ -294,52 +170,20 @@ function doAddUrl() {
             console.log(resultString);
             var rowData = JSON.parse(resultString);
             
-            var readerUrl = rowData.zlink ? makeReaderUrl(rowData.zlink) : "#";
-            var draftUrl = rowData.zlink ? makeDraftUrl(rowData.zlink) : "#";
-            var twitterUrl = rowData.url ? makeTwitterUrl(rowData.url, rowData.title) : "#";
-            var facebookUrl = rowData.url ? makeFacebookUrl(rowData.url, rowData.title) : "#";
             var nRows = $('#result_table tr').length;
 
-
-            var newRow = createRow(nRows, rowData.paper, rowData.title, url, readerUrl, draftUrl, twitterUrl, facebookUrl);
+            var newRow = createRow(nRows, rowData.paper, rowData.title, rowData);
             gDataTable.row.add([
-                nRows-1,
+                '' + nRows-1,
                 newRow.childNodes[1].innerHTML,
                 newRow.childNodes[2].innerHTML,
-                newRow.childNodes[3].innerHTML,
-                newRow.childNodes[4].innerHTML,
-                newRow.childNodes[5].innerHTML,
-                newRow.childNodes[6].innerHTML                
-            ]);
-            
-            var commentRow = createCommentRow(nRows);
-            gDataTable.row.add([
-                nRows,
-                commentRow.childNodes[1].innerHTML,
-                commentRow.childNodes[2].innerHTML,
-                commentRow.childNodes[3].innerHTML,
-                commentRow.childNodes[4].innerHTML,
-                commentRow.childNodes[5].innerHTML,
-                commentRow.childNodes[6].innerHTML
+                newRow.childNodes[3].innerHTML
             ]);
             
             gDataTable.draw();
-            
-            var allRows = $("#result_table tr");
-            allRows[allRows.length-3].childNodes[2].style = "padding-left:30px";
-            
-            var delCell = allRows[allRows.length-3].childNodes[1];
-            delCell.classList.add("del-btn");
-
-            var commentRow = allRows[allRows.length-2];
-            
-            delCell = allRows[allRows.length-2].childNodes[1];
-            $(delCell).css("background-color", "#d0d0d0");
-            
-            var commentCell = commentRow.childNodes[2];
-            commentCell.style = "font-weight:bold";
-            commentCell.setAttribute("contenteditable", "true");
-            commentCell.setAttribute("colspan", 4);
+            var rowCount = gDataTable.rows().count();
+            var newTr = gDataTable.row(rowCount-1).node();
+            newTr.__lte = rowData;
         }
         catch (e) {
             alert("Unable to get info for URL: " + (e.message ? e.message : e));
@@ -349,9 +193,4 @@ function doAddUrl() {
         alert("Unable to add the URL" + e);
         showSpin(false);
     });
-
-}
-
-function doToggleHelp() {
-    $("#help-pane").toggle();
 }
