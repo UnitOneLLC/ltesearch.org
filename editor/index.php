@@ -4,20 +4,19 @@ include "../common/version.php";
 <!DOCTYPE html>
 <head>
     <meta name="robots" content="noindex,nofollow">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="editor.js?ver=<?php echo VERSION;?>"></script>
 
     <title>LTE Editor</title>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css"/>
-    <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/rowreorder/1.2.8/js/dataTables.rowReorder.min.js"></script>
+
+    <script type="text/javascript" src="https://cdn.datatables.net/2.0.0/js/dataTables.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/rowreorder/1.5.0/js/dataTables.rowReorder.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/rowreorder/1.5.0/js/rowReorder.dataTables.js"></script>
     <script type="text/javascript">
         var items = <?php
             echo $_POST["items_json"];
         ?>;
-        var bEnableSocial = <?php
-            echo $_POST["enable_social"];
-        ?>
     </script>
 
     <style type="text/css">
@@ -69,11 +68,6 @@ include "../common/version.php";
             padding: 10px;
             margin-top: 10px;
         }
-        #help-pane {
-            padding: 3px;
-            margin: 5px 0;
-            font-style: italic;
-        }
         .del-btn {
             font-weight: 800;
             color: white;
@@ -92,15 +86,9 @@ include "../common/version.php";
 <body>
     <div id="adder">
         <span>Add another link:</span>&nbsp;<input id="url-to-add-input" type="text"><button id="add-url-btn">Add</button>
-        <button id="toggle-help" style="display:inline-div;float:right">?</button>
     </div>
 
     <div contenteditable id="container">
-        <div id="head" contenteditable style="min-height:20px;">
-            Good Morning,<br>
-            <br>
-            Here are today's links.<br>
-        </div>
          <div id="table-parent">
 			<table id="result_table" class="hover stripe">
 				<tbody>
@@ -108,19 +96,10 @@ include "../common/version.php";
 			</table>
             <div id="after-table">&nbsp;</div>
 		</div>
-        <div id="foot" contenteditable style="min-height:20px;">
-            Thanks for writing.<br>
-            <br>
-            &lt;signature&gt;
-            <br>
-        </div>
-        <div id="_end_"></div>
         <div id="buffer-for-chrome">&nbsp</div>
         <div id="controls">
             <div>
-                <button id="copy-btn" title="Copy the letter to the clipboard">Copy email to clipboard</button>&nbsp;<span id="copy-feedback"></span>
-            </div>
-            <div id="help-pane">
+                <button id="copy-btn" title="Copy table to the clipboard">Copy</button>&nbsp;<span id="copy-feedback"></span>
             </div>
         </div>
     </div>

@@ -252,6 +252,7 @@ function onDisplaySelectChange() {
 }
 
 function setClipboardMulti(items, event) {
+    alert("This button will soon be unavailable. Please learn to use the Editor. Thanks!");
     var outer = document.createElement("div");
     var last = document.createElement("div");
     var c = items.length;

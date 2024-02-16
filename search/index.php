@@ -221,12 +221,14 @@ function _bot_detected() {
                                 </form>
                             </div>
                             <button id="copy-selected">Copy selected</button><br>
-                            <input id="incl-text-only" type="checkbox" name="incl-text-only" style="margin-left:20px">
-                            <label for="incl-text-only" style="font-size:0.9em">include text-only links</label><br>
-                            <input id="incl-create-draft" type="checkbox" name="incl-create-draft" style="margin-left:20px">
-                            <label for="incl-create-draft" style="font-size:0.9em">include create draft links</label><br>
-                            <input id="incl-social" type="checkbox" name="incl-social" style="margin-left:20px">
-                            <label for="incl-social" style="font-size:0.9em">include social media links</label>
+                            <span style="display: none;"> 
+                                <input id="incl-text-only" type="checkbox" name="incl-text-only" style="margin-left:20px">
+                                <label for="incl-text-only" style="font-size:0.9em">include text-only links</label><br>
+                                <input id="incl-create-draft" type="checkbox" name="incl-create-draft" style="margin-left:20px">
+                                <label for="incl-create-draft" style="font-size:0.9em">include create draft links</label><br>
+                                <input id="incl-social" type="checkbox" name="incl-social" style="margin-left:20px">
+                                <label for="incl-social" style="font-size:0.9em">include social media links</label>
+                            </span>
                         </div>
                         <div style="float:right">
                             <button id="clear-selection">Clear selection</button>

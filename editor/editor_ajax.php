@@ -41,7 +41,7 @@
 		
 		$encoded = encode_url($u);
 		
-		$result = ["paper" => $paper["name"], "title" => $title, "zlink" => $encoded];
+		$result = ["paper" => $paper["name"], "title" => $title, "url" =>$u, "zlink" => $encoded];
 		
 		echo json_encode($result);
 	}
