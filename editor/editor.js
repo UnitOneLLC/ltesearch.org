@@ -112,10 +112,10 @@ function copyDivToClipboard() {
 
 function doCopy() {
     const cssContainer = "";
-    const cssTable = "background-color: #eee; width: 80%; max-width: 640px; font-family: arial; margin-left: 28px";
-    const cssPaperCell = "width: 25%; font-style: italic; text-align: right; padding-right: 10px";
-    const cssLinkCell = "width: 67";
-    const cssBtnCell = " width: 50px;  text-align: center";
+    const cssTable = "background-color: #eee; width: 90%; max-width: 640px; font-family: arial; margin-left: 20px";
+    const cssPaperCell = "width: 27%; font-style: italic; text-align: right; padding-right: 10px";
+    const cssLinkCell = "width: 65";
+    const cssBtnCell = " width: 45px;  text-align: center; font-size:0.8em";
     const cssBtnLink = "background-color: rgb(17,17,170); color: #FFF; font-weight: bold; text-decoration: none; font-variant: small-caps";
     const textLinkStem = "https://ltesearch.org/read?z=";
     const draftLinkStem = "https://ltesearch.org/draft?z=";    
