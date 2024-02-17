@@ -218,7 +218,7 @@ class LTE_DB {
 		}
 		return $result[0];
 	}
-	
+
 	/*
 	 * store text in article cache for URL
 	 */
@@ -226,10 +226,9 @@ class LTE_DB {
 		error_log("[ENTER update_cache_entry] $url");
 		// Convert the HTML content to UTF-8
 		try {
-			$htmlContent = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
 			$timestamp = gmdate("Y-m-d H:i:s");
 			$stmt = $this->_conn->prepare("INSERT INTO article_cache (url, timestamp, contents) VALUES (?, ?, ?)");		
-			$stmt->execute([$url, $timestamp, $htmlContent]);
+			$stmt->execute([$url, $timestamp, $text]);
 			error_log("[update_cache_entry] $url $timestamp");
 		} catch (PDOException $e) {
 			$errorMessage = $e->getMessage();
