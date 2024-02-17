@@ -367,7 +367,19 @@
 			echo "<br>";
 		}
 	}
-	
+		
+	function remove_from_cache($url) {
+		try {
+			$conn = new LTE_DB();
+			$paper = $conn->remove_cache_entry($url);
+			$conn = null;
+		}
+		catch (PDOException $e) {
+			$conn = null;
+			error_log("PDOException while removing url from cache: " . $e->getMessage());
+		}
+	}
+
 #===================================================
 	try {	
 		$trace_param = $_GET['trace'];
@@ -532,7 +544,6 @@
 				processData: true
 			});
 		}
-
 	</script>
 
 </head>
@@ -618,12 +629,10 @@
 		}
 		else {
 			echo "No article found.";
+			remove_from_cache($u);
 			exit(0);
 		}
-			
-		
 
-			
 		?>
 	</div>	
 	<div>

@@ -103,7 +103,6 @@ define("LOGOCLASS","logo-350");
             <li>A link to the article (in the above example: "Nature in cities is important to environmental resilience").</li>
             <li>A button that links to just the text of the article (used when you don't have access to the paper's website).</li>
             <li>A button that you use to create a draft for a letter about the article.</li>
-            <li>The social media buttons for sharing the article (instead of writing a letter).</li>
           </ul>
         </p>
         <p>  

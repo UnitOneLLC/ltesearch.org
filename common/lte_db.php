@@ -289,7 +289,25 @@ error_log("[TRIM_CACHE] current count=$rowCount");
 		
 		return $rowCount;
 	}
-
+	
+	function remove_cache_entry($url) {
+		try {
+			// The SQL query with a placeholder for the URL
+			$sql = "DELETE FROM article_cache WHERE url = :url";
+			
+			// Prepare the statement
+			$stmt = $this->_conn->prepare($sql);
+			
+			// Bind the parameter
+			$stmt->bindParam(':url', $url, PDO::PARAM_STR);
+			
+			// Execute the statement
+			$stmt->execute();
+		} catch (PDOException $e) {
+			// Handle the exception
+			error_log("PDO Exception: " . $e->getMessage());
+		}
+	}
 	
 	function get_parameter($p)
 	{
