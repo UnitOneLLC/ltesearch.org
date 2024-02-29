@@ -29,6 +29,10 @@ $(document).ready(function() {
     gDataTable = buildResultTable(items);
 });
 
+function isFirefox() {
+    return !(navigator.clipboard && navigator.clipboard.write);
+}
+
 function createRow(seq, paperName, text, data) {
     var row = document.createElement("tr");
     row.__lte = data;
@@ -91,6 +95,11 @@ function getLteObjectsFromTable(tableNode) {
 }
 
 function copyDivToClipboard() {
+    
+    if (isFirefox()) {
+        return legacyCopyToClipboard();
+    }
+
     // Get the element by ID
     var clipDiv = document.getElementById('clipDiv');
     
@@ -104,10 +113,30 @@ function copyDivToClipboard() {
         })
     ]).then(() => {
         $(clipDiv).remove();
+        $("#__end__").remove();
         $("#copy-feedback").text("" + gDataTable.rows().count() + " articles copied to clipboard")
     }).catch((error) => {
         console.error('Unable to copy HTML to clipboard', error);
     });
+}
+
+function legacyCopyToClipboard() {
+    var clipDiv = document.getElementById('copy_buffer');
+    var range = document.createRange();
+    range.setStart(clipDiv, 0);
+    range.setEnd(document.getElementById("__end__"), 0);        
+    
+    var selObj = window.getSelection()
+    selObj.removeAllRanges();
+    selObj.addRange(range);
+    
+    if (document.execCommand('copy')) {
+        $(clipDiv).remove();
+        $("#__end__").remove();        
+        $("#copy-feedback").text("" + gDataTable.rows().count() + " articles copied to clipboard")
+    } else {
+        console.error('Unable to copy HTML to clipboard (legacy)');    
+    }
 }
 
 function doCopy() {
@@ -145,10 +174,16 @@ function doCopy() {
                             "</td>" +
                         "</tr>"+
                     "</table>";
+
+        if (isFirefox())
+            markUp += "<span style='padding:0 20px; display:inline; font-weight:default'>&nbsp;</span>";
         
         $(container).append(markUp);
     }
-    $("body").append($(container));
+    $("#copy_buffer").append($(container));
+    var endMark = document.createElement("div");
+    $(endMark).prop("id", "__end__");
+    $("#copy_buffer").append($(endMark));
     copyDivToClipboard();
 }
 

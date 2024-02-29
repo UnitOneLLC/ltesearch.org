@@ -78,8 +78,10 @@
 	
 	$paraVisit = function($elem) {
 		global $found_para_count;
+		global $preFilterDOM;
 
 		if ($elem->nodeName == 'p') {
+			$preFilterDOM($elem);
 			echo "<p>" . innerHtml($elem) . "</p>";
 			$found_para_count++;
 		}
@@ -588,7 +590,7 @@
 
 
 	<div style="font-size:0.8em;margin:8px 0">
-		<a href="<?php echo $u; ?>"><?php echo $u;?></a>
+		<a referrerpolicy="no-referrer" href="<?php echo $u; ?>"><?php echo $u;?></a>
 		<div style="margin:8px 0"><?php insertImage(); ?></div>
 	</div>
 	<?php 

@@ -103,4 +103,7 @@ include "../common/version.php";
             </div>
         </div>
     </div>
+    <div id="copy_buffer" style="padding:20px">
+        &nbsp;<br>
+    </div>
 </body>

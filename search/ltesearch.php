@@ -23,7 +23,7 @@ define('HIGHLIGHT_THRESHOLD',4);
 define('AUTH_ERROR', 'Authentication error');
 //define('AI_SCREEN_TEMPLATE', 'Would you guess that the subject matter of a news article entitled "#title" is related to any of the following: #subjects? Answer one of the following: Very likely, Maybe, Very unlikely.');
 
-define('AI_SCREEN_TEMPLATE', 'On a scale of 1 to 100, where 1 means not very likely, how likely is a news article entitled "#title" to be related to one of the following subjects: #subjects ? Do not give your reasoning. Your answer must always be a single number, the maximum score over all the given subjects.');
+define('AI_SCREEN_TEMPLATE', 'On a scale of 1 to 100, where 1 means not very likely, how likely is a news article entitled "#title" to be related to one of the following subjects: #subjects ? Do not give your reasoning. If the title is probably for a press release, the rank is 1. Your answer must always be a single number, the maximum score over all the given subjects.');
 define('MIN_RANK', 10);
 define('AI_CUTOFF', 25);
 

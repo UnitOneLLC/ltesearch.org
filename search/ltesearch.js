@@ -252,7 +252,7 @@ function onDisplaySelectChange() {
 }
 
 function setClipboardMulti(items, event) {
-    alert("This button will soon be unavailable. Please learn to use the Editor. Thanks!");
+    setTimeout(()=>alert("This button will soon be unavailable. Please learn to use the Editor. Thanks!"), 100);
     var outer = document.createElement("div");
     var last = document.createElement("div");
     var c = items.length;
@@ -681,6 +681,10 @@ function getDigest() {
         type: 'POST',
         data: {"tkn":localStorage.getItem("token")},
         success: function(data) { gResultData = JSON.parse(data); $("#digest").show(); $("#loading").hide(); buildResultTable(gResultData) },
+        error: function (err) {
+            $("#loading").hide();
+            alert("System unavailable — try again later: " + JSON.stringify(err, null, 2));
+        },
         cache: false,
         contentType: false,
         processData: true
