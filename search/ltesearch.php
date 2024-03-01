@@ -290,10 +290,10 @@ include_once "../common/aiutility.php";
 				
 				$title_word_count = word_count($result["title"]); 
 				if ($title_word_count == 1){
-					$result["rank"] += 100;					
+					$result["rank"] += 110;					
 				}
 				else if ($title_word_count == 2) {
-					$result["rank"] += 70;
+					$result["rank"] += 90;
 				}
 				$result["rank"] -= $title_word_count*2;
 			}
