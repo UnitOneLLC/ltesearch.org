@@ -17,11 +17,121 @@ var DATA_TABLE_OPTIONS = {
     "bFilter": false,
     "columns": [
         /* seq #   */ {type: "text", className: 'reorder'},
+        /* buttons */ {
+//            name: 'action',
+            data: null,
+            searchable: false,
+            sortable: false,
+            render: function (data, type, full, meta) {
+                if (type === 'display') {
+                    var $span = $('<span></span>');
+                    $('<a class="dtMoveUp">  ↑  </a>').appendTo($span);
+                    $('<a class="dtMoveDown">  ↓  </a>').appendTo($span);
+                    
+                    return $span.html();
+                }
+                return data;
+            }
+        },
         /* del btn */ {type: "html"},
         /* paper   */ {type: "text"},
-        /* title   */ {type: "html"}
-    ]
+        /* title   */ {type: "html"},
+    ],
+    'drawCallback': function (settings) {
+        $('#result_table tr:last .dtMoveDown').prop('disabled', true);
+        
+        // Remove previous binding before adding it
+        $('.dtMoveUp').unbind('click');
+        $('.dtMoveDown').unbind('click');
+        
+        // Bind clicks to functions
+        $('.dtMoveUp').click(moveUp);
+        $('.dtMoveDown').click(moveDown);
+        
+        if (gDataTable) {
+            gDataTable.rows().every( (rowIdx, tableLoop, rowLoop)=>{
+                gDataTable.rows(rowIdx).data(0)[0] = "" + rowIdx;
+            });
+        }
+    }
 };
+
+
+function isFirstRow(t, r) {
+    // Get the first row of the table
+    var firstRow = t.rows[1];
+    
+    // Check if the provided row is the first row
+    return r === firstRow;
+}
+
+function isLastRow(t, r) {
+    // Get the last row index in the table
+    var lastRowIndex = t.rows.length - 1;
+    
+    // Get the last row of the table
+    var lastRow = t.rows[lastRowIndex];
+    
+    // Check if the provided row is the last row
+    return r === lastRow;
+}
+
+function moveUp() {
+    var tr = $(this).parents('tr');
+    
+    if (isFirstRow($("#result_table")[0], tr[0]))
+        return;
+    
+    moveRow(tr, 'up');
+}
+
+// Move the row down
+function moveDown() {
+    var tr = $(this).parents('tr');
+    
+    if (isLastRow($("#result_table")[0], tr[0]))
+        return;
+    
+    moveRow(tr, 'down');
+}
+
+// Move up or down (depending...)
+function moveRow(row, direction) {
+//    var index = gDataTable.row(row).index();
+    var index = parseInt(row.children().first()[0].innerText);
+    
+    var order = -1;
+    if (direction === 'down') {
+        order = 1;
+    }
+//    var data1 = gDataTable.row(index).data();
+    var data1 = gDataTable.rows().data()[index];
+//    data1.order += order;
+    data1[0] = "" + (parseInt(data1[0]) + order);
+    
+//    var data2 = gDataTable.row(index + order).data();
+    var data2 = gDataTable.rows().data()[index + order];
+    
+//    data2.order += -order;
+    data2[0] = "" + (parseInt(data2[0]) - order);
+    
+    rowFromSeq(index).data(data2);
+    rowFromSeq(index + order).data(data1);
+    
+    gDataTable.page(0).draw(false);
+}
+
+function rowFromSeq(seq) {
+    var rows = gDataTable.rows();
+    for (var i=0; i < rows.data().length; ++i) {
+        var row = rows.row(i);
+        var rowSeq = parseInt(row.data()[0]);
+        if (rowSeq == seq) {
+            return row;
+        }
+    }
+    return null;
+}
 
 $(document).ready(function() {
     $("#copy-btn").click(doCopy);
@@ -36,12 +146,14 @@ function isFirefox() {
 function createRow(seq, paperName, text, data) {
     var row = document.createElement("tr");
     row.__lte = data;
+    var arrowsCell = document.createElement("td");
     var seqCell = document.createElement("td");
     var delBtnCell = document.createElement("td");
     var paperCell = document.createElement("td");
     var linkCell = document.createElement("td");
 
     row.appendChild(seqCell);
+    row.appendChild(arrowsCell);
     row.appendChild(delBtnCell);
     row.appendChild(paperCell);
     row.appendChild(linkCell);

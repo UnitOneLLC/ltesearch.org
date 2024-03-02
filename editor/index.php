@@ -79,6 +79,11 @@ include "../common/version.php";
         tr:hover .del-btn {
             color: red;
         }
+        .dtMoveUp, .dtMoveDown {
+            font-size: 1.2em;
+            font-weight: 800;
+            cursor: pointer;
+        }
         
      </style>
 </head>
