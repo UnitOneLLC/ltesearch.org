@@ -7,7 +7,6 @@ const DRAFT_URL = "https://ltesearch.org/draft";
 const HAMBURGER = "\u2630";
 
 var gDataTable = null;
-
 var docTitle = window.docTitle;
 
 var DATA_TABLE_OPTIONS = {  
@@ -18,15 +17,14 @@ var DATA_TABLE_OPTIONS = {
     "columns": [
         /* seq #   */ {type: "text", className: 'reorder'},
         /* buttons */ {
-//            name: 'action',
             data: null,
             searchable: false,
             sortable: false,
             render: function (data, type, full, meta) {
                 if (type === 'display') {
                     var $span = $('<span></span>');
-                    $('<a class="dtMoveUp">  ↑  </a>').appendTo($span);
-                    $('<a class="dtMoveDown">  ↓  </a>').appendTo($span);
+                    $('<button class="dtMoveUp">  ↑  </button>').appendTo($span);
+                    $('<button class="dtMoveDown">  ↓  </button>').appendTo($span);
                     
                     return $span.html();
                 }
@@ -38,8 +36,20 @@ var DATA_TABLE_OPTIONS = {
         /* title   */ {type: "html"},
     ],
     'drawCallback': function (settings) {
-        $('#result_table tr:last .dtMoveDown').prop('disabled', true);
-        
+
+        if (gDataTable) {
+            var rows = $("#result_table")[0].rows;
+            
+            for (var i=1; i < rows.length; ++i) {
+                var tRowElem = rows[i];
+                var rowObj = gDataTable.row(tRowElem);
+                if (rowObj.data()) {
+                    var rowData = rowObj.data();
+                    rowData[0] = getZeroPaddedStringForInt(i-1);
+                    rowObj.data(rowData);
+                }
+            }
+        }
         // Remove previous binding before adding it
         $('.dtMoveUp').unbind('click');
         $('.dtMoveDown').unbind('click');
@@ -47,12 +57,7 @@ var DATA_TABLE_OPTIONS = {
         // Bind clicks to functions
         $('.dtMoveUp').click(moveUp);
         $('.dtMoveDown').click(moveDown);
-        
-        if (gDataTable) {
-            gDataTable.rows().every( (rowIdx, tableLoop, rowLoop)=>{
-                gDataTable.rows(rowIdx).data(0)[0] = "" + rowIdx;
-            });
-        }
+
     }
 };
 
@@ -95,6 +100,13 @@ function moveDown() {
     moveRow(tr, 'down');
 }
 
+function getZeroPaddedStringForInt(n) {
+    if (n < 10) 
+        return "0" + n;
+    else
+        return "" + n;
+}
+
 // Move up or down (depending...)
 function moveRow(row, direction) {
 //    var index = gDataTable.row(row).index();
@@ -106,17 +118,19 @@ function moveRow(row, direction) {
     }
 //    var data1 = gDataTable.row(index).data();
     var data1 = gDataTable.rows().data()[index];
-//    data1.order += order;
-    data1[0] = "" + (parseInt(data1[0]) + order);
+    data1[0] = getZeroPaddedStringForInt(parseInt(data1[0]) + order);
     
-//    var data2 = gDataTable.row(index + order).data();
     var data2 = gDataTable.rows().data()[index + order];
+    data2[0] = getZeroPaddedStringForInt(parseInt(data2[0]) - order);
     
-//    data2.order += -order;
-    data2[0] = "" + (parseInt(data2[0]) - order);
-    
-    rowFromSeq(index).data(data2);
-    rowFromSeq(index + order).data(data1);
+    var r = rowFromSeq(index);
+    if (r) {
+        r.data(data2);
+    }
+    r = rowFromSeq(index + order)
+    if (r) {
+        r.data(data1);
+    }
     
     gDataTable.page(0).draw(false);
 }
@@ -125,9 +139,11 @@ function rowFromSeq(seq) {
     var rows = gDataTable.rows();
     for (var i=0; i < rows.data().length; ++i) {
         var row = rows.row(i);
-        var rowSeq = parseInt(row.data()[0]);
-        if (rowSeq == seq) {
-            return row;
+        if (row.data()) {
+            var rowSeq = parseInt(row.data()[0]);
+            if (rowSeq == seq) {
+                return row;
+            }
         }
     }
     return null;
@@ -152,14 +168,17 @@ function createRow(seq, paperName, text, data) {
     var paperCell = document.createElement("td");
     var linkCell = document.createElement("td");
 
+    seq = getZeroPaddedStringForInt(seq);
+
     row.appendChild(seqCell);
     row.appendChild(arrowsCell);
     row.appendChild(delBtnCell);
     row.appendChild(paperCell);
     row.appendChild(linkCell);
     
+    
     seqCell.appendChild(document.createTextNode(seq));
-    delBtnCell.innerHTML = "<span onclick='deleteRow(this)' class=del-btn contenteditable=false>x</span>";
+    delBtnCell.innerHTML = "<span onclick='deleteRow(this)' class=del-btn>x</span>";
     $(delBtnCell).addClass("del-btn");
     paperCell.appendChild(document.createTextNode(paperName));
     linkCell.appendChild(document.createTextNode(text));
@@ -181,7 +200,7 @@ function buildResultTable(jsonArr) {
         var row = createRow(i, d.paper, d.title, d);
         tbody[0].appendChild(row);
     }
-    
+
     return table.DataTable(DATA_TABLE_OPTIONS);
 }
 
@@ -321,10 +340,11 @@ function doAddUrl() {
 
             var newRow = createRow(nRows, rowData.paper, rowData.title, rowData);
             gDataTable.row.add([
-                '' + nRows-1,
+                getZeroPaddedStringForInt(nRows-1),
                 newRow.childNodes[1].innerHTML,
                 newRow.childNodes[2].innerHTML,
-                newRow.childNodes[3].innerHTML
+                newRow.childNodes[3].innerHTML,
+                newRow.childNodes[4].innerHTML,                
             ]);
             
             gDataTable.draw();

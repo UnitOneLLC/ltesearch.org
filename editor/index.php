@@ -93,7 +93,7 @@ include "../common/version.php";
         <span>Add another link:</span>&nbsp;<input id="url-to-add-input" type="text"><button id="add-url-btn">Add</button>
     </div>
 
-    <div contenteditable id="container">
+    <div id="container">
          <div id="table-parent">
 			<table id="result_table" class="hover stripe" style="width:100%">
 				<tbody>
