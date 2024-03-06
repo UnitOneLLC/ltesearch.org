@@ -32,12 +32,28 @@
 		}
 	}
 	
+	function fixAnchorUrl($elem) {
+		global $targetHostPrefix;
+		if ($elem->nodeName == 'a') {
+			$href = $elem->getAttribute("href");
+			$url = parse_url($href);
+			dbg_trace(1, "Fix anchor URL " . $href);
+
+			if (empty($url["host"]) || (substr($href, 0, 1) === '/')) {
+				$href = $targetHostPrefix . $href;
+				dbg_trace(1, "set href on fixed anchor to $href");
+				$elem->setAttribute("href", $href);
+			}
+		}
+	}
+	
 	$found_para_count = 0;
 	
 	$visitNode = function ($elem) {
 		global $found_para_count;
 		global $using_alternates;
 		global $preFilterDOM;
+		global $paraVisit;
 		
 		if ($elem->nodeName == 'article' or ($using_alternates and (($elem->nodeName == 'div') or ($elem->nodeName == 'section')))) {
 			$visited = $elem->getAttribute("ltesearch");
@@ -58,13 +74,16 @@
 			}
 		}
 		
+		fixAnchorUrl($elem);
+		
 		if (looksLikeArticleBody($elem)) {
 			$text = "";
 			$child = $elem->firstChild;
 			do {
 				if ($child->nodeName == 'p') {
-					$text = $text . "<p>" . innerHtml($child) . "</p>";
-					$found_para_count++;
+					$paraVisit($child);
+//					$text = $text . "<p>" . innerHtml($child) . "</p>";
+//					$found_para_count++;
 				}
 				$child = $child->nextSibling;
 			} while ($child != null);
@@ -81,23 +100,25 @@
 		global $preFilterDOM;
 
 		if ($elem->nodeName == 'p') {
-			$preFilterDOM($elem);
+			// Get the child nodes
+			$childNodes = $elem->childNodes;
+			
+			// Loop through the child nodes
+			foreach ($childNodes as $childNode) {
+				// Check if the node is an element (node type 1)
+				if (($childNode->nodeType === XML_ELEMENT_NODE) && 
+					($childNode->nodeName === 'a')) {
+						fixAnchorUrl($childNode);
+				}
+			}
+			
 			echo "<p>" . innerHtml($elem) . "</p>";
 			$found_para_count++;
 		}
 	};
 
 	$preFilterDOM = function($elem) {
-		global $targetHostPrefix;
-		if ($elem->nodeName == 'a') {
-			$href = $elem->getAttribute("href");
-			$url = parse_url($href);
-			if (empty($url["host"])) {
-				$href = $targetHostPrefix . $href;
-				$elem->setAttribute("href", $href);
-			}
-		}
-		else if ($elem->nodeName == 'img') {
+		if ($elem->nodeName == 'img') {
 			$src = $elem->getAttribute("src");
 			$url = parse_url($src);
 			if (empty($url["host"])) {
@@ -369,7 +390,8 @@
 			echo "<br>";
 		}
 	}
-		
+	
+	
 	function remove_from_cache($url) {
 		try {
 			$conn = new LTE_DB();
