@@ -54,7 +54,7 @@ class LTE_DB {
 	 */
 	function fetch_topics() {
 		$stmt = $this->_conn->query("select distinct topic from keywords");
-		$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'topic');
+		$result = $stmt->fetchAll(PDO::FETCH_COLUMN);
 		$stmt = null;
 		return $result;
 	}
@@ -64,7 +64,7 @@ class LTE_DB {
 	 */
 	 function fetch_keywords($topic, $region_id) {
 		$stmt = $this->_conn->query("select keyword from keywords where topic='$topic' and (region_id='$region_id' or region_id=0)");
-		$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'keyword');
+		$result = $stmt->fetchAll(PDO::FETCH_COLUMN);
 		$stmt = null;
 		return $result;
 	 }
@@ -73,7 +73,7 @@ class LTE_DB {
 	 */
 	 function fetch_regions() {
 		$stmt = $this->_conn->query("select name from regions");
-		$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'name');
+		$result = $stmt->fetchAll(PDO::FETCH_COLUMN);
 		$stmt = null;
 		return $result;
 	 }
@@ -83,7 +83,7 @@ class LTE_DB {
 	  */
 	 function fetch_engine_keys($region_id) {
 	 	$stmt = $this->_conn->query("select gcseid from engines where (region_id='$region_id' or region_id='0')");
-	 	$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'gcseid');
+	 	$result = $stmt->fetchAll(PDO::FETCH_COLUMN);
 	 	$stmt = null;
 	 	return $result;
 	 }
@@ -93,7 +93,7 @@ class LTE_DB {
 	  */
 	 function fetch_url_filters($topic, $region_id) {
 	 	$stmt = $this->_conn->query("select filter from url_filters where (region_id='$region_id' or region_id=0) and topic='$topic' and remove_suffix=false");
-	 	$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'filter');
+	 	$result = $stmt->fetchAll(PDO::FETCH_COLUMN);
 	 	$stmt = null;
 	 	return $result;
 	 }
@@ -102,7 +102,7 @@ class LTE_DB {
 	*/
 	function fetch_url_removal_suffixes($topic, $region_id) {
 		$stmt = $this->_conn->query("select filter from url_filters where (region_id='$region_id' or region_id=0) and topic='$topic' and remove_suffix=true");
-		$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'filter');
+		$result = $stmt->fetchAll(PDO::FETCH_COLUMN);
 		$stmt = null;
 		return $result;
 	}
@@ -112,7 +112,7 @@ class LTE_DB {
 	  */
 	 function fetch_content_filters($topic, $region_id) {
 	 	$stmt = $this->_conn->query("select filter from content_filters where (region_id='$region_id' or region_id=0) and topic='$topic'");
-	 	$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'filter');
+	 	$result = $stmt->fetchAll(PDO::FETCH_COLUMN);
 	 	$stmt = null;
 	 	return $result;
 	 }
@@ -121,7 +121,7 @@ class LTE_DB {
 	 */
 	function fetch_title_filters($region_id) {
 		$stmt = $this->_conn->query("select blacklisted_title from title_filters where region_id='$region_id' or region_id='0'");
-		$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'blacklisted_title');
+		$result = $stmt->fetchAll(PDO::FETCH_COLUMN);
 		$stmt = null;
 		return $result;
 	}
@@ -202,7 +202,7 @@ class LTE_DB {
 	*/
 	function fetch_screen_subjects($topic) {
 		$stmt = $this->_conn->query("select screen from ai_screen where topic='$topic'");
-		$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'screen');
+		$result = $stmt->fetchAll(PDO::FETCH_COLUMN);
 		$stmt = null;
 		return $result;
 	}
@@ -211,7 +211,7 @@ class LTE_DB {
 	 */
 	function fetch_key_ai_screen_phrase_for_topic($topic) {
 		$stmt = $this->_conn->query("select screen from ai_screen where topic='$topic' and is_key_phrase=1");
-		$result = $stmt->fetchAll(PDO::FETCH_COLUMN, 'screen');
+		$result = $stmt->fetchAll(PDO::FETCH_COLUMN);
 		$stmt = null;
 		if (count($result) === 0) {
 			return null;
