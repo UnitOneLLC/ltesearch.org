@@ -271,7 +271,7 @@ include_once "../common/aiutility.php";
 			
 			$papers = $conn->fetch_papers();
 			foreach($all_results as &$result) {
-				$n_bold = get_bold_word_count($item["description"]);
+				$n_bold = get_bold_word_count($result["description"]);
 				$result["rank"] -= $n_bold*3;
 				$result["paper"] = find_paper_name($papers, $result["url"]);
 				$result["highlight"] = false; // is_highlight($result);
@@ -475,7 +475,6 @@ include_once "../common/aiutility.php";
     try {
       $timestamp = gmdate("Y-m-d H:i:s");
       $ipaddr = get_ip_address();
-      $b_filter = ($filter_strength == CustomSearch::FILTER_OFF) ? 0 : 1;
       $pdo->insert_qtab_row($timestamp, $region, $ipaddr, $topic, $n_results, $token);
 	  return "OK";
     }

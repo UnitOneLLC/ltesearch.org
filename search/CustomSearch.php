@@ -144,6 +144,9 @@ class CustomSearch {
 				/*dbg("JSON", $json);*/
 				curl_close($curlObj);
 				$result_aa = json_decode($json, TRUE);
+				if (!array_key_exists('items', $result_aa)) {
+					break;
+				}
 				$items = $result_aa["items"];
 				if (is_null($items)) {
 					break;
