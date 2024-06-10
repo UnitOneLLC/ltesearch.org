@@ -9,9 +9,8 @@ include_once("../common/version.php");
     <script src="papers.js?ver=<?php echo VERSION;?>"></script>
 
     <title>LTE Newspaper Database</title>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css"/>
-    <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
- 
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.5/css/dataTables.dataTables.css" />
+    <script src="https://cdn.datatables.net/2.0.5/js/dataTables.js"></script> 
     <script type="text/javascript">
         var papers_json = <?php
             $conn = new LTE_DB();
@@ -29,34 +28,48 @@ include_once("../common/version.php");
             background-color: #e8e8f0;
             padding: 10px;
         }
-        
+        .url {
+            width: 150px;
+        }
+
         @media  (min-width: 600px) {
         	#container {
 				max-width: 900px;
-				width: 66%;
+				width: 100%;
         	}
         }
         @media  (min-width: 1000px) {
         	#container {
 				max-width: 1100px;
-				width: 75%;
+				width: 100;
         	}
         }
-        
+
         .spacer {
             display: inline-block;
             margin: 0 15px 0 0;
         }
+        
+        #digest {
+            table-layout: fixed;
+        }
         #digest_length {
             display: none;  /* don't show page length control */
         }
+        
+        td, th {
+            overflow: hidden; /* optional: hides content that exceeds cell height */
+            white-space: normal; /* allows content to wrap */
+        }
+        
+
      </style>
 </head>
 
 <body>
     <div id="container">
-         <div id="table-parent">
-			<table id="digest" class="hover stripe">
+         <div id="table-parent" style="width:100%">
+			<table id="digest" class="hover stripe" style="width:100%">
 				<thead>
 					<tr><th>Name</th><th>Domain</th><th>LTE Address</th><th>Max words</th></tr>
 				</thead>

@@ -23,7 +23,7 @@ define('HIGHLIGHT_THRESHOLD',4);
 define('AUTH_ERROR', 'Authentication error');
 //define('AI_SCREEN_TEMPLATE', 'Would you guess that the subject matter of a news article entitled "#title" is related to any of the following: #subjects? Answer one of the following: Very likely, Maybe, Very unlikely.');
 
-define('AI_SCREEN_TEMPLATE', 'On a scale of 1 to 100, where 1 means not very likely, how likely is a news article entitled "#title" to be related to one of the following subjects: #subjects ? Do not give your reasoning. If the title is probably for a press release, the rank is 1. Your answer must always be a single number, the maximum score over all the given subjects.');
+define('AI_SCREEN_TEMPLATE', 'On a scale of 1 to 100, where 1 means very unlikely, how likely is a news article entitled "#title" to be related to one of the following subjects: #subjects ? Do not give your reasoning. If the title is probably for a press release, the rank is 1. Divide score by 2 if the articles ia about a country other than the United States. Your answer must always be a single number, the maximum score over all the given subjects.');
 define('MIN_RANK', 10);
 define('AI_CUTOFF', 25);
 
@@ -187,7 +187,7 @@ include_once "../common/aiutility.php";
 			return;
 		}
 	}
-	$filter_strength = $qstr_aa[FILTER];
+	$filter_strength = @$qstr_aa[FILTER];
 	if (empty($filter_strength)) {
 		$filter_strength = CustomSearch::FILTER_STRONG;
 	}
@@ -210,7 +210,7 @@ include_once "../common/aiutility.php";
 	if ($action == SEARCH) {
 		
 		$is_raw_mode = false;
-		$mode = $qstr_aa[MODE];
+		$mode = @$qstr_aa[MODE];
 		if (!empty($mode)) {
 			$is_raw_mode = ($mode == RAW);
 		}
@@ -221,7 +221,7 @@ include_once "../common/aiutility.php";
 			return;
 		}
 		
-		$debug = $qstr_aa[LTEDEBUG];
+		$debug = @$qstr_aa[LTEDEBUG];
 		
 		try {
 			$conn = new LTE_DB();
@@ -231,7 +231,7 @@ include_once "../common/aiutility.php";
 				return;
 			}
 
-			$kw_search = $qstr_aa[KWSEARCH];
+			$kw_search = @$qstr_aa[KWSEARCH];
 			$keywords = array();
 			if (empty($kw_search)) {
 				$keywords = $conn->fetch_keywords($topic, $region_id);
@@ -280,7 +280,7 @@ include_once "../common/aiutility.php";
 				
 				if ($result["rank"] > MIN_RANK) {
 					$ft = $result["title"];
-					if (endsWith($ft, "...") and strlen($ft) < 30) {
+					if (endsWith($ft, "...") and strlen($ft) < 100) {
 						$ft = get_full_title($result["url"]);
 						if ($ft != null) {
 							$result["title"] = $ft;
@@ -372,7 +372,7 @@ include_once "../common/aiutility.php";
 			}
 			else {
 				$instru = str_replace("#title", $title, $screen);
-				$ai_returned_string = trim(fetch_from_openai_completion($instru));
+				$ai_returned_string = trim(query_ai($instru));
 //				error_log("ai returned string is $ai_returned_string");
 				
 				$answer = intval($ai_returned_string);
@@ -393,10 +393,11 @@ include_once "../common/aiutility.php";
 			if ($answer >= AI_CUTOFF) {
 				$value["rank"] -= $answer;
 				$value["description"] .= " /s" . $answer;
+				$url = $value["url"];
 				if ($value["rank"] < $min_rank)
 					array_push($ret_array, $value);
 				else {
-					error_log("[FILTER][AI-1] $answer] $title");
+					error_log("[FILTER][AI-1] $answer] $title ($url)");
 				}
 			}
 			else if ($debug != 0) {

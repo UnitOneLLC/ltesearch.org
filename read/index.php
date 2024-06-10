@@ -562,7 +562,7 @@
 				url: "https://ltesearch.org/read/summary.php",
 				method: 'POST',
 				data: {"text": text},
-				success: function(markup) {$("#main").html(markup); $("#spinner").hide();},
+				success: function(markup) {$("#main").html(markup + "<br><br>" + $("#main").html()); $("#spinner").hide();},
 				cache: false,
 				contentType: false,
 				processData: true

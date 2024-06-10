@@ -307,7 +307,7 @@ function doCopy() {
                     "</table>";
 
         if (isFirefox())
-            markUp += "<span style='padding:0 20px; display:inline; font-weight:default'>&nbsp;</span>";
+            markUp += "<span style='font-weight:default'>&nbsp;</span>";
         
         $(container).append(markUp);
     }

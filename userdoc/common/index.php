@@ -138,6 +138,12 @@ define("LOGOCLASS","logo-350");
         <p>You can then simply type (or paste in) the text of your letter below the salutation, "To the editor." Typing in a Google doc is 
           not essentially different than typing an email.
         </p>
+        <p>If you are emailing the letter, rather than submitting it to the paper's letter form on its website, your letter may contain hyperlinks.
+          <br>
+          <br>
+          <b style="color:red">DO NOT UNDER ANY CIRCUMSTANCES SUBMIT A LETTER WITH A LINK THAT CONTAINS ltesearch.org</b>
+          <br>
+        </p>
       </div>
       
       <div class="w3-container " id="critique">

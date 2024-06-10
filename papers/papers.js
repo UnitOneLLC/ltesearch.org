@@ -2,14 +2,15 @@
 
 var DATA_TABLE_OPTIONS = {
     "paging": false,
-    "scrollY": "80vh",
-    "scrollCollapse": true,
+    "autoWidth": false,
+/*    "scrollY": "80vh",*/
+/*    "scrollCollapse": true, */
     "order": [ [0, "asc"]],
     "columns": [
-        {type: "text"},
-        {type: "html"},
-        {type: "text"},
-        {type: "text"}
+        {type: "text", width: "25%"},
+        {type: "html", width: "40%"},
+        {type: "text", width: "40%"},
+        {type: "text", width: "5%"}
         ]
 }
 
@@ -37,7 +38,7 @@ function buildPapersTable(jsonArr) {
         var row = "<tr>";
         row += "<td>" + d.name + "</td>";
         row += "<td>" + "<a href='" + url + "' target=_blank>" + d.domain + "</a></td>";
-        row += "<td>" + d.lteaddr + "</td>";
+        row += "<td class='url'>" + d.lteaddr + "</td>";
         row += "<td>" + d.max_words + "</td>";
         row += "</tr>";
         table.append(row);
