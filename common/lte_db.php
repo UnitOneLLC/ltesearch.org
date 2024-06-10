@@ -223,13 +223,13 @@ class LTE_DB {
 	 * store text in article cache for URL
 	 */
 	function update_cache_entry($url, $text) {
-		error_log("[ENTER update_cache_entry] $url");
+		//error_log("[ENTER update_cache_entry] $url");
 		// Convert the HTML content to UTF-8
 		try {
 			$timestamp = gmdate("Y-m-d H:i:s");
 			$stmt = $this->_conn->prepare("INSERT INTO article_cache (url, timestamp, contents) VALUES (?, ?, ?)");		
 			$stmt->execute([$url, $timestamp, $text]);
-			error_log("[update_cache_entry] $url $timestamp");
+			//error_log("[update_cache_entry] $url $timestamp");
 		} catch (PDOException $e) {
 			$errorMessage = $e->getMessage();
 			error_log("PDOException: " . $errorMessage);
@@ -254,11 +254,11 @@ class LTE_DB {
 			if ($stmt->rowCount() > 0) {
 				// Rows exist, process the results
 				while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-					error_log("[CACHE HIT] $url");
+					//error_log("[CACHE HIT] $url");
 					return trim($row['contents']);
 				}
 			} else {
-				error_log("[CACHE MISS] $url");
+				//error_log("[CACHE MISS] $url");
 				return "";
 			}
 		} else {

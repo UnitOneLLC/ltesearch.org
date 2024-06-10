@@ -61,7 +61,7 @@
 			return;
 		
 		try {
-			error_log("[CACHE URL] $url");
+			//error_log("[CACHE URL] $url");
 			$conn = new LTE_DB();
 			$article = $conn->update_cache_entry($url, $text);
 			$conn->trim_cache();

@@ -406,7 +406,7 @@
 
 #===================================================
 	try {	
-		$trace_param = $_GET['trace'];
+		$trace_param = @$_GET['trace'];
 		if (!empty($trace_param)) {
 			$trace = intval($trace_param);
 		}
