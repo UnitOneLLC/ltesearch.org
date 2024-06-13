@@ -1,5 +1,6 @@
 <?php
 define ("MAX_ARTICLE_CACHE_ROW_COUNT", 100);
+define ("MAX_SUMMARY_CACHE_ROW_COUNT", 100);
 
 class LTE_DB {
 
@@ -273,7 +274,7 @@ class LTE_DB {
 			$rowCountStmt = $this->_conn->prepare("SELECT COUNT(*) FROM article_cache");
 			$rowCountStmt->execute();
 			$rowCount = $rowCountStmt->fetchColumn();
-error_log("[TRIM_CACHE] current count=$rowCount");
+
 			if ($rowCount > MAX_ARTICLE_CACHE_ROW_COUNT) {
 				$findMinTimeStmt = $this->_conn->prepare("SELECT MIN(timestamp) FROM article_cache");
 				$findMinTimeStmt->execute();
@@ -307,6 +308,97 @@ error_log("[TRIM_CACHE] current count=$rowCount");
 			error_log("PDO Exception: " . $e->getMessage());
 		}
 	}
+
+	/*
+	* store text in summary cache for URL
+	*/
+	function update_summary_cache_entry($url, $text) {
+		//error_log("[ENTER update_cache_entry] $url");
+		// Convert the HTML content to UTF-8
+		try {
+			$timestamp = gmdate("Y-m-d H:i:s");
+			$stmt = $this->_conn->prepare("INSERT INTO summary_cache (url, timestamp, contents) VALUES (?, ?, ?)");		
+			$stmt->execute([$url, $timestamp, $text]);
+			//error_log("[update_cache_entry] $url $timestamp");
+		} catch (PDOException $e) {
+			$errorMessage = $e->getMessage();
+			error_log("summary cache PDOException: " . $errorMessage);
+		}
+		catch (Exception $e2) {
+			$errorMessage = $e->getMessage();
+			error_log("summary cache Generic Exception: " . $errorMessage);
+		}
+	}
+	
+	/*
+	* retrieve a summary from the cache
+	*/
+	function get_summary_from_cache($url) {
+		$query = "SELECT contents FROM summary_cache WHERE url = ?";
+		$stmt = $this->_conn->prepare($query);
+		$stmt->execute([$url]);
+		
+		// Check if the query executed successfully
+		if ($stmt !== false) {
+			// Check if the query returned any rows
+			if ($stmt->rowCount() > 0) {
+				// Rows exist, process the results
+				while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+					//error_log("[CACHE HIT] $url");
+					return trim($row['contents']);
+				}
+			} else {
+				//error_log("[CACHE MISS] $url");
+				return "";
+			}
+		} else {
+			return "";
+		}
+	}
+	
+	function trim_summary_cache()
+	{
+		$safety = 100;
+		do {
+			$rowCountStmt = $this->_conn->prepare("SELECT COUNT(*) FROM summary_cache");
+			$rowCountStmt->execute();
+			$rowCount = $rowCountStmt->fetchColumn();
+			error_log("[TRIM_CACHE] current count=$rowCount");
+			if ($rowCount > MAX_SUMMARY_CACHE_ROW_COUNT) {
+				$findMinTimeStmt = $this->_conn->prepare("SELECT MIN(timestamp) FROM summary_cache");
+				$findMinTimeStmt->execute();
+				$row = $findMinTimeStmt->fetch(PDO::FETCH_ASSOC);
+				$minTimestamp = $row['MIN(timestamp)'];
+				
+				$deleteStmt = $this->_conn->prepare("DELETE FROM summary_cache WHERE timestamp = ?");
+				
+				$deleteStmt->execute([$minTimestamp]);
+			}
+		} while ($rowCount > MAX_SUMMARY_CACHE_ROW_COUNT && --$safety);
+		
+		return $rowCount;
+	}
+	
+	function remove_summary_cache_entry($url) {
+		try {
+			// The SQL query with a placeholder for the URL
+			$sql = "DELETE FROM summary_cache WHERE url = :url";
+			
+			// Prepare the statement
+			$stmt = $this->_conn->prepare($sql);
+			
+			// Bind the parameter
+			$stmt->bindParam(':url', $url, PDO::PARAM_STR);
+			
+			// Execute the statement
+			$stmt->execute();
+		} catch (PDOException $e) {
+			// Handle the exception
+			error_log("PDO Exception: " . $e->getMessage());
+		}
+	}
+	
+// end summary cache
 	
 	function get_parameter($p)
 	{

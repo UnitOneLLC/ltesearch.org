@@ -43,6 +43,24 @@
 		return $article;
 	}
 
+	function read_from_summary_cache($url) {
+		$summary = "";
+		try {
+			$conn = new LTE_DB();
+			$summary = $conn->get_summary_from_cache($url);
+			$summary = trim($summary);
+			$conn = null;
+		}
+		catch (PDOException $e) {
+			$conn = null;
+		}
+		finally {
+			$conn = null;
+		}
+		return $summary;
+	}
+	
+
 	function paper_uses_proxy_reader($u) {
 		$host = parse_url($u, PHP_URL_HOST);
 		if (strncmp($host, "www.", 4) === 0) {
@@ -65,6 +83,21 @@
 			$conn = new LTE_DB();
 			$article = $conn->update_cache_entry($url, $text);
 			$conn->trim_cache();
+			$conn = null;
+		}
+		catch (PDOException $e) {
+			$conn = null;
+		}
+		finally {
+			$conn = null;
+		}
+	}
+	
+	function cache_summary($url, $text) {
+		try {
+			$conn = new LTE_DB();
+			$article = $conn->update_summary_cache_entry($url, $text);
+			$conn->trim_summary_cache();
 			$conn = null;
 		}
 		catch (PDOException $e) {

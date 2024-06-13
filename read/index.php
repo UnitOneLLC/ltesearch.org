@@ -507,6 +507,9 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script type="text/javascript">
 		const FONT_COOKIE_NAME = "reader-font-size";
+		
+		g_article_url = "<?= $u ?>";
+		
 		function setupFontControl() {
 			$("#spinner").hide();
 			document.getElementById("btn-font-up").addEventListener("click", ()=>incrFont());
@@ -561,7 +564,7 @@
 			$.ajax({
 				url: "https://ltesearch.org/read/summary.php",
 				method: 'POST',
-				data: {"text": text},
+				data: {"text": text, 'article_url':g_article_url},
 				success: function(markup) {$("#main").html(markup + "<br><br>" + $("#main").html()); $("#spinner").hide();},
 				cache: false,
 				contentType: false,

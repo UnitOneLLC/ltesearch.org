@@ -17,7 +17,17 @@
 		}
 		return $result;
 	}
+	$form_vars = get_form_variables();
+	
+	$text = read_from_summary_cache($form_vars["article_url"]);
+	if (!empty($text)) {
+		echo $text;
+	}
+	else {
+		$text = $form_vars["text"];
+		$summary = query_ai(PROMPT . $text);
+		cache_summary($form_vars["article_url"], $summary);
+		echo $summary;
+	}
 
-	$text = get_form_variables()["text"];
-	echo query_ai(PROMPT . $text);
 ?>

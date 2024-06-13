@@ -25,7 +25,8 @@ define('AUTH_ERROR', 'Authentication error');
 
 define('AI_SCREEN_TEMPLATE', 'On a scale of 1 to 100, where 1 means very unlikely, how likely is a news article entitled "#title" to be related to one of the following subjects: #subjects ? Do not give your reasoning. If the title is probably for a press release, the rank is 1. Divide score by 2 if the articles ia about a country other than the United States. Your answer must always be a single number, the maximum score over all the given subjects.');
 define('MIN_RANK', 10);
-define('AI_CUTOFF', 25);
+define('AI_CUTOFF', 30);
+define('MAX_SCORE', 200);
 
 include "CustomSearch.php";
 include_once "../common/lte_db.php";
@@ -290,7 +291,7 @@ include_once "../common/aiutility.php";
 				
 				$title_word_count = word_count($result["title"]); 
 				if ($title_word_count == 1){
-					$result["rank"] += 110;					
+					$result["rank"] += 300;					
 				}
 				else if ($title_word_count == 2) {
 					$result["rank"] += 90;
@@ -358,10 +359,9 @@ include_once "../common/aiutility.php";
 		
 		$ret_array = array();
 		foreach ($results as $key => $value) {
-//			if ($value["rank"] < $min_rank) {
-//				array_push($ret_array, $value);
-//				continue;
-//			}
+			if ($value["rank"] >= MAX_SCORE) {
+				continue;
+			}
 			
 			$title = $value["title"];
 			if (stripos($title, "letter") !== false) {
@@ -394,7 +394,7 @@ include_once "../common/aiutility.php";
 				$value["rank"] -= $answer;
 				$value["description"] .= " /s" . $answer;
 				$url = $value["url"];
-				if ($value["rank"] < $min_rank)
+				if (($answer > 50) || ($value["rank"] < $min_rank))
 					array_push($ret_array, $value);
 				else {
 					error_log("[FILTER][AI-1] $answer] $title ($url)");
