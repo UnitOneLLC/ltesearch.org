@@ -35,7 +35,7 @@
 		return "error obsolete"; 
 	}
 	
-	function suggest_angles($topic, $url, $pro, $text, $max_tokens = 800, $temperature = 1.0) {
+	function suggest_angles($topic, $url, $pro, $text, $extra, $max_tokens = 800, $temperature = 1.0) {
 		$head = substr(sanitizeString($text), 0, INPUT_SIZE);
 
 		$conn = new LTE_DB();
@@ -43,10 +43,11 @@
 		$conn = null;
 		if (is_null($key_phrase))
 			$key_phrase = 'climate change';
-		
-		$instru = get_ai_draft_prompt() . $head;		
+		if (empty($extra)) 
+			$extra="";
+		$instru = get_ai_draft_prompt() . " " . $extra . " Here is the article: " . $head;		
 		$instru = str_replace("#key_phrase", $key_phrase, $instru);
-
+error_log($instru);
 		$response = query_ai($instru);
 		return json_encode(array("text" => extractToTheEditorSubstring($response)));
 /*	
@@ -96,7 +97,7 @@
 	
 # begin script
 	
-	$u = $_GET['u'];
+	$u = @$_GET['u'];
 	
 	if ($u == null) {
 		
@@ -136,7 +137,8 @@
 		echo get_talking_points($topic, $u, $pro, $innerText);
 	}
 	else if ($req = 'angles') {
-		echo suggest_angles($topic, $u, $pro, $innerText);
+		$extra = $_GET['extra'];
+		echo suggest_angles($topic, $u, $pro, $innerText, $extra);
 	}
 	else {
 		echo ("Bad request. No request type was given.");

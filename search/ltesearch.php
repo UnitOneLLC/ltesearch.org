@@ -359,13 +359,15 @@ include_once "../common/aiutility.php";
 		
 		$ret_array = array();
 		foreach ($results as $key => $value) {
+			$url = $value["url"];
+			$title = $value["title"];
+			
 			if ($value["rank"] >= MAX_SCORE) {
 				continue;
 			}
 			
-			$title = $value["title"];
-			if (stripos($title, "letter") !== false) {
-				$answer = 50;
+			if ((stripos($title, "letter") !== false) || (stripos($url, "letter") !== false)) {
+				$answer = 51;
 			}
 			else if (containsKeyword($title, $keywords)) {
 				$answer = 90;
@@ -393,7 +395,6 @@ include_once "../common/aiutility.php";
 			if ($answer >= AI_CUTOFF) {
 				$value["rank"] -= $answer;
 				$value["description"] .= " /s" . $answer;
-				$url = $value["url"];
 				if (($answer > 50) || ($value["rank"] < $min_rank))
 					array_push($ret_array, $value);
 				else {

@@ -176,6 +176,12 @@
 								<button id="btn-get-angles">Get suggestions</button>
 								<span style="font-style: italic">&nbsp;(uses AI to generate a first draft of your letter)</span>
 							</div>
+							<div>
+								<details>
+									<summary>Add instructions</summary>
+									<textarea style="width:80%" id="extra-prompt"></textarea>
+								</details>
+							</div>
 						</div>
 					</td>
 					<tr>

@@ -53,6 +53,11 @@ function onSuggestAngles() {
 	showSpin(true, "tp");
 	var qStringParams = new URLSearchParams(window.location.search);
 	var url = "./aitp.php?z=" + qStringParams.get('z') + "&pro=" + pro + "&req=angles" + "&topic=" + theTopic;
+	var extra = $('#extra-prompt').val();
+	if (extra && extra.length > 0) {
+		url += "&extra=" + encodeURIComponent(extra);
+	}
+	
 	$.ajax(url)
 	.done((resultString)=>{
 		showSpin(false, "tp");
@@ -201,7 +206,7 @@ function createDraftAndGo() {
 		responding_title: g_title.trim(),
 		responding_url: sanitized_link,
 		lteaddr: sanitized_lteaddr,
-		title: title.trim()
+		title: title.trim(),
 	}
 	
 	showSpin(true);
