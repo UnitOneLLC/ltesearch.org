@@ -116,12 +116,18 @@ define("LOGOCLASS","logo-350");
         <h3 class="w3-border-bottom w3-border-light-grey tam-padding-header">Creating a draft of your letter</h3>
         <p>The first step to create a draft of your letter is to click on the <span class="tam-blast-buttons">draft</span> button next to the article link in a row of the morning blast.
           You will then see a page that looks like this:<br><br>
-          <img src="../image/create-draft.png" class="tam-width-reduced" alt="create draft page screenshot">
+          <img src="../image/create-draft-1.png" class="tam-width-reduced" alt="create draft page screenshot">
         </p>
         <p>The first time you land on this page, you'll need to enter your name in the provided box. </p>
         <p>Notice that on the lower half of the <span class="tam-blast-buttons">draft</span> page, there is a button with the label "Get suggestions".
           If you like, use this button to generate a letter for the chosen article using artificial intelligence. The output is somewhat
           unpredictable. <i>It's possible that what the AI generates will be factually incorrect.</i> It may occasionally generate a high-quality letter, but in most cases you will only want to use the AI-generated text as a starting point for your letter. 
+        </p>
+        <p>Underneath the "Get suggestions" button, the words "Add instructions" appear. If you click this
+          it opens an input box that allows you to provide additional input to the AI. For example, you
+          might add something like "Mention that fracking uses an enormous amount of water." The AI will
+          incorporate the additional input into the draft it generates. Do this before you click the
+          "Get suggestions" button.
         </p>
         <p>The button labeled "Copy" on the lower right copies the AI-generated text to the clipboard so that you can paste it elsewhere.
         </p>

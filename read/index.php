@@ -403,6 +403,65 @@
 			error_log("PDOException while removing url from cache: " . $e->getMessage());
 		}
 	}
+		
+		function findJsonPropertyInScript($dom, $propertyName) {
+			try {
+				$xpath = new DOMXPath($dom);
+				
+				// Find all script elements
+				$scriptElements = $xpath->query('//script');
+				
+				foreach ($scriptElements as $script) {
+					$scriptContent = $script->nodeValue;
+					// Extract assignment statements
+					preg_match_all('/\s*(\w+)\s*=\s*(.*);/', $scriptContent, $matches, PREG_SET_ORDER);
+					
+					foreach ($matches as $match) {
+						$varName = $match[1];
+						$jsonStr = trim($match[2]);
+						// Decode JSON string
+						$jsonObject = json_decode($jsonStr, false);
+						
+						if ($jsonObject === null) {
+							continue; // Invalid JSON
+						}
+						// Recursively search for the property
+						$value = findPropertyValueRecursive($jsonObject, $propertyName);
+						if ($value !== null) {
+							return $value;
+						}
+					}
+				}
+			}
+			catch(Exception $e) {
+				error_log("exception scanning JSON: " . $e->getMessage());
+			}
+			
+			return null;
+		}
+		
+		function findPropertyValueRecursive($data, $propertyName) {
+			if (is_array($data)) {
+				foreach ($data as $value) {
+					$result = findPropertyValueRecursive($value, $propertyName);
+					if ($result !== null) {
+						return $result;
+					}
+				}
+			} elseif (is_object($data)) {
+				foreach ($data as $key => $value) {
+					if ($key === $propertyName && is_string($value)) {
+						return $value;
+					}
+					$result = findPropertyValueRecursive($value, $propertyName);
+					if ($result !== null) {
+						return $result;
+					}
+				}
+			}
+			
+			return null;
+		}
 
 #===================================================
 	try {	
@@ -481,6 +540,22 @@
 				$articles = getAlternateArticles($doc);
 				$using_alternates = true;
 				dbg_trace(1, "using alternates");
+			}
+		}
+		
+		$jsonContent = findJsonPropertyInScript($doc, "body");
+		if (empty($jsonContent)) {
+			$jsonContent = findJsonPropertyInScript($doc, "content");
+		}
+		if (!empty($jsonContent)) {
+			$tempDoc = new DOMDocument();
+			$tempDoc->loadHTML("<html><body><DIV id='_lteWrap'>$jsonContent</DIV></body></html>");
+			$jsonArt = $tempDoc->getElementById('_lteWrap');
+			if (is_object($jsonArt)) {
+				array_unshift($articles, $jsonArt);
+			}
+			else {
+				error_log("synth article fail");
 			}
 		}
 	}
