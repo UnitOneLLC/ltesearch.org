@@ -216,7 +216,14 @@ function createDraftAndGo() {
 			try {
 				var result = JSON.parse(resultString);
 				var url = "https://docs.google.com/document/d/" + result.id + "/copy?title=" + title;
-				location.assign(url);
+				
+				var cbox = document.getElementById("cbox-new-window");
+				if (cbox.checked) {
+					window.open(url, "_blank");
+				}
+				else {
+					location.assign(url);
+				}
 			}
 			catch (e) {
 				alert("Unable to create the draft doc: " + (e.message ? e.message : e));

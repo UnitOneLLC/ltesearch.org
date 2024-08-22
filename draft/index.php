@@ -3,6 +3,12 @@
 	include_once("../common/urlcode.php");
 	include_once("../common/lte_db.php");
 
+	function convertWhitespaceToSpaces($inputString) {
+		// Replace any whitespace character (including newlines) with a space
+		$convertedString = preg_replace('/\s+/', ' ', $inputString);
+		return $convertedString;
+	}
+	
 	error_reporting(E_ERROR | E_PARSE);
 	
 	$u = $_GET['u'];
@@ -34,6 +40,7 @@
 	$title = $u;
 	$title=str_replace("https://", "", $title);
 	$title=str_replace("http://", "", $title);
+	$title=convertWhitespaceToSpaces($title);
 	$html = read_html_from_url($u,"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)");
 	$titleOffset = strpos($html, "<title");
 	if ($titleOffset !== false) {
@@ -113,9 +120,9 @@
 				padding: 0 2px 2px 2px;
 			}
 			#spinner-prompt {
-				vertical-align: baseline;
 			}
 			#spinner {
+				vertical-align: bottom;
 			}
 			#hidden-inputs {
 				display: none;
@@ -138,6 +145,10 @@
 			#btn-get-angles {
 				padding-right: 8px;
 				margin: 10px 0 10px 0px;
+			}
+			#cbox-container {
+				display: inline-block;
+				margin: 15px 0 0 30px
 			}
 		</style>
 		<script type="text/javascript">
@@ -163,6 +174,9 @@
 				<div>
 					<button id="copyAndGoBtn">Create document</button>
 					<span id="spinner-prompt">creating doc . . . </span><img id="spinner" height="45px" src="../search/loading_spinner.gif"/>
+					<div id="cbox-container">
+						<input id="cbox-new-window" type="checkbox"><span>Open in a new window or tab</span>
+					</div>
 				</div>
 				<div id="hint">
 					You will be asked to make a copy of a document. <br>Click the 'Make a copy' button when it appears.<br>
@@ -174,11 +188,12 @@
 						<div id="tpdiv">
 							<div>
 								<button id="btn-get-angles">Get suggestions</button>
-								<span style="font-style: italic">&nbsp;(uses AI to generate a first draft of your letter)</span>
+								<span style="font-style: italic">&nbsp;(Generates a first draft of your letter)</span>
 							</div>
 							<div>
 								<details>
 									<summary>Add instructions</summary>
+									<div><em>Enter here any specific points you want included in the letter.</em></div>
 									<textarea style="width:80%" id="extra-prompt"></textarea>
 								</details>
 							</div>

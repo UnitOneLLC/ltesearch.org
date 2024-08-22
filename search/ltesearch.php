@@ -309,6 +309,11 @@ include_once "../common/aiutility.php";
 				$result["description"] .= "/r$rank";
 			}
 
+			$max_search_items = $conn->get_parameter('max_search_items');
+			if (count($all_results) > $max_search_items) {
+				$all_results = array_slice($all_results, 0, $max_search_items);
+			}
+			
 			$status = update_queries($conn, $region, $topic, count($all_results), $usertoken);
 
 			$conn = null;

@@ -59,7 +59,7 @@
 ?>
 <body>
   <div id="top-box">
-    <header>AI Letter Critique</header>
+    <header>Letter Critique</header>
     <div id="instructions">
         After you have a draft of your letter, you can copy it to the clipboard and
         paste it into the form below. Click <b>Submit</b>, and the AI will assess the

@@ -520,6 +520,7 @@
 					$title = utf8_decode($title);
 				}
 				dbg_trace(1, "title", $title);
+				if (stripos($title, "Access to this page has been denied") !== false) continue;								
 				if ((trim($title) !== "Access Denied") && (stripos($title, "are you a robot") == false)) {
 					break;
 				}

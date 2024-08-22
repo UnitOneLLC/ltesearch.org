@@ -155,6 +155,10 @@
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
 		curl_setopt($ch, CURLOPT_REFERER, "twitter.com");
+		curl_setopt($ch, CURLOPT_HTTPHEADER, [
+			'Accept-Language: en-US,en;q=0.9'
+		]);
+
 		$data = curl_exec($ch);
 		curl_close($ch);
 		
