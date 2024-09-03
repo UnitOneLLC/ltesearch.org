@@ -64,7 +64,7 @@
 				$elem->setAttribute("ltesearch", "true");
 			}
 		}
-		if ($elem->nodeName == "div") {
+		if (($elem->nodeName == "div") || ($elem->nodeName == "p")) {
 			$cls = $elem->getAttribute("class");
 			if ((stripos($cls, "byline") !== false) || 
 				(stripos($cls, "by_") !== false) ||

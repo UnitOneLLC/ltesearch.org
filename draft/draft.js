@@ -207,6 +207,7 @@ function createDraftAndGo() {
 		responding_url: sanitized_link,
 		lteaddr: sanitized_lteaddr,
 		title: title.trim(),
+		maxWords: g_max_words
 	}
 	
 	showSpin(true);

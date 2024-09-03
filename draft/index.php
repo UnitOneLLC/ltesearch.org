@@ -33,14 +33,13 @@
 	$paper = $conn->fetch_paper_by_domain($host);
 	$conn = null;
 	if (empty($paper)) {
-		$paper = ["name"=>"unknown", "lteaddr"=>"unknown"];
+		$paper = ["name"=>"unknown", "lteaddr"=>"unknown", "max_words"=>"not specified"];
 	}
 	
 	
 	$title = $u;
 	$title=str_replace("https://", "", $title);
 	$title=str_replace("http://", "", $title);
-	$title=convertWhitespaceToSpaces($title);
 	$html = read_html_from_url($u,"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)");
 	$titleOffset = strpos($html, "<title");
 	if ($titleOffset !== false) {
@@ -50,6 +49,7 @@
 			$title = substr($html, $titleOffset, $titleEnd-$titleOffset);
 		}
 	}
+	$title=convertWhitespaceToSpaces($title);
 	
 ?>
 <!DOCTYPE html>
@@ -156,6 +156,7 @@
 			var g_url = "<?php echo trim($u); ?>";
 			var g_newspaper = "<?php echo trim($paper["name"]) ?>";
 			var g_lteaddr = "<?php echo trim($paper["lteaddr"]) ?>";
+			var g_max_words = "<?php echo $paper["max_words"] ?>";
 		</script>
 		<title>Create LTE Draft</title>
 	</head>

@@ -308,6 +308,11 @@ include_once "../common/aiutility.php";
 				$rank = $result["rank"];
 				$result["description"] .= "/r$rank";
 			}
+			
+			// Sorting the array in descending order based on the numeric value of 'rank'
+			usort($all_results, function ($a, $b) {
+				return intval($b['rank']) <=> intval($a['rank']);
+			});			
 
 			$max_search_items = $conn->get_parameter('max_search_items');
 			if (count($all_results) > $max_search_items) {
