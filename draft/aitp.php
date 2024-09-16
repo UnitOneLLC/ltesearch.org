@@ -81,15 +81,22 @@ error_log($instru);
 	}
 	
 	function extractToTheEditorSubstring($s) {
-		$phrase = "To the Editor";
-		$position = stripos($s, $phrase);
+		$result = $s;
+
+		$phrases = [
+			"To the Editor:",
+			"To the Editor,",
+			"Dear Editor:",
+			"Dear Editor,"
+		];
 		
-		if ($position !== false) {
-			// If the phrase is found, extract the substring from the position where the phrase starts.
-			$result = substr($s, $position);
-		} else {
-			// If the phrase is not found, return the entire string $s.
-			$result = $s;
+		foreach ($phrases as $key_phrase) {
+			$position = stripos($s, $key_phrase);		
+			if ($position !== false) {
+				// If the phrase is found, extract the substring from the position where the phrase starts.
+				$result = substr($s, $position + strlen($key_phrase) + 1);
+				break;
+			} 
 		}
 		
 		return $result;
