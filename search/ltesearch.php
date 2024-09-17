@@ -319,19 +319,21 @@ include_once "../common/aiutility.php";
 				$all_results = array_slice($all_results, 0, $max_search_items);
 			}
 			
+			$conn = null;
+			$conn = new LTE_DB();
 			$status = update_queries($conn, $region, $topic, count($all_results), $usertoken);
 
 			$conn = null;
 			
 			if ($status != "OK") {
-			//	echo $status;
-			//	return;
+				error_log("update_queries failed with status $status");
 			}
 			
 			echo json_encode($all_results);
 		}
 		catch (PDOException $e) {
 			$conn = null;
+			error_log("Exception: " . $e->getMessage());
 			echo return_error(DATABASE_FAILURE, $e->getMessage());
 			return;
 		}
