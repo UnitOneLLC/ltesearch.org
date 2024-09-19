@@ -206,6 +206,10 @@
 				$time_string = $node->getAttribute("content");
 				dbg_trace(3, "time string content", $time_string);
 				try {
+					if (date_create($time_string) === false) {
+						dbg_trace(3, "unable to parse time string $time_string");
+						return null;
+					}
 					$time_formatted = date_format(date_create($time_string),"M d, Y");
 					dbg_trace(3,"Date found", "|$time_formatted|");
 					return $time_formatted;
@@ -287,7 +291,7 @@
 	
 	function looksLikeArticleBody($elem) {
 		global $trace;
-		$looksGood;
+		$looksGood = true;
 
 		if ($trace >= 3) {
 			if (get_class($elem) == "DOMElement")		{
