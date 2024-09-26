@@ -409,6 +409,8 @@
 	}
 		
 		function findJsonPropertyInScript($dom, $propertyName) {
+			if ($dom === null)
+				return null;
 			try {
 				$xpath = new DOMXPath($dom);
 				

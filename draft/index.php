@@ -208,10 +208,16 @@
 						</td>
 					</tr>
 				</tr>
-					<tr>
-						<td></td>
-						<td><button style="float:right" id="btn-copy-ai">Copy</button></td>
-					</tr></tbody>
+				<tr>
+					<td></td>
+					<td><button style="float:right" id="btn-copy-ai">Copy</button></td>
+				</tr>
+				<tr id="post-ai-notice">
+					<td colspan=2 style="font-style:italic">
+						After revising the your draft, use this <a target="_blank" href="https://quillbot.com/ai-content-detector">AI detector</a> to see how much of it is still detectable as being AI-written.
+					</td>
+				</tr>
+				</tbody>
 			</table>
 		</div>
 	</body>

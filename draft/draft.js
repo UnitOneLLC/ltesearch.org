@@ -11,6 +11,7 @@ $(document).ready(function() {
 	$("#btn-get-angles").click(onSuggestAngles);
 	$("#btn-copy-ai").click(onCopyAi);
 	$("#btn-copy-ai").attr("disabled", true);
+	$("#post-ai-notice").hide();
 	setupAuthor();
 });
 
@@ -67,6 +68,7 @@ function onSuggestAngles() {
 			cellDiv.empty();
 			cellDiv.append($("<div>" + results["text"] + "</div>"));
 			$("#btn-copy-ai").attr("disabled", false);
+			$("#post-ai-notice").show();
 		}
 		catch (e) {
 			cellDiv.empty();
