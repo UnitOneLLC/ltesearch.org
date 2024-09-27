@@ -72,6 +72,11 @@
 				echo innerHtml($elem);
 				return;
 			}
+			$cls = $elem->getAttribute("class");
+			if ($cls == "subscriber-only") { // mdjonline.com
+				$elem->setAttribute("style", "display:block");
+				echo "<p>" . innerHtml($elem) . "</p>";
+			}
 		}
 		
 		fixAnchorUrl($elem);
@@ -128,6 +133,12 @@
 		}
 		else if ($elem->nodeName == "svg") {
 			$elem->parentNode->removeChild($elem);
+		}
+		else if ($elem->nodeName == "div") {
+			$cls = $elem->getAttribute("class");
+			if ($cls == "subscriber-only") { // mdjonline.com
+				$elem->setAttribute("style", "display:block");
+			}
 		}
 	};
 	
