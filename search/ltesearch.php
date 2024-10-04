@@ -271,6 +271,8 @@ include_once "../common/aiutility.php";
 			$all_results = remove_duplicate_urls($all_results);
 			
 			$papers = $conn->fetch_papers();
+			$conn = null;
+
 			foreach($all_results as &$result) {
 				$n_bold = get_bold_word_count($result["description"]);
 				$result["rank"] -= $n_bold*3;
@@ -314,13 +316,13 @@ include_once "../common/aiutility.php";
 				return intval($b['rank']) <=> intval($a['rank']);
 			});			
 
+			$conn = new LTE_DB();
+			
 			$max_search_items = $conn->get_parameter('max_search_items');
 			if (count($all_results) > $max_search_items) {
 				$all_results = array_slice($all_results, 0, $max_search_items);
 			}
 			
-			$conn = null;
-			$conn = new LTE_DB();
 			$status = update_queries($conn, $region, $topic, count($all_results), $usertoken);
 
 			$conn = null;

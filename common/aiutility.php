@@ -7,6 +7,9 @@
 	define("OPEN_AI_COMPLETION", "https://api.openai.com/v1/completions");
 	define("OPEN_AI_CHAT_COMPLETION", "https://api.openai.com/v1/chat/completions");
 	
+	define("CLAUDE_MODEL", "claude-3-5-sonnet-20240620");
+	define("CLAUDE_ENDPOINT", 'https://api.anthropic.com/v1/messages');
+	
 	function get_openai_api_key() {
 		try {
 			$conn = new LTE_DB();
@@ -21,8 +24,115 @@
 		
 		return $key;
 	}
+	
+	function get_claude_api_key() {
+		try {
+			$conn = new LTE_DB();
+			$apiKey = $conn->get_parameter("claude-api-key");
+		}
+		catch (PDOException $e) {
+			$conn = null;
+			echo("exception "); var_dump($e);
+			return null;
+		}
+		return $apiKey;
+	}
+	
+	function get_claude_sleep_time() { //usec
+		try {
+			$conn = new LTE_DB();
+			$usec = $conn->get_parameter("claude_sleep_usec");
+		}
+		catch (PDOException $e) {
+			$conn = null;
+			echo("exception "); var_dump($e);
+			return null;
+		}
+		return (int)$usec;
+	}
 
 	function query_ai($query) {
+		try {
+			$conn = new LTE_DB();
+			$engine = $conn->get_parameter("ai_engine");
+			$conn = null;
+		}
+		catch (PDOException $e) {
+			$conn = null;
+			$key = null;
+			error_log("PDOException in query_ai");
+		}
+		if ($engine == 'openai') {
+			return query_ai_openai($query);
+		}
+		else if ($engine == 'claude') {
+			return query_ai_claude($query);
+		}
+		else {
+			error_log("AI engine parameter not found.");
+			return "Unavailable at this time";
+		}
+	}
+
+	function query_ai_claude($query) {
+		$apiKey = get_claude_api_key();
+
+		$url = CLAUDE_ENDPOINT;
+
+		$messages = [
+			[
+				'role' => 'user',
+				'content' => $query
+			]
+		];
+		
+		// Convert messages to JSON
+		$data = [
+			'model' => CLAUDE_MODEL,
+			'max_tokens' => 2048,
+			'messages' => $messages
+		];
+		
+		
+		$jsonData = json_encode($data);        
+//		error_log($jsonData);
+		
+		// Setup the curl data
+		$curl = curl_init();
+		
+		curl_setopt_array($curl, [
+			CURLOPT_URL => $url,
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_ENCODING => '',
+			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_TIMEOUT => 0,
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST => 'POST',
+			CURLOPT_POSTFIELDS => $jsonData,
+			CURLOPT_HTTPHEADER => [
+				'x-api-key: ' . $apiKey,
+				'anthropic-version: 2023-06-01',
+				'content-type: application/json'
+			],
+		]);      
+		// Execute curl
+		$response = curl_exec($curl);
+		if (stripos($response, "error")) {
+			error_log("response from claude: $response");
+		}
+		curl_close($curl);
+		
+		// Decode the API response
+		$responseData = json_decode($response, true);        
+		// Extract the assistant's reply
+		$content = $responseData['content'][0]['text'];
+		usleep(get_claude_sleep_time());
+		return $content;
+	}
+
+
+	function query_ai_openai($query) {
 		$ch = curl_init();
 		
 		$url = OPEN_AI_CHAT_COMPLETION;

@@ -1,20 +1,14 @@
 <?php
-  define("OPENAI_MODEL", "gpt-4");
-  define("OPEN_AI_COMPLETION", "https://api.openai.com/v1/completions");
-  define("OPEN_AI_CHAT_COMPLETION", "https://api.openai.com/v1/chat/completions");
-
   include_once "../common/version.php";
   include_once "../common/urlcode.php";
   include_once "../common/aiutility.php";
   include_once "../common/lte_db.php";
   
-  function query_ai($query) {
+  function query_ai_test($query) {
     $ch = curl_init();
     
     $url = OPEN_AI_CHAT_COMPLETION;
-    
-    $api_key = get_openai_api_key();
-
+    $api_key = get_openai_api_key();
     $post_fields = array(
       "model" => OPENAI_MODEL,
       "messages" => array(
@@ -87,10 +81,11 @@
   </style>
 </head>
 <?php 
+  $prompt = "";
   if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     
-    if ($_GET["action"] == "openai") {
-      $prompt = $_GET["prompt"];
+    if ($_GET["action"] == "openai" || $_GET['action'] == "claude") {
+      $prompt = @$_GET["prompt"];
 ?>
 <body>
   <div id="container">
@@ -99,7 +94,7 @@
       <textarea id="input_url" rows="6" cols="80" name="payload" value=""><?php echo($prompt);?></textarea>
       <br>
       <input type="submit" value="Submit">
-      <input type="hidden" id="action" name="action" value="openai">
+      <input type="hidden" id="action" name="action" value="<?php echo $_GET['action'] ?>">
     </form>
   </div>
 </body>
@@ -157,7 +152,111 @@ Access denied.
   }
   }
   else  if ($_SERVER['REQUEST_METHOD'] === 'POST') { 
-    
+
+    if ($_POST["action"]=="claude") {
+      $valid_url = true;
+      try { 
+        try {
+          $conn = new LTE_DB();
+          $apiKey = $conn->get_parameter("claude-api-key");
+          error_log ("the api key is $apiKey");
+        }
+        catch (PDOException $e) {
+          $conn = null;
+          echo("exception "); var_dump($e);
+          return;
+        }
+        
+        // API endpoint URL
+        $url = 'https://api.anthropic.com/v1/messages';
+
+        // Prompt for the conversation
+        $messages = [
+          [
+            'role' => 'user',
+            'content' => $_POST['payload']
+          ]
+        ];
+        
+        // Convert messages to JSON
+        $data = [
+          'model' => 'claude-3-5-sonnet-20240620',
+          'max_tokens' => 2048,
+          'messages' => $messages
+        ];
+        
+        
+        $jsonData = json_encode($data);        
+        error_log($jsonData);
+        
+        // Setup the curl data
+        $curl = curl_init();
+        
+        curl_setopt_array($curl, [
+          CURLOPT_URL => $url,
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'POST',
+          CURLOPT_POSTFIELDS => $jsonData,
+          CURLOPT_HTTPHEADER => [
+            'x-api-key: ' . $apiKey,
+            'anthropic-version: 2023-06-01',
+            'content-type: application/json'
+          ],
+        ]);      
+        // Execute curl
+        $response = curl_exec($curl);
+error_log("response from claude: $response");
+        curl_close($curl);
+        
+        // Decode the API response
+        $responseData = json_decode($response, true);        
+        // Extract the assistant's reply
+        $content = $responseData['content'][0]['text'];
+        
+        // Output the reply
+        // Assuming $reply contains the response from the API
+        $lines = explode("\n", $content);        
+        
+        // Loop through the lines
+        foreach ($lines as $line) {
+          // Process each line as needed
+          if (preg_match('/^\*\*Day \d+:\*\*$/', $line)) {
+            echo '<strong>' . $line . "</strong><br>";
+          } else {
+            echo $line . '<br>';
+          }
+        }        
+        
+      }
+      catch (Exception $e) {
+        $answer = "An exception occurred: " . $e.message();
+      } ?>
+<body>
+  <div id="container">
+    <div id="inner">
+      Prompt: <br>
+      <?php echo($ai_prompt);?>
+      <br><br>
+      <?php echo($answer)?>
+    </div>
+    <div>
+      <br>
+      <button><a href="./?action=openai&prompt=<?php echo(urlencode($ai_prompt)); ?>">New query</a></button>
+    </div>
+  </div>
+</body>      
+<?php }    
+  
+  
+  
+  
+  
+  
     if ($_POST["action"]=="openai") {
       $valid_url = true;
       try { 
