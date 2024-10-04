@@ -23,7 +23,11 @@ define('HIGHLIGHT_THRESHOLD',4);
 define('AUTH_ERROR', 'Authentication error');
 //define('AI_SCREEN_TEMPLATE', 'Would you guess that the subject matter of a news article entitled "#title" is related to any of the following: #subjects? Answer one of the following: Very likely, Maybe, Very unlikely.');
 
-define('AI_SCREEN_TEMPLATE', 'On a scale of 1 to 100, where 1 means very unlikely, how likely is a news article entitled "#title" to be related to one of the following subjects: #subjects ? Do not give your reasoning. If the title is probably for a press release, the rank is 1. Divide score by 2 if the articles ia about a country other than the United States. Your answer must always be a single number, the maximum score over all the given subjects.');
+//define('AI_SCREEN_TEMPLATE', 'On a scale of 1 to 100, where 1 means very unlikely, how likely is a news article entitled "#title" to be related to one of the following subjects: #subjects ? Do not give your reasoning. If the title is probably for a press release, the rank is 1. Divide score by 2 if the articles ia about a country other than the United States. Your answer must always be a single number, the maximum score over all the given subjects.');
+
+define('AI_SCREEN_TEMPLATE', 'I will give you a JSON array. Each element in the array is an associative array. Your job is to return the full array after adding to each element a new key-value pair. The key of the new key-value pair is "s". The value of "s" is an integer. You compute the value of "s" based on the value of the "title" key in the same associative array. Assign to the "s" value the probability from 0 to 100 that a newspaper article whose title is given in the "title" value is related to any of the following subjects: #subjects. Return ONLY the updated JSON array without any additional preface, explanation or comment. Here is the JSON array:');
+
+
 define('MIN_RANK', 10);
 define('AI_CUTOFF', 30);
 define('MAX_SCORE', 200);
@@ -128,7 +132,7 @@ include_once "../common/aiutility.php";
 	$parts = parse_url($_SERVER['REQUEST_URI']);
 	parse_str($parts['query'], $qstr_aa);
 
-	$action = $qstr_aa[ACTION];
+	$action = @$qstr_aa[ACTION];
 	if (empty($action)) {
 		echo return_error(MISSING_PARAM, ACTION);
 	}
@@ -303,7 +307,7 @@ include_once "../common/aiutility.php";
 
 			$screen = build_ai_screen_prompt_template($topic);
 			if ($screen != null) {
-				$all_results = do_ai_screen($keywords, MIN_RANK, $screen, $all_results, $debug);
+				$all_results = screen_results($keywords, MIN_RANK, $screen, $all_results, $debug);
 			}
 			
 			foreach($all_results as &$result) {
@@ -368,10 +372,96 @@ include_once "../common/aiutility.php";
 		}
 		return false;
 	}
+	
+	function ai_screen_results($keywords, $min_rank, $screen, $results, $debug) {
+		$chunk_size = 20;
+		$n_to_scan = count($results);
+		$n_processed = 0;
+		$result_array = array();
+		
+		while ($n_to_scan > 0) {
+			$n_screen_this_chunk = min($chunk_size, $n_to_scan);
 
-	function do_ai_screen($keywords, $min_rank, $screen, $results, $debug) {
+			$this_chunk = array();
+			for ($i=0; $i < $n_screen_this_chunk; ++$i) {
+				array_push($this_chunk, $results[$n_processed+$i]);
+			}
+			$this_chunk = ai_screen_results_chunk($keywords, $min_rank, $screen, $this_chunk, $debug);
+			$result_array = array_merge($result_array, $this_chunk);
+			
+			$n_processed += $n_screen_this_chunk;
+			$n_to_scan -= $n_screen_this_chunk;
+		}
+
+		return $result_array;
+	}
+		
+	function ai_screen_results_chunk($keywords, $min_rank, $screen, $results, $debug) {
+		$titles_only = array();
+		foreach ($results as $result) {
+			array_push($titles_only, ["t"=> $result["title"], "s"=> 0]);
+		}
+		
+		$json_results = json_encode($titles_only);
+		$screen .= $json_results;
+		$ai_result_string = trim(query_ai($screen));
+
+		// Find the position of the first '['
+		$start_pos = strpos($ai_result_string, '[');
+		
+		// Find the position of the last ']'
+		$end_pos = strrpos($ai_result_string, ']');
+		
+		// Check if both '[' and ']' exist in the string
+		if ($start_pos !== false && $end_pos !== false && $end_pos > $start_pos) {
+			// Extract the part of the string between '[' and ']'
+			$ai_result_string = substr($ai_result_string, $start_pos, $end_pos - $start_pos + 1);
+		} else {
+			// If the brackets are not found or invalid, return the original string or handle it as needed
+			$ai_result_string = $input_string;
+		}
+
+		$ai_result_array = json_decode($ai_result_string, true);
+
+		// Loop through each element in $ai_result_array
+		foreach ($ai_result_array as $ai_result) {
+			// Extract the 't' and 's' values from $ai_result
+			$ai_title = $ai_result['t'];
+			$ai_score = $ai_result['s'];
+			
+			// Loop through $results to find a matching 'title'
+			foreach ($results as &$result) { // Use reference to modify the $results array
+				if ($result['title'] === $ai_title) {
+					// When a match is found, add the 'ai_score' key with the value of 's'
+					$result['ai_score'] = $ai_score;
+					break; // Exit the inner loop once the match is found
+				}
+			}
+		}		
 		
 		$ret_array = array();
+		foreach ($results as &$air) {
+			$score = intval($air["ai_score"]);
+			if ($score >= AI_CUTOFF) {
+				$air["rank"] = (int)$air["rank"] - $score;
+				$air["description"] .= " /s" . $score;
+
+				array_push($ret_array, $air);
+			}
+			else if ($debug != 0) {
+				error_log("[FILTER][AI] $score] " . $air["title"] . " (" . $air["url"] . ")");
+			}
+		}
+
+		return $ret_array;
+	}
+	
+
+	function screen_results($keywords, $min_rank, $screen, $results, $debug) {
+		
+		$ret_array = array();
+		$titles_ai_screened = array();
+		
 		foreach ($results as $key => $value) {
 			$url = $value["url"];
 			$title = $value["title"];
@@ -381,44 +471,25 @@ include_once "../common/aiutility.php";
 			}
 			
 			if ((stripos($title, "letter") !== false) || (stripos($url, "letter") !== false)) {
-				$answer = 51;
+//				$value["rank"] = 51;
+				$value["description"] .= " /s" . "51";
+				array_push($ret_array, $value);
 			}
 			else if (containsKeyword($title, $keywords)) {
-				$answer = 90;
+//				$value["rank"] = 90;
+				$value["description"] .= " /s" . "90";
+				array_push($ret_array, $value);
 			}
 			else {
-				$instru = str_replace("#title", $title, $screen);
-				$ai_returned_string = trim(query_ai($instru));
-//				error_log("ai returned string is $ai_returned_string");
-				
-				$answer = intval($ai_returned_string);
-/*				
-				if ($decoded && is_array($decoded)) {
-					$answerText = trim($decoded["text"]);
-					$answer = intval($answerText);
-					if ($answer == 0) {
-						$answer = 50;
-					}
-				}
-				else {
-					$answer = 50;
-				}
-*/				
-			}
-			
-			if ($answer >= AI_CUTOFF) {
-				$value["rank"] -= $answer;
-				$value["description"] .= " /s" . $answer;
-				if (($answer > 50) || ($value["rank"] < $min_rank))
-					array_push($ret_array, $value);
-				else {
-					error_log("[FILTER][AI-1] $answer] $title ($url)");
-				}
-			}
-			else if ($debug != 0) {
-				error_log("[FILTER][AI-2 $answer] $title");
+//				$value["rank"] = -1;
+				array_push($titles_ai_screened, $value);
 			}
 		}
+		
+		$screened = ai_screen_results($keywords, $min_rank, $screen, $titles_ai_screened, $debug);
+			
+		$ret_array = array_merge($ret_array, $screened);
+				
 	
 		return $ret_array;
 	}
