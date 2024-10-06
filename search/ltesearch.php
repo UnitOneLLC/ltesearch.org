@@ -374,7 +374,7 @@ include_once "../common/aiutility.php";
 	}
 	
 	function ai_screen_results($keywords, $min_rank, $screen, $results, $debug) {
-		$chunk_size = 20;
+		$chunk_size = 10;
 		$n_to_scan = count($results);
 		$n_processed = 0;
 		$result_array = array();
@@ -471,17 +471,14 @@ include_once "../common/aiutility.php";
 			}
 			
 			if ((stripos($title, "letter") !== false) || (stripos($url, "letter") !== false)) {
-//				$value["rank"] = 51;
 				$value["description"] .= " /s" . "51";
 				array_push($ret_array, $value);
 			}
 			else if (containsKeyword($title, $keywords)) {
-//				$value["rank"] = 90;
 				$value["description"] .= " /s" . "90";
 				array_push($ret_array, $value);
 			}
 			else {
-//				$value["rank"] = -1;
 				array_push($titles_ai_screened, $value);
 			}
 		}

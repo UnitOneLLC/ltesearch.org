@@ -23,11 +23,10 @@
 			exit(0);
 		}
 	}
-	
-	$host = parse_url($u, PHP_URL_HOST);
-	if (strncmp($host, "www.", 4) === 0) {
-		$host = substr($host, 4);
-	}
+		
+	$host = parse_url($u, PHP_URL_HOST);  // Extract the host
+	$host_parts = explode('.', $host);     // Split the host by dots
+	$host = $host_parts[count($host_parts) - 2] . '.' . $host_parts[count($host_parts) - 1];  // Combine the last two parts
 	
 	$conn = new LTE_DB();
 	$paper = $conn->fetch_paper_by_domain($host);
