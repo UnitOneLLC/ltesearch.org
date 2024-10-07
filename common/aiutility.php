@@ -7,7 +7,8 @@
 	define("OPEN_AI_COMPLETION", "https://api.openai.com/v1/completions");
 	define("OPEN_AI_CHAT_COMPLETION", "https://api.openai.com/v1/chat/completions");
 	
-	define("CLAUDE_MODEL", "claude-3-5-sonnet-20240620");
+//	define("CLAUDE_MODEL", "claude-3-5-sonnet-20240620");
+	define("CLAUDE_MODEL", "claude-3-sonnet-20240229");
 	define("CLAUDE_ENDPOINT", 'https://api.anthropic.com/v1/messages');
 	
 	function get_openai_api_key() {
