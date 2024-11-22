@@ -51,6 +51,26 @@
     function showSpinner() {
       document.getElementById("spinner").style.display="inline";
     }
+    
+    function onLoad() {
+      document.getElementById('pasteButton').addEventListener('click', async () => {
+        try {
+          // Check if the Clipboard API is available
+          if (navigator.clipboard && navigator.clipboard.readText) {
+            const text = await navigator.clipboard.readText(); // Get clipboard text
+            document.getElementById('input_url').value = text; // Set the textarea value
+          } else {
+            alert('Clipboard API not available in your browser.');
+          }
+        } catch (error) {
+          console.error('Failed to paste clipboard text:', error);
+          alert('Could not paste clipboard text. Please ensure clipboard permissions are enabled.');
+        }
+      });
+    }
+    
+  document.addEventListener('DOMContentLoaded', onLoad);
+  
   </script>
 </head>
 
@@ -68,8 +88,8 @@
     </div>
   </div>
   <div id="container">
+    <div><button id="pasteButton">Paste</button></div>
     <form method="POST">
-      <label for="input_url">Paste your letter here:</label><br>
       <textarea id="input_url" rows="25" cols="80" name="payload" value=""><?php echo($prompt);?></textarea>
       <br>
       <input type="submit" value="Submit" onclick="showSpinner()">

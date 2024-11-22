@@ -68,7 +68,7 @@ $(document).ready(function() {
             $("#region").val(reg); 
         }
         else {
-            $("#region").val("Massachusetts");
+            $("#region").val("New England");
         }
     }
 
