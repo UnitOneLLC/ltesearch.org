@@ -479,6 +479,66 @@
 			
 			return null;
 		}
+		
+		function tnt_unscramble($sInput) {
+			$sOutput = '';
+			$c = strlen($sInput); // Get the length of the string
+			
+			for ($i = 0; $i < $c; $i++) {
+				$nChar = ord($sInput[$i]); // Get the ASCII code of the character
+				
+				if ($nChar >= 33 && $nChar <= 126) {
+					// Perform the transformation
+					$sTmp = chr(33 + (($nChar - 33 + 47) % 94));
+					$sOutput .= $sTmp;
+				} else {
+					// Append the original character if it's outside the range
+					$sOutput .= $sInput[$i];
+				}
+			}
+			
+			return $sOutput;
+		}
+
+
+		function get_tnt_subscriber_text($doc) {
+			$result = '';
+			
+			// Use DOMXPath to find elements matching the selector
+			$xpath = new DOMXPath($doc);
+
+			$preview_query = "//*[contains(concat(' ', normalize-space(@class), ' '), ' subscriber-preview ')]";
+			
+			// Execute the query
+			$elements = $xpath->query($preview_query);			
+			foreach ($elements as $element) {
+
+				if ($element->tagName == 'div') {
+					$pElement = $element->getElementsByTagName('p')->item(0);
+					// Get the textContent of the element
+					$textContent = "<p>" . $pElement->textContent . "</p>";
+
+					// Concatenate the returned string to the result
+					$result .= $textContent;
+
+				}
+			}
+			
+			$body_elements = $xpath->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' subscriber-only ') and contains(concat(' ', normalize-space(@class), ' '), ' encrypted-content ')]");
+
+			foreach ($body_elements as $element) {
+				// Get the textContent of the element
+				$textContent = $element->textContent;
+				
+				// Pass it to the tnt_unscramble function
+				$unscrambled = tnt_unscramble($textContent);
+				
+				// Concatenate the returned string to the result
+				$result .= $unscrambled;
+			}
+			
+			return $result;
+		}
 
 #===================================================
 	try {	
@@ -547,6 +607,7 @@
 		}
 		
 		if (!empty($doc)) {
+			
 			dump_meta($doc);
 			
 			walkDom($doc, $preFilterDOM);
@@ -559,6 +620,7 @@
 				$using_alternates = true;
 				dbg_trace(1, "using alternates");
 			}
+
 		}
 		
 		$jsonContent = findJsonPropertyInScript($doc, "body");
@@ -576,6 +638,22 @@
 				error_log("synth article fail");
 			}
 		}
+		
+		$subscriber_text = get_tnt_subscriber_text($doc);
+		if (!empty($subscriber_text)) {
+			$subscriber_text = utf8_decode($subscriber_text);
+			$articles = array();
+			$tempDoc = new DOMDocument();
+			$tempDoc->loadHTML("<html><body><DIV id='_lteWrap2'>$subscriber_text</DIV></body></html>");
+			$jsonArt = $tempDoc->getElementById('_lteWrap2');
+			if (is_object($jsonArt)) {
+				array_unshift($articles, $jsonArt);
+			}
+			else {
+				error_log("synth article fail 2");
+			}
+		}
+
 	}
 	catch (Exception $e) {
 		echo 'Reader encountered an error: ',  $e->getMessage(), "<br>";
