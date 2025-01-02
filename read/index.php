@@ -284,7 +284,7 @@
 		
 		$html = $p->ownerDocument->saveHTML($p);
 		dbg_trace(4, "html before utf-8 decode", $html);
-		if ($need_utf8_decode) {
+		if ($need_utf8_decode  || mb_check_encoding($html, 'UTF-8');) {
 			$html = utf8_decode($html);
 			dbg_trace(4, "html after utf-8 decode", $html);			
 		}
@@ -588,7 +588,7 @@
 			dbg_trace(1, "publish time: ", $pub_time);
 			$by_line = getByLine($metas);
 			
-			$need_utf8_decode  = (strcasecmp($charset, "utf-8") !== 0 or $host=='washingtonpost.com');
+			$need_utf8_decode  = (strcasecmp($charset, "utf-8") !== 0);
 
 			$titles = $doc->getElementsByTagName("title");
 			if (count($titles) > 0) {

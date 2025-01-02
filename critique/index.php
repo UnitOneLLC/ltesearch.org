@@ -1,7 +1,7 @@
 <?php
   include_once "../common/version.php";
   include_once "../common/aiutility.php";
-  define("PREAMBLE", "Critique this letter-to-the-editor. Do not rewrite it. First, report the count of words in the letter. If the word count is more than 200, include a warning that the guidelines usually suggest a maximum of 200 words. Then, give a list of its strengths and weaknesses. Also, very important, point out grammatical, syntax, and spelling errors. You may also suggest minor wording changes if they would improve clarity. Format the response using HTML. Headings and Listed items must start on a new line. Here is the letter: ");
+  define("PREAMBLE", "Critique this letter-to-the-editor. Do not rewrite it. First, report the count of words in the letter. If the word count is more than 200, include a warning that the guidelines usually suggest a maximum of 200 words. Then, give a list of its strengths and weaknesses. Also, very important, point out grammatical, syntax, and spelling errors. You must also note whether or not the letter is coherent and expresses a clear viewpoint. You may also suggest minor wording changes if they would improve clarity. Format the response using HTML. Headings and Listed items must start on a new line. Here is the letter: ");
 ?>
 <!DOCTYPE html>
 <head>
@@ -90,7 +90,7 @@
   <div id="container">
     <div><button id="pasteButton">Paste</button></div>
     <form method="POST">
-      <textarea id="input_url" rows="25" cols="80" name="payload" value=""><?php echo($prompt);?></textarea>
+      <textarea id="input_url" rows="25" cols="80" name="payload" value=""></textarea>
       <br>
       <input type="submit" value="Submit" onclick="showSpinner()">
       <img id="spinner" style="display:none;padding-left:3px;height:25px;vertical-align:sub" src="loading_spinner.gif">
@@ -111,8 +111,6 @@
       <body>
         <div id="container">
           <div id="inner">
-            <?php echo($ai_prompt);?>
-            <br>
             <?php echo($answer)?>
           </div>
           <div>
