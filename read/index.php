@@ -123,6 +123,8 @@
 	};
 
 	$preFilterDOM = function($elem) {
+		global $targetHostPrefix;
+
 		if ($elem->nodeName == 'img') {
 			$src = $elem->getAttribute("src");
 			$url = parse_url($src);
@@ -136,7 +138,7 @@
 		}
 		else if ($elem->nodeName == "div") {
 			$cls = $elem->getAttribute("class");
-			if ($cls == "subscriber-only") { // mdjonline.com
+			if (strpos($cls, "subscriber-only") !== false) { // mdjonline.com
 				$elem->setAttribute("style", "display:block");
 			}
 		}
@@ -169,12 +171,12 @@
 		foreach ($metas as $node) {
 			$cs = $node->getAttribute("charset");
 			if (!empty($cs)) {
-				return $cs;
+				return trim($cs);
 			}
 			else {
 				$cs = $node->getAttribute("charSet");
 				if (!empty($cs)) {
-					return $cs;
+					return trim($cs);
 				}
 				else {
 					$cs = $node->getAttribute("content");
@@ -284,7 +286,7 @@
 		
 		$html = $p->ownerDocument->saveHTML($p);
 		dbg_trace(4, "html before utf-8 decode", $html);
-		if ($need_utf8_decode  || mb_check_encoding($html, 'UTF-8');) {
+		if ($need_utf8_decode) {
 			$html = utf8_decode($html);
 			dbg_trace(4, "html after utf-8 decode", $html);			
 		}
@@ -501,6 +503,45 @@
 		}
 
 
+		function hasClass(DOMElement $element, string $className): bool {
+			// Get the class attribute
+			$classAttr = $element->getAttribute('class');
+			
+			// Split the class attribute into an array of individual classes
+			$classes = explode(' ', $classAttr);
+			
+			// Check if the desired class is in the array
+			return in_array($className, $classes, true);
+		}
+		
+		function setDisplayBlock(DOMElement $element): void {
+			// Get the current 'style' attribute
+			$styleAttr = $element->getAttribute('style');
+			
+			// Parse existing styles into an associative array
+			$styles = [];
+			if (!empty($styleAttr)) {
+				foreach (explode(';', $styleAttr) as $style) {
+					$style = trim($style);
+					if (empty($style)) {
+						continue;
+					}
+					[$property, $value] = explode(':', $style, 2);
+					$styles[trim($property)] = trim($value);
+				}
+			}
+			
+			// Set the 'display' property to 'block'
+			$styles['display'] = 'block';
+			
+			// Rebuild the style attribute string
+			$newStyleAttr = '';
+			foreach ($styles as $property => $value) {
+				$newStyleAttr .= "$property: $value; ";
+			}
+			$element->setAttribute('style', trim($newStyleAttr));
+		}
+		
 		function get_tnt_subscriber_text($doc) {
 			$result = '';
 			
@@ -512,7 +553,6 @@
 			// Execute the query
 			$elements = $xpath->query($preview_query);			
 			foreach ($elements as $element) {
-
 				if ($element->tagName == 'div') {
 					$pElement = $element->getElementsByTagName('p')->item(0);
 					// Get the textContent of the element
@@ -523,20 +563,28 @@
 
 				}
 			}
-			
+/*			
 			$body_elements = $xpath->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' subscriber-only ') and contains(concat(' ', normalize-space(@class), ' '), ' encrypted-content ')]");
+*/
+			
+			$body_elements = $xpath->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' subscriber-only ')]");
 
-			foreach ($body_elements as $element) {
+			foreach ($body_elements as $element) {				
 				// Get the textContent of the element
 				$textContent = $element->textContent;
 				
-				// Pass it to the tnt_unscramble function
-				$unscrambled = tnt_unscramble($textContent);
-				
-				// Concatenate the returned string to the result
-				$result .= $unscrambled;
+				if (hasClass($element, "encrypted-content")) {
+					// Pass it to the tnt_unscramble function
+					$unscrambled = tnt_unscramble($textContent);
+					
+					// Concatenate the returned string to the result
+					$result .= $unscrambled;
+				}
+				else {
+					setDisplayBlock($element);
+					$result .= $textContent;
+				}
 			}
-			
 			return $result;
 		}
 
@@ -588,7 +636,9 @@
 			dbg_trace(1, "publish time: ", $pub_time);
 			$by_line = getByLine($metas);
 			
-			$need_utf8_decode  = (strcasecmp($charset, "utf-8") !== 0);
+			$need_utf8_decode  = (strcasecmp($charset, "utf-8") !== 0) ||
+				str_contains($host, "gazettenet") ||
+				str_contains($host, "recorder");
 
 			$titles = $doc->getElementsByTagName("title");
 			if (count($titles) > 0) {
@@ -817,7 +867,7 @@
 					walkDom($article, $paraVisit);
 				}
 			}
-			if ($found_para_count < 5 and !$using_alternates) {
+			if ($found_para_count < 50 and !$using_alternates) {
 				dbg_trace(1, "walk alternates with paragraph vist");				
 				$articles = getAlternateArticles($doc);
 				foreach($articles as $article) {
