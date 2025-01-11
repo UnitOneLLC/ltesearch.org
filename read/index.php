@@ -867,7 +867,7 @@
 					walkDom($article, $paraVisit);
 				}
 			}
-			if ($found_para_count < 50 and !$using_alternates) {
+			if ($found_para_count < 12 and !$using_alternates) {
 				dbg_trace(1, "walk alternates with paragraph vist");				
 				$articles = getAlternateArticles($doc);
 				foreach($articles as $article) {
