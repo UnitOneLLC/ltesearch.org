@@ -5,6 +5,7 @@
 	
 	$using_alternates = false;
 	$trace = 0;
+	$outputStrings = array();
 	$user_agents = [ #https://developers.whatismybrowser.com/useragents/parse/
 		"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.58",
 		"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/113.0",
@@ -103,6 +104,7 @@
 	$paraVisit = function($elem) {
 		global $found_para_count;
 		global $preFilterDOM;
+		global $outputStrings;
 
 		if ($elem->nodeName == 'p') {
 			// Get the child nodes
@@ -117,8 +119,12 @@
 				}
 			}
 			
-			echo "<p>" . innerHtml($elem) . "</p>";
-			$found_para_count++;
+			$paraText = innerHtml($elem);
+			if (!in_array($paraText, $outputStrings)) {
+				$outputStrings[] = $paraText;
+				echo "<p>" . $paraText . "</p>";
+				$found_para_count++;
+			}
 		}
 	};
 
@@ -587,7 +593,31 @@
 			}
 			return $result;
 		}
-
+		
+		function get_fusion_data($doc) {
+			// Find the <script> element with id="fusion-metadata"
+			$scriptElement = $doc->getElementById('fusion-metadata');
+			if ($scriptElement) {
+				// Extract the JSON content from the <script> element
+				$jsonContent = $scriptElement->nodeValue;
+				
+				// Define a pattern to match the substrings between "content": and "type":
+				$pattern = '/\\"content\\":\\"(.*?)\\",\\"type\\":/';
+				
+				// Perform the matching using preg_match_all
+				preg_match_all($pattern, $jsonContent, $matches);
+				
+				// Extract the results from the matches array
+				$result = "";
+				if (!empty($matches[1])) {
+					foreach ($matches[1] as $s) {
+						$result .= "<p>" . $s . "</p>";
+					}
+					return $result;
+				}
+			} 
+			return null;
+		}
 #===================================================
 	try {	
 		$trace_param = @$_GET['trace'];
@@ -690,14 +720,23 @@
 		}
 		
 		$subscriber_text = get_tnt_subscriber_text($doc);
+
+		if (empty($subscriber_text)) {
+			$subscriber_text = get_fusion_data($doc);
+		}
+
 		if (!empty($subscriber_text)) {
 			$subscriber_text = utf8_decode($subscriber_text);
+			
 			$articles = array();
 			$tempDoc = new DOMDocument();
-			$tempDoc->loadHTML("<html><body><DIV id='_lteWrap2'>$subscriber_text</DIV></body></html>");
+			$synthDocText = "<html><body><DIV id='_lteWrap2'>$subscriber_text</DIV></body></html>";
+
+			$tempDoc->loadHTML($synthDocText);
 			$jsonArt = $tempDoc->getElementById('_lteWrap2');
 			if (is_object($jsonArt)) {
-				array_unshift($articles, $jsonArt);
+				$articles = array($jsonArt);
+//				array_unshift($articles, $jsonArt);
 			}
 			else {
 				error_log("synth article fail 2");
