@@ -413,8 +413,7 @@
 			echo "<br>";
 		}
 	}
-	
-	
+		
 	function remove_from_cache($url) {
 		try {
 			$conn = new LTE_DB();
@@ -600,10 +599,11 @@
 			if ($scriptElement) {
 				// Extract the JSON content from the <script> element
 				$jsonContent = $scriptElement->nodeValue;
-				
+				if (!mb_check_encoding($jsonContent, 'UTF-8')) {
+					$jsonContent = mb_convert_encoding($jsonContent, 'UTF-8', 'ISO-8859-1'); // Adjust source encoding if needed
+				}
 				// Define a pattern to match the substrings between "content": and "type":
-				$pattern = '/\\"content\\":\\"(.*?)\\",\\"type\\":/';
-				
+				$pattern = '/\\"content\\":\\"(.*?)\\",\\"type\\":/u';
 				// Perform the matching using preg_match_all
 				preg_match_all($pattern, $jsonContent, $matches);
 				
@@ -611,6 +611,7 @@
 				$result = "";
 				if (!empty($matches[1])) {
 					foreach ($matches[1] as $s) {
+//						dbg_trace(4, bin2hex($s) . PHP_EOL);
 						$result .= "<p>" . $s . "</p>";
 					}
 					return $result;
@@ -726,12 +727,12 @@
 		}
 
 		if (!empty($subscriber_text)) {
-			$subscriber_text = utf8_decode($subscriber_text);
 			
 			$articles = array();
 			$tempDoc = new DOMDocument();
-			$synthDocText = "<html><body><DIV id='_lteWrap2'>$subscriber_text</DIV></body></html>";
 
+			$synthDocText = "<html><meta charset='utf-8'><body><DIV id='_lteWrap2'>$subscriber_text</DIV></body></html>";
+			
 			$tempDoc->loadHTML($synthDocText);
 			$jsonArt = $tempDoc->getElementById('_lteWrap2');
 			if (is_object($jsonArt)) {
