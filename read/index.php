@@ -603,7 +603,8 @@
 					$jsonContent = mb_convert_encoding($jsonContent, 'UTF-8', 'ISO-8859-1'); // Adjust source encoding if needed
 				}
 				// Define a pattern to match the substrings between "content": and "type":
-				$pattern = '/\\"content\\":\\"(.*?)\\",\\"type\\":/u';
+//				$pattern = '/\\"content\\":\\"(.*?)\\",\\"type\\":/u';
+				$pattern = '/\\"content\\":\\"(.*?)\\",\\"type\\:\\"text\\":/u';
 				// Perform the matching using preg_match_all
 				preg_match_all($pattern, $jsonContent, $matches);
 				
