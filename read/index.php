@@ -55,6 +55,7 @@
 		global $using_alternates;
 		global $preFilterDOM;
 		global $paraVisit;
+		global $outputStrings;
 		
 		if ($elem->nodeName == 'article' or ($using_alternates and (($elem->nodeName == 'div') or ($elem->nodeName == 'section')))) {
 			$visited = $elem->getAttribute("ltesearch");
@@ -70,31 +71,36 @@
 			if ((stripos($cls, "byline") !== false) || 
 				(stripos($cls, "by_") !== false) ||
 				(stripos($cls, "authors") !== false)) {
-				echo innerHtml($elem);
+				$byline = innerHtml($elem);
+				if (!in_array($byline, $outputStrings)) {
+					array_push($outputStrings, $byline);
+					echo innerHtml($elem);					
+				}
 				return;
 			}
 			$cls = $elem->getAttribute("class");
 			if ($cls == "subscriber-only") { // mdjonline.com
 				$elem->setAttribute("style", "display:block");
-				echo "<p>" . innerHtml($elem) . "</p>";
+				$byline = innerHtml($elem);
+				if (!in_array($byline, $outputStrings)) {
+					array_push($outputStrings, $byline);
+					echo "<p>" . innerHtml($elem) . "</p>";
+				}
 			}
 		}
 		
 		fixAnchorUrl($elem);
 		
 		if (looksLikeArticleBody($elem)) {
-			$text = "";
+
 			$child = $elem->firstChild;
 			do {
 				if ($child->nodeName == 'p') {
 					$paraVisit($child);
-//					$text = $text . "<p>" . innerHtml($child) . "</p>";
-//					$found_para_count++;
 				}
 				$child = $child->nextSibling;
 			} while ($child != null);
 			
-			echo $text;
 			return true;
 		}
 	
@@ -120,8 +126,8 @@
 			}
 			
 			$paraText = innerHtml($elem);
-			if (!in_array($paraText, $outputStrings)) {
-				$outputStrings[] = $paraText;
+			if (!in_array(trim($paraText), $outputStrings)) {
+				$outputStrings[] = trim($paraText);
 				echo "<p>" . $paraText . "</p>";
 				$found_para_count++;
 			}
@@ -881,7 +887,7 @@
 		<div style="margin:8px 0"><?php insertImage(); ?></div>
 	</div>
 	<?php 
-			if (!empty($by_line)) { ?>
+			if (!empty($by_line) && !in_array($by_line, $outputStrings)) { ?>
 				<div style="font-style: italic;"><?php echo $by_line?></div>
 			<?php
 			}
