@@ -35,7 +35,7 @@
 		return "error obsolete"; 
 	}
 	
-	function suggest_angles($topic, $url, $pro, $text, $extra, $max_tokens = 800, $temperature = 1.0) {
+	function suggest_angles($tp_only, $topic, $url, $pro, $text, $extra, $max_tokens = 800, $temperature = 1.0) {
 		$head = substr(sanitizeString($text), 0, INPUT_SIZE);
 
 		$conn = new LTE_DB();
@@ -45,9 +45,13 @@
 			$key_phrase = 'climate change';
 		if (empty($extra)) 
 			$extra="";
-		$instru = get_ai_draft_prompt() . " " . $extra . " Here is the article: " . $head;		
+		$instru = get_ai_draft_prompt() . " " . $extra;
+		if ($tp_only == "true") {
+			$instru .= "Do not generate a letter. Only generate an HTML-formatted bullet list of talking points. Emit just the HTML-formatted list without introduction.";
+		}
+		$instru .= " Here is the article: " . $head;		
 		$instru = str_replace("#key_phrase", $key_phrase, $instru);
-error_log($instru);
+
 		$response = query_ai($instru);
 		return json_encode(array("text" => extractToTheEditorSubstring($response)));
 /*	
@@ -133,11 +137,14 @@ error_log($instru);
 	}
 	
 	$pro = $_GET['pro'];
-	if ($pro == '0')
+	if ($pro == '0') {
 		$pro = false;
-	else 
+	}
+	else {
 		$pro = true;
+	}
 
+	$tp_only = isset($_GET['tp-only']) ? $_GET['tp-only'] : null;
 
 	$req = $_GET['req'];
 	if ($req == 'tp') {
@@ -145,7 +152,7 @@ error_log($instru);
 	}
 	else if ($req = 'angles') {
 		$extra = $_GET['extra'];
-		echo suggest_angles($topic, $u, $pro, $innerText, $extra);
+		echo suggest_angles($tp_only, $topic, $u, $pro, $innerText, $extra);
 	}
 	else {
 		echo ("Bad request. No request type was given.");

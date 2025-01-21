@@ -12,8 +12,25 @@ $(document).ready(function() {
 	$("#btn-copy-ai").click(onCopyAi);
 	$("#btn-copy-ai").attr("disabled", true);
 	$("#post-ai-notice").hide();
+	$("#ckbox-tponly").change(onTalkingPointsChange);
+	$("#add-instructions-dropdown").hide();
+	$("#post-ai-notice").hide();
+
 	setupAuthor();
 });
+
+function onTalkingPointsChange() {
+	if ($("#ckbox-tponly").is(":checked")) {
+		$("#add-instructions-dropdown").hide();
+		$("#post-ai-notice").hide();
+		$("#btn-get-angles").text("Get talking points");
+	} else {
+		$("#add-instructions-dropdown").show();
+		$("#post-ai-notice").show();
+		$("#btn-get-angles").text("Draft letter");
+	}
+}
+
 
 function onGetTalkingPoints() {
 	var pro = true;
@@ -58,6 +75,8 @@ function onSuggestAngles() {
 	if (extra && extra.length > 0) {
 		url += "&extra=" + encodeURIComponent(extra);
 	}
+	var tpOnly = $("#ckbox-tponly").is(":checked");
+	url += "&tp-only=" + tpOnly;
 	
 	$.ajax(url)
 	.done((resultString)=>{

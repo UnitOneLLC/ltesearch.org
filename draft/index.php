@@ -187,11 +187,12 @@
 					<td style="width:15%; vertical-align: top;" colspan="2">
 						<div id="tpdiv">
 							<div>
-								<button id="btn-get-angles">Get suggestions</button>
-								<span style="font-style: italic">&nbsp;(Generates a first draft of your letter)</span>
+								<button id="btn-get-angles">Get talking points</button>
+								<span style="font-style: italic">&nbsp;</span>
+								<input id="ckbox-tponly" type="checkbox" checked><span>Talking points only</span>
 							</div>
 							<div>
-								<details>
+								<details id="add-instructions-dropdown">
 									<summary>Add instructions</summary>
 									<div><em>Enter here any specific points you want included in the letter.</em></div>
 									<textarea style="width:80%" id="extra-prompt"></textarea>
