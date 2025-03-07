@@ -156,7 +156,7 @@ $(document).ready(function() {
 });
 
 function isFirefox() {
-    return !(navigator.clipboard && navigator.clipboard.write);
+    return navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 }
 
 function createRow(seq, paperName, text, data) {
@@ -307,7 +307,7 @@ function doCopy() {
                     "</table>";
 
         if (isFirefox())
-            markUp += "<span style='font-weight:default'>&nbsp;</span>";
+            markUp += "<span style='font-weight:default;color:transparent'>.&nbsp;</span><span style='color:default;'>&nbsp;&nbsp</span>";
         
         $(container).append(markUp);
     }

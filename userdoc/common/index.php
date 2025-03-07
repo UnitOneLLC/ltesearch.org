@@ -197,7 +197,7 @@ define("LOGOCLASS","logo-350");
           <span class="tam-indent w3-text-grey">[<?=EMAILSUBJLINE?>] Document shared with you: "LTE Boston Globe- Nature in cities is important t"</span>
         </p>
         <p>Clicking on the link in the email opens the Google doc for the letter you're reviewing. Once you're there, any changes you make to the draft will
-          be recorded and displayed as changes that the author can either either accept or reject. 
+          be recorded and displayed as changes that the author can either accept or reject. 
         </p>
         <p>Another common practice is to select a section of text in the draft, which will cause this symbol to appear on the right margin:<br>
           <img src="../image/comment.png" class="tam-indent tam-width-reduced-more" alt="comment control icons"> <br>

@@ -82,7 +82,7 @@
     <header>Letter Critique</header>
     <div id="instructions">
         After you have a draft of your letter, you can copy it to the clipboard and
-        paste it into the form below. Click <b>Submit</b>, and the AI will assess the
+        paste it into the form below. Click <b>Get Critique</b>, and the AI will assess the
         strengths and weaknesses of your letter, as well as checking for grammatical
         errors.
     </div>
@@ -92,7 +92,7 @@
     <form method="POST">
       <textarea id="input_url" rows="25" cols="80" name="payload" value=""></textarea>
       <br>
-      <input type="submit" value="Submit" onclick="showSpinner()">
+      <input type="submit" value="Get Critique" onclick="showSpinner()">
       <img id="spinner" style="display:none;padding-left:3px;height:25px;vertical-align:sub" src="loading_spinner.gif">
       <input type="hidden" id="action" name="action" value="openai">
     </form>

@@ -38,9 +38,11 @@
 		if ($elem->nodeName == 'a') {
 			$href = $elem->getAttribute("href");
 			$url = parse_url($href);
+			$href = str_replace('"', '', $href);
+			$href = str_replace('\\', '', $href);
 			dbg_trace(1, "Fix anchor URL " . $href);
-
-			if (empty($url["host"]) || (substr($href, 0, 1) === '/')) {
+			$elem->setAttribute("href", $href);
+			if (substr($href, 0, 4) !== 'http') {
 				$href = $targetHostPrefix . $href;
 				dbg_trace(1, "set href on fixed anchor to $href");
 				$elem->setAttribute("href", $href);
@@ -370,7 +372,6 @@
 			$conn = new LTE_DB();
 			$paper = $conn->fetch_paper_by_domain($host);
 			$conn = null;
-			
 			if (!empty($paper["lteaddr"])) {
 				$link = "https://ltesearch.org/draft?z=" . encode_url($u);
 	?>
@@ -609,18 +610,17 @@
 					$jsonContent = mb_convert_encoding($jsonContent, 'UTF-8', 'ISO-8859-1'); // Adjust source encoding if needed
 				}
 				// Define a pattern to match the substrings between "content": and "type":
-//				$pattern = '/\\"content\\":\\"(.*?)\\",\\"type\\":/u';
-				$pattern = '/\\"content\\":\\"(.*?)\\",\\"type\\:\\"text\\":/u';
+				$pattern = '/"content":"(.*?)","type":"text"/u';
 				// Perform the matching using preg_match_all
 				preg_match_all($pattern, $jsonContent, $matches);
-				
 				// Extract the results from the matches array
 				$result = "";
 				if (!empty($matches[1])) {
 					foreach ($matches[1] as $s) {
 //						dbg_trace(4, bin2hex($s) . PHP_EOL);
-						$result .= "<p>" . $s . "</p>";
-					}
+						if (strpos($s, '{"') === false)
+							$result .= "<p>" . $s . "</p>";
+						}
 					return $result;
 				}
 			} 
