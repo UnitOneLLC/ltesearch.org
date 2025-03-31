@@ -9,12 +9,12 @@ class LTE_DB {
 	/*
 	 * Get a connection to the lte search database. Throws on failure.
 	 */
-	function __construct($bWrite=false) {
+	function __construct($bWrite=false, $etc_path="../../etc/ltesearch.org/") {
 		if ($bWrite) {
-			$dbjson = file_get_contents("../../etc/ltesearch.org/db-write.json");
+			$dbjson = file_get_contents($etc_path . 'db-write.json');
 		}
 		else {
-			$dbjson = file_get_contents("../../etc/ltesearch.org/db.json");
+			$dbjson = file_get_contents($etc_path . "db.json");
 		}
 		$dbarr = json_decode($dbjson, TRUE);
   
@@ -219,7 +219,40 @@ class LTE_DB {
 		}
 		return $result[0];
 	}
+	/*
+	 * Fetch rows from the 'pubs' table with optional team filter and limit.
+	 */
+	function fetch_pubs($max_rows, $team = '') {
+		try {
+			$sql = "SELECT * FROM pubs";
+			$params = [];
 
+			// Add team filter if provided
+			if (!empty($team)) {
+				$sql .= " WHERE team = :team";
+				$params[':team'] = $team;
+			}
+
+			// Add sorting and limit
+			$sql .= " ORDER BY date DESC LIMIT :max_rows";
+			$params[':max_rows'] = (int)$max_rows;
+
+			$stmt = $this->_conn->prepare($sql);
+
+			// Bind parameters
+			foreach ($params as $key => $value) {
+				$stmt->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
+			}
+
+			$stmt->execute();
+			$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+			$stmt = null;
+			return $result;
+		} catch (PDOException $e) {
+			error_log("PDO Exception: " . $e->getMessage());
+			return [];
+		}
+	}
 	/*
 	 * store text in article cache for URL
 	 */
