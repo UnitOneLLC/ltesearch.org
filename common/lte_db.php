@@ -229,7 +229,7 @@ class LTE_DB {
 
 			// Add team filter if provided
 			if (!empty($team)) {
-				$sql .= " WHERE team = :team";
+				$sql .= " WHERE (team = :team OR team = '')";
 				$params[':team'] = $team;
 			}
 

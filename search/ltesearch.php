@@ -21,12 +21,6 @@ define('UNKNOWN_TOPIC', 'Unknown topic specified');
 define('BAD_FILTER_VALUE', 'Invalid filter argument');
 define('HIGHLIGHT_THRESHOLD',4);
 define('AUTH_ERROR', 'Authentication error');
-//define('AI_SCREEN_TEMPLATE', 'Would you guess that the subject matter of a news article entitled "#title" is related to any of the following: #subjects? Answer one of the following: Very likely, Maybe, Very unlikely.');
-
-//define('AI_SCREEN_TEMPLATE', 'On a scale of 1 to 100, where 1 means very unlikely, how likely is a news article entitled "#title" to be related to one of the following subjects: #subjects ? Do not give your reasoning. If the title is probably for a press release, the rank is 1. Divide score by 2 if the articles ia about a country other than the United States. Your answer must always be a single number, the maximum score over all the given subjects.');
-
-define('AI_SCREEN_TEMPLATE', 'I will give you a JSON array. Each element in the array is an associative array. Your job is to return the full array after adding to each element a new key-value pair. The key of the new key-value pair is "s". The value of "s" is an integer. You compute the value of "s" based on the value of the "title" key in the same associative array. Assign to the "s" value the probability from 0 to 100 that a newspaper article whose title is given in the "title" value is related to any of the following subjects: #subjects. If the title indicates that the article is a corporate press release, the value of "s" must be 1. Return ONLY the updated JSON array without any additional preface, explanation or comment. Here is the JSON array:');
-
 
 define('MIN_RANK', 10);
 define('AI_CUTOFF', 30);
@@ -348,12 +342,14 @@ include_once "../common/aiutility.php";
 	function build_ai_screen_prompt_template($topic) {
 		try {
 			$conn = new LTE_DB();
+			$template = $conn->get_parameter("ai_screen_template");
+
 			$subjects = $conn->fetch_screen_subjects($topic);
 			if (count($subjects) === 0) {
 				return null;
 			}
 			$subj_list = implode(",", $subjects);
-			$prompt = str_replace("#subjects", $subj_list, AI_SCREEN_TEMPLATE);
+			$prompt = str_replace("#subjects", $subj_list, $template);
 			$conn = null;			
 			return $prompt;
 		}

@@ -2,7 +2,15 @@
 	include_once("../../common/version.php");
 	include_once("../../common/lte_db.php");
 	include_once("../../common/urlcode.php");
-	
+
+  if (!defined("TEAM")) {
+    define("LOGOCLASS", "logo-dual");
+    define("IMGPATH", ".");
+    define("LOGONAME", "dual-team.png");
+    define("WGNAME", "");
+    define("TEAM", "");
+  }
+
 define("MAX_PUBS", 100);
 /*
 
