@@ -208,5 +208,24 @@
 		return $answerText;
 	}
 
+	function suggest_angles($tp_only, $topic, $url, $pro, $text, $extra, $max_tokens = 800, $temperature = 1.0) {
+		$head = substr(sanitizeString($text), 0, INPUT_SIZE);
 
+		$conn = new LTE_DB();
+		$key_phrase = $conn->fetch_key_ai_screen_phrase_for_topic($topic);
+		$conn = null;
+		if (is_null($key_phrase))
+			$key_phrase = 'climate change';
+		if (empty($extra)) 
+			$extra="";
+		$instru = get_ai_draft_prompt() . " " . $extra;
+		if ($tp_only == "true") {
+			$instru .= "Do not generate a letter. Only generate an HTML-formatted bullet list of talking points. Emit just the HTML-formatted list without introduction.";
+		}
+		$instru .= " Here is the article: " . $head;		
+		$instru = str_replace("#key_phrase", $key_phrase, $instru);
+
+		$response = query_ai($instru);
+		return json_encode(array("text" => extractToTheEditorSubstring($response)));
+	}
 ?>

@@ -32,6 +32,21 @@ include "../common/version.php";
             margin: auto;
             padding: 10px;
         }
+        .tp-wait {
+            background-color: red;
+            color: white;
+            cursor: default;
+        }
+        .tp-ready {
+            background-color: green;
+            color: white;
+            cursor: default;
+        }
+        .tp-btn {
+            border-radius: 5px;
+            padding: 3px;
+            cursor: pointer;
+        }
         
         @media  (min-width: 600px) {
         	#container, #adder {

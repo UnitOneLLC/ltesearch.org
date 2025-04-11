@@ -33,6 +33,7 @@ var DATA_TABLE_OPTIONS = {
         },
         /* del btn */ {type: "html"},
         /* paper   */ {type: "text"},
+        /* tp btn  */ {type: "html"},
         /* title   */ {type: "html"},
     ],
     'drawCallback': function (settings) {
@@ -47,6 +48,10 @@ var DATA_TABLE_OPTIONS = {
                     var rowData = rowObj.data();
                     rowData[0] = getZeroPaddedStringForInt(i-1);
                     rowObj.data(rowData);
+                }
+                if (tRowElem.__lte.tp) {
+                    var tpSpan = $(tRowElem).find(".tp-btn")[0];
+                    $(tpSpan).addClass("tp-ready");
                 }
             }
         }
@@ -149,6 +154,29 @@ function rowFromSeq(seq) {
     return null;
 }
 
+function showSpin(show, id) {
+}
+
+function getTalkingPoints(tpCell, event) {
+	var pro = true;
+	var lteObj = $(tpCell).parents("tr").prop("__lte");
+    var targetUrl = lteObj.url;
+	var url = "../draft/aitp.php?u=" + targetUrl + "&pro=" + pro + "&req=angles" + "&topic=" + "climate change";
+	url += "&tp-only=true";
+    
+    $(tpCell).addClass("tp-wait").prop("disabled", true);
+	$.ajax(url)
+	.done((resultString)=>{
+        $(tpCell).removeClass("tp-wait").addClass("tp-ready");
+        $(tpCell).removeAttr("onclick");
+        lteObj.tp = JSON.parse(resultString);
+    })
+	.fail((e)=>{
+		alert("Unable to get angle suggestions: " + e);
+        $(btn).removeClass("tp-wait");
+    });
+}
+
 $(document).ready(function() {
     $("#copy-btn").click(doCopy);
     $("#add-url-btn").click(doAddUrl);
@@ -167,20 +195,21 @@ function createRow(seq, paperName, text, data) {
     var delBtnCell = document.createElement("td");
     var paperCell = document.createElement("td");
     var linkCell = document.createElement("td");
-
+    var tpBtnCell = document.createElement("td");
     seq = getZeroPaddedStringForInt(seq);
 
     row.appendChild(seqCell);
     row.appendChild(arrowsCell);
     row.appendChild(delBtnCell);
     row.appendChild(paperCell);
+    row.appendChild(tpBtnCell);
     row.appendChild(linkCell);
-    
-    
+        
     seqCell.appendChild(document.createTextNode(seq));
     delBtnCell.innerHTML = "<span onclick='deleteRow(this)' class=del-btn>x</span>";
     $(delBtnCell).addClass("del-btn");
     paperCell.appendChild(document.createTextNode(paperName));
+    tpBtnCell.innerHTML = "<span class='tp-btn' onclick='getTalkingPoints(this, event)'>TP</span>";
     linkCell.appendChild(document.createTextNode(text));
     
     return row;
@@ -289,7 +318,11 @@ function doCopy() {
         
         var textLink = textLinkStem + lteObjs[i].zlink;
         var draftLink = draftLinkStem + lteObjs[i].zlink;
-        var markUp ="<table style='" + cssTable + "'>" +
+        var markUp = ""
+        if (lteObjs[i].tp) {
+            markUp = lteObjs[i].tp.text;
+        }
+        markUp +="<table style='" + cssTable + "'>" +
                         "<tr>" +
                             "<td style='"+ cssPaperCell + "'>" + // paper
                                 lteObjs[i].paper +
