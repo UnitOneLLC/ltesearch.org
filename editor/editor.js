@@ -49,7 +49,7 @@ var DATA_TABLE_OPTIONS = {
                     rowData[0] = getZeroPaddedStringForInt(i-1);
                     rowObj.data(rowData);
                 }
-                if (tRowElem.__lte.tp) {
+                if (tRowElem.__lte && tRowElem.__lte.tp) {
                     var tpSpan = $(tRowElem).find(".tp-btn")[0];
                     $(tpSpan).addClass("tp-ready");
                 }
@@ -378,6 +378,7 @@ function doAddUrl() {
                 newRow.childNodes[2].innerHTML,
                 newRow.childNodes[3].innerHTML,
                 newRow.childNodes[4].innerHTML,                
+                newRow.childNodes[5].innerHTML                
             ]);
             
             gDataTable.draw();
